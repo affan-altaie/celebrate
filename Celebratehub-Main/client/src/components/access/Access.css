@@ -116,12 +116,9 @@
   }
   
   .error-message {
-    background-color: #ffebee;
     color: #c62828;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-    text-align: center;
+    font-size: 12px;
+    margin-top: 5px;
   }
   
   .verification-success {
@@ -202,4 +199,30 @@
   
   .password-requirements li {
     margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+  }
+
+  .password-requirements li.valid {
+    color: green;
+  }
+
+  .password-requirements li.invalid {
+    color: red;
+  }
+
+  .password-requirements li::before {
+    content: " ";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+  }
+  
+  .password-requirements li.valid::before {
+    content: "✓";
+  }
+  
+  .password-requirements li.invalid::before {
+    content: "✗";
   }

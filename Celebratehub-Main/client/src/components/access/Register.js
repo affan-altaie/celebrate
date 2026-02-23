@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Access.css";
 import logo2 from "../../assets/logo2-cut.png";
@@ -26,19 +26,19 @@ const Register = () => {
     specialChar: false,
   });
 
-  const validate = () => {
+  const validate = useCallback(() => {
     const errors = {};
     if (!formData.username) {
       errors.username = "Username is required";
     }
     if (!formData.email) {
       errors.email = "Email is required";
-    } else if (!/\\S+@\\S+\\.\\S+/.test(formData.email)) {
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(formData.email)) {
       errors.email = "Email address is invalid";
     }
     if (!formData.phoneNumber) {
       errors.phoneNumber = "Phone number is required";
-    } else if (!/^[79]\\d{7}$/.test(formData.phoneNumber)) {
+    } else if (!/^[79][0-9]{7}$/.test(formData.phoneNumber)) {
       errors.phoneNumber = "Phone number must be 8 digits and start with 7 or 9";
     }
     if (!formData.password) {
@@ -51,12 +51,12 @@ const Register = () => {
       errors.location = "Business location is required";
     }
     return errors;
-  };
+  }, [formData]);
 
   useEffect(() => {
     const errors = validate();
     setFormErrors(errors);
-  }, [formData]);
+  }, [validate]);
 
 
   const validatePassword = (password) => {

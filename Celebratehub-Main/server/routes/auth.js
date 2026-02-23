@@ -176,7 +176,8 @@ router.post("/login", async (req, res) => {
         email: user.email,
         role: user.role,
         profilePicture: user.profilePicture,
-        phoneNumber: user.phoneNumber
+        phoneNumber: user.phoneNumber,
+        location: user.location
       }
     });
   } catch (error) {

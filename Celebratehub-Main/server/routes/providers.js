@@ -107,4 +107,18 @@ router.put("/:id/reject", async (req, res) => {
   }
 });
 
+// Get provider by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const provider = await User.findById(req.params.id);
+    if (!provider || provider.role !== "provider") {
+      return res.status(404).json({ message: "Provider not found" });
+    }
+    res.json(provider);
+  } catch (error) {
+    console.error("Error fetching provider:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;

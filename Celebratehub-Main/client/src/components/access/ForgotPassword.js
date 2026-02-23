@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Access.css";
 import logo2 from "../../assets/logo2-cut.png";
-// test update
+// test update now
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");

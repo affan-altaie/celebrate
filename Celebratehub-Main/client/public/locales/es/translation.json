@@ -1,0 +1,17 @@
+{
+  "login": "Iniciar Sesión",
+  "signUp": "Registrarse",
+  "adminDashboard": "Panel de Administrador",
+  "logout": "Cerrar Sesión",
+  "manageServices": "Gestionar Servicios",
+  "manageServicesDescription": "Añadir, editar o eliminar servicios",
+  "userManagement": "Gestión de Usuarios",
+  "userManagementDescription": "Editar/Eliminar usuarios, Restablecer contraseñas",
+  "providerApprovals": "Aprobaciones de Proveedores",
+  "providerApprovalsDescription": "Aprobar o desaprobar registros de proveedores",
+  "reportsAndFeedback": "Informes y Comentarios",
+  "reportsAndFeedbackDescription": "Ver informes del sistema y comentarios de los usuarios",
+  "manageUsers": "Gestionar Usuarios",
+  "viewRequests": "Ver Solicitudes",
+  "viewReports": "Ver Informes"
+}

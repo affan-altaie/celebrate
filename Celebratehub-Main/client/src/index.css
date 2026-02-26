@@ -9,6 +9,21 @@
   --card-background: #fdfdff;
   --border-radius: 12px;
   --box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  --button-background-color: #6a5af9;
+  --button-text-color: #ffffff;
+  --border-color: #dddddd;
+}
+
+body.dark {
+  --primary-color: #bb86fc;
+  --secondary-color: #333333;
+  --accent-color: #03dac6;
+  --text-color: #ffffff;
+  --background-color: #121212;
+  --card-background: #1e1e1e;
+  --button-background-color: #bb86fc;
+  --button-text-color: #121212;
+  --border-color: #555555;
 }
 
 body {

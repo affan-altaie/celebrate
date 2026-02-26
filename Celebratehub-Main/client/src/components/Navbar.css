@@ -2,14 +2,24 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 1rem;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #dee2e6;
+  padding: 1rem 2rem;
+  background-color: var(--card-background);
+  box-shadow: var(--box-shadow);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
 }
 
 .navbar a {
   text-decoration: none;
-  color: #007bff;
+  color: var(--primary-color);
 }
 
 .navbar-logo {
@@ -37,5 +47,5 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #007bff;
+  color: var(--primary-color);
 }

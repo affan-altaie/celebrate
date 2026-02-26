@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import logo2 from '../assets/logo2-cut.png';
 import logo1 from '../assets/logo1.png'; // Fallback image
+import ThemeSwitcher from './ThemeSwitcher';
+import LanguageSwitcher from './LanguageSwitcher';
 import './Navbar.css';
 
 const Navbar = () => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -37,15 +41,15 @@ const Navbar = () => {
           <img src={logo2} alt="Logo" className="navbar-logo" />
         </Link>
       </div>
-      <div>
+      <div className="navbar-right">
         {user ? (
           <div className="navbar-user">
             {user.role !== 'admin' && (
               <>
                 <Link to={getDashboardLink()}>
-                  <img 
-                    src={user.profilePicture ? user.profilePicture : logo1} 
-                    alt="Profile" 
+                  <img
+                    src={user.profilePicture ? user.profilePicture : logo1}
+                    alt="Profile"
                     className="navbar-user-profile"
                     onError={handleImageError}
                   />
@@ -56,10 +60,12 @@ const Navbar = () => {
           </div>
         ) : (
           <>
-            <Link to="/login" style={{ marginRight: '1rem' }}>Login</Link>
-            <Link to="/register">Sign Up</Link>
+            <Link to="/login" style={{ marginRight: '1rem' }}>{t('login')}</Link>
+            <Link to="/register">{t('signUp')}</Link>
           </>
         )}
+        <ThemeSwitcher />
+        <LanguageSwitcher />
       </div>
     </nav>
   );

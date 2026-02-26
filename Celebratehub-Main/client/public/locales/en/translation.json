@@ -1,0 +1,17 @@
+{
+  "login": "Login",
+  "signUp": "Sign Up",
+  "adminDashboard": "Admin Dashboard",
+  "logout": "Logout",
+  "manageServices": "Manage Services",
+  "manageServicesDescription": "Add, edit, or delete services",
+  "userManagement": "User Management",
+  "userManagementDescription": "Edit/Delete users, Reset passwords",
+  "providerApprovals": "Provider Approvals",
+  "providerApprovalsDescription": "Approve or disapprove provider registrations",
+  "reportsAndFeedback": "Reports & Feedback",
+  "reportsAndFeedbackDescription": "View system reports and user feedback",
+  "manageUsers": "Manage Users",
+  "viewRequests": "View Requests",
+  "viewReports": "View Reports"
+}

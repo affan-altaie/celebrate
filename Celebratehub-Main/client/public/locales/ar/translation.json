@@ -1,0 +1,17 @@
+{
+  "login": "تسجيل الدخول",
+  "signUp": "انشاء حساب",
+  "adminDashboard": "لوحة تحكم المسؤول",
+  "logout": "تسجيل الخروج",
+  "manageServices": "إدارة الخدمات",
+  "manageServicesDescription": "إضافة أو تعديل أو حذف الخدمات",
+  "userManagement": "إدارة المستخدمين",
+  "userManagementDescription": "تعديل / حذف المستخدمين ، إعادة تعيين كلمات المرور",
+  "providerApprovals": "موافقات المزود",
+  "providerApprovalsDescription": "الموافقة على أو رفض تسجيلات المزود",
+  "reportsAndFeedback": "التقارير والملاحظات",
+  "reportsAndFeedbackDescription": "عرض تقارير النظام وملاحظات المستخدم",
+  "manageUsers": "إدارة المستخدمين",
+  "viewRequests": "عرض الطلبات",
+  "viewReports": "عرض التقارير"
+}

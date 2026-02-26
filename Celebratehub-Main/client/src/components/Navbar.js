@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import logo2 from '../assets/logo2-cut.png';
+import logo2Dark from '../assets/logo2-cut-darkmode.png';
 import logo1 from '../assets/logo1.png'; // Fallback image
 import ThemeSwitcher from './ThemeSwitcher';
 import LanguageSwitcher from './LanguageSwitcher';
+import { useTheme } from '../context/ThemeContext';
 import './Navbar.css';
 
 const Navbar = () => {
+  const { theme } = useTheme();
   const { t } = useTranslation();
   const [user, setUser] = useState(null);
 
@@ -38,7 +41,7 @@ const Navbar = () => {
     <nav className="navbar">
       <div>
         <Link to={getDashboardLink()}>
-          <img src={logo2} alt="Logo" className="navbar-logo" />
+          <img src={theme === 'dark' ? logo2Dark : logo2} alt="Logo" className="navbar-logo" />
         </Link>
       </div>
       <div className="navbar-right">

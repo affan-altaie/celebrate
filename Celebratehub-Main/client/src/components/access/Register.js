@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from 'react-i18next';
 import "./Access.css";
-import logo2 from "../../assets/logo2-cut.png";
 
 const Register = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
@@ -156,15 +157,13 @@ const Register = () => {
   return (
     <div className="access-container">
       <div className="access-card">
-        <img src={logo2} alt="CelebrateHub Logo" className="access-logo" />
-
-        <h3 className="access-subtitle">Create your account</h3>
+        <h3 className="access-subtitle">{t('createYourAccount')}</h3>
 
         {error && <div className="error-message">{error}</div>}
 
         <form className="access-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">{t('username')}</label>
             <input
               type="text"
               id="username"
@@ -172,7 +171,7 @@ const Register = () => {
               value={formData.username}
               onChange={handleChange}
               onBlur={handleBlur}
-              placeholder="Choose a username"
+              placeholder={t('chooseAUsername')}
               required
             />
             {touched.username && formErrors.username && (
@@ -181,7 +180,7 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="role">I want to register as a:</label>
+            <label htmlFor="role">{t('iWantToRegisterAsA')}</label>
             <select
               id="role"
               name="role"
@@ -196,14 +195,14 @@ const Register = () => {
                 marginBottom: "1rem",
               }}
             >
-              <option value="customer">Customer</option>
-              <option value="provider">Service Provider</option>
+              <option value="customer">{t('customer')}</option>
+              <option value="provider">{t('serviceProvider')}</option>
             </select>
           </div>
 
           {formData.role === "provider" && (
             <div className="form-group">
-              <label htmlFor="location">Location of Business</label>
+              <label htmlFor="location">{t('locationOfBusiness')}</label>
               <input
                 type="text"
                 id="location"
@@ -211,7 +210,7 @@ const Register = () => {
                 value={formData.location}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Enter your business location"
+                placeholder={t('enterYourBusinessLocation')}
                 required
               />
               {touched.location && formErrors.location && (
@@ -221,7 +220,7 @@ const Register = () => {
           )}
 
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">{t('emailAddress')}</label>
             <input
               type="email"
               id="email"
@@ -229,7 +228,7 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               onBlur={handleBlur}
-              placeholder="Enter your email"
+              placeholder={t('enterYourEmail')}
               required
             />
             {touched.email && formErrors.email && (
@@ -238,7 +237,7 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="phoneNumber">Phone Number</label>
+            <label htmlFor="phoneNumber">{t('phoneNumber')}</label>
             <div className="phone-input-container">
               <span className="country-code">+968</span>
               <input
@@ -248,7 +247,7 @@ const Register = () => {
                 value={formData.phoneNumber}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Enter your phone number"
+                placeholder={t('enterYourPhoneNumber')}
                 required
               />
             </div>
@@ -258,7 +257,7 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t('password')}</label>
             <input
               type="password"
               id="password"
@@ -270,26 +269,26 @@ const Register = () => {
                 setPasswordRequirements(false);
                 handleBlur(e);
               }}
-              placeholder="Create a password"
+              placeholder={t('createAPassword')}
               required
             />
             {passwordRequirements && (
               <div className="password-requirements">
                 <ul>
                   <li className={passwordValidity.length ? "valid" : "invalid"}>
-                    At least 8 characters
+                    {t('atLeast8Characters')}
                   </li>
                   <li className={passwordValidity.uppercase ? "valid" : "invalid"}>
-                    At least one uppercase letter
+                    {t('atLeastOneUppercaseLetter')}
                   </li>
                   <li className={passwordValidity.lowercase ? "valid" : "invalid"}>
-                    At least one lowercase letter
+                    {t('atLeastOneLowercaseLetter')}
                   </li>
                   <li className={passwordValidity.number ? "valid" : "invalid"}>
-                    At least one number
+                    {t('atLeastOneNumber')}
                   </li>
                   <li className={passwordValidity.specialChar ? "valid" : "invalid"}>
-                    At least one special character
+                    {t('atLeastOneSpecialCharacter')}
                   </li>
                 </ul>
               </div>
@@ -300,7 +299,7 @@ const Register = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+            <label htmlFor="confirmPassword">{t('confirmPassword')}</label>
             <input
               type="password"
               id="confirmPassword"
@@ -308,7 +307,7 @@ const Register = () => {
               value={formData.confirmPassword}
               onChange={handleChange}
               onBlur={handleBlur}
-              placeholder="Confirm your password"
+              placeholder={t('confirmYourPassword')}
               required
             />
             {touched.confirmPassword && formErrors.confirmPassword && (
@@ -317,14 +316,14 @@ const Register = () => {
           </div>
 
           <button type="submit" className="submit-btn">
-            Create Account
+            {t('createAccount')}
           </button>
         </form>
 
         <div className="access-footer">
-          Already have an account?
+          {t('alreadyHaveAnAccount')}
           <Link to="/login" className="access-link">
-            Sign in
+            {t('signIn')}
           </Link>
         </div>
       </div>

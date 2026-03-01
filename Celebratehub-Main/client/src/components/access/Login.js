@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Access.css';
-import logo2 from '../../assets/logo2-cut.png';
 
 const Login = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -70,40 +71,39 @@ const Login = () => {
   return (
     <div className="access-container">
       <div className="access-card">
-        <img src={logo2} alt="CelebrateHub Logo" className="access-logo" />
-        <h3 className="access-subtitle">Sign in to your account</h3>
+        <h3 className="access-subtitle">{t('signInToYourAccount')}</h3>
 
         {error && <div className="error-message">{error}</div>}
         
         <form className="access-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">{t('emailAddress')}</label>
             <input
               type="email"
               id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter your email"
+              placeholder={t('enterYourEmail')}
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t('password')}</label>
             <input
               type="password"
               id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="Enter your password"
+              placeholder={t('enterYourPassword')}
               required
             />
           </div>
 
           <div className="form-options">
-            <Link to="/forgot-password" className="forgot-password-link">Forgot Password?</Link>
+            <Link to="/forgot-password" className="forgot-password-link">{t('forgotPassword')}</Link>
             <div className="form-check">
               <input
                 type="checkbox"
@@ -113,18 +113,18 @@ const Login = () => {
                 onChange={handleChange}
                 className="form-check-input"
               />
-              <label htmlFor="keepMeSignedIn" className="form-check-label">Keep me signed in</label>
+              <label htmlFor="keepMeSignedIn" className="form-check-label">{t('keepMeSignedIn')}</label>
             </div>
           </div>
 
           <button type="submit" className="submit-btn">
-            Sign In
+            {t('signIn')}
           </button>
         </form>
 
         <div className="access-footer">
-          Don't have an account? 
-          <Link to="/register" className="access-link">Sign up</Link>
+          {t('dontHaveAnAccount')}
+          <Link to="/register" className="access-link">{t('signUp')}</Link>
         </div>
       </div>
     </div>

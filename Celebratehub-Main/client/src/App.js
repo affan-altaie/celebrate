@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import AuthHeader from './components/AuthHeader';
 import Footer from './components/Footer';
 import Home from './components/Home';
 import Login from './components/access/Login';
@@ -60,11 +61,13 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 
 const AppContent = () => {
   const location = useLocation();
-  const showNavbar = !['/login', '/register'].includes(location.pathname);
+  const showNavbar = !['/login', '/register', '/forgot-password'].includes(location.pathname);
+  const showAuthHeader = ['/login', '/register', '/forgot-password'].includes(location.pathname);
 
   return (
     <div className="App">
       {showNavbar && <Navbar />}
+      {showAuthHeader && <AuthHeader />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/customer-dashboard" element={<ProtectedRoute allowedRoles={['customer']}><CustomerDashboard /></ProtectedRoute>} />

@@ -14,9 +14,6 @@ const LanguageSwitcher = () => {
       <button onClick={() => changeLanguage('en')} disabled={i18n.language === 'en'}>
         English
       </button>
-      <button onClick={() => changeLanguage('es')} disabled={i18n.language === 'es'}>
-        Español
-      </button>
       <button onClick={() => changeLanguage('ar')} disabled={i18n.language === 'ar'}>
         العربية
       </button>

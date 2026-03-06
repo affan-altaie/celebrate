@@ -1,11 +1,10 @@
 .service-details-container {
     padding: 2rem;
-    font-family: 'Arial', sans-serif;
-    color: #333;
+    color: var(--text-color);
   }
   
   .back-button {
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: white;
     padding: 0.5rem 1rem;
     border: none;
@@ -35,7 +34,8 @@
     display: flex;
     gap: 1rem;
     margin: 1rem 0;
-    color: #555;
+    color: var(--text-color);
+    opacity: 0.8;
   }
   
   .service-meta span {
@@ -64,12 +64,13 @@
 
   .price-per-person {
     font-size: 1rem;
-    color: #555;
+    color: var(--text-color);
+    opacity: 0.7;
   }
   
 .book-now-button {
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 5px;
@@ -107,7 +108,8 @@
     display: flex;
     gap: 1rem;
     padding: 1rem;
-    background-color: #f8f9fa;
+    background-color: var(--card-background);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     margin-bottom: 1rem;
   }
@@ -152,7 +154,7 @@
     font-size: 1.5rem;
   }
   .provider-link {
-    color: #007bff;
+    color: var(--primary-color);
     text-decoration: none;
   }
   

@@ -53,9 +53,25 @@
 }
 
 .menu-button {
-  background: none;
-  border: none;
+  background: var(--secondary-color);
+  border: 1px solid var(--border-color);
   font-size: 1.5rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   cursor: pointer;
   color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-left: 0.5rem;
+}
+
+.menu-button:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(106, 90, 249, 0.2);
 }

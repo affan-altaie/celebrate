@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   FaSearch, FaMapMarkerAlt, FaMoneyBillAlt, FaStar, FaCalendarCheck, FaUserFriends, 
   FaSearchLocation, FaMapMarkedAlt, FaUtensils, FaCameraRetro, FaMusic, FaCheckCircle
@@ -7,6 +8,7 @@ import {
 import './NewBooking.css';
 
 const NewBooking = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [location, setLocation] = useState('');
@@ -125,8 +127,8 @@ const NewBooking = () => {
         <div className="overlay"></div>
         <div className="content-container">
           <div className="header-text">
-            <h1>Your Perfect Event Starts Here</h1>
-            <p>Discover amazing events and connect with top-rated service providers for your special occasions</p>
+            <h1>{t('newBookingTitle')}</h1>
+            <p>{t('newBookingSubtitle')}</p>
           </div>
           
           <div className="search-box">
@@ -134,7 +136,7 @@ const NewBooking = () => {
               <FaSearch className="icon" />
               <input 
                 type="text" 
-                placeholder="Search events or services..." 
+                placeholder={t('searchPlaceholder')} 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -142,7 +144,7 @@ const NewBooking = () => {
             <div className="search-input">
               <FaMapMarkerAlt className="icon" />
               <select value={location} onChange={(e) => setLocation(e.target.value)}>
-                <option value="">Location</option>
+                <option value="">{t('locationLabel')}</option>
                 <option value="Muscat">Muscat</option>
                 <option value="Salalah">Salalah</option>
                 <option value="Sohar">Sohar</option>
@@ -152,7 +154,7 @@ const NewBooking = () => {
             <div className="search-input">
               <FaMoneyBillAlt className="icon" />
               <select value={price} onChange={(e) => setPrice(e.target.value)}>
-                <option value="">Max Price</option>
+                <option value="">{t('maxPriceLabel')}</option>
                 <option value="50">OMR 50</option>
                 <option value="150">OMR 150</option>
                 <option value="300">OMR 300</option>
@@ -161,13 +163,13 @@ const NewBooking = () => {
             <div className="search-input">
               <FaStar className="icon" />
               <select value={rating} onChange={(e) => setRating(e.target.value)}>
-                <option value="">Rating</option>
+                <option value="">{t('ratingLabel')}</option>
                 <option value="4.5">4.5+</option>
                 <option value="4">4.0+</option>
                 <option value="3">3.0+</option>
               </select>
             </div>
-            <button className="search-button" onClick={handleSearch}>Search</button>
+            <button className="search-button" onClick={handleSearch}>{t('searchButton')}</button>
           </div>
 
           <div className="features-container">
@@ -175,28 +177,28 @@ const NewBooking = () => {
               <div className="feature-icon-wrapper">
                 <FaCalendarCheck className="feature-icon" />
               </div>
-              <h3>Share Your Moment</h3>
-              <p>Let the world know about your special event</p>
+              <h3>{t('shareMomentTitle')}</h3>
+              <p>{t('shareMomentDesc')}</p>
             </div>
             <div className="feature">
               <div className="feature-icon-wrapper">
                   <FaUserFriends className="feature-icon" />
               </div>
-              <h3>Find Providers</h3>
-              <p>Connect with trusted event service professionals</p>
+              <h3>{t('findProvidersTitle')}</h3>
+              <p>{t('findProvidersDesc')}</p>
             </div>
             <div className="feature">
               <div className="feature-icon-wrapper">
                   <FaSearchLocation className="feature-icon" />
               </div>
-              <h3>Book Instantly</h3>
-              <p>Secure your spot with easy online booking</p>
+              <h3>{t('bookInstantlyTitle')}</h3>
+              <p>{t('bookInstantlyDesc')}</p>
             </div>
           </div>
         </div>
       </div>
       <div className="top-providers-container">
-        <h2>Top Service Providers</h2>
+        <h2>{t('topProvidersTitle')}</h2>
         <div className="results-grid">
           {topProviders.map((provider, index) => (
             <div key={index} className="result-card" onClick={() => navigate(`/service/${provider.id}`)}>
@@ -209,7 +211,7 @@ const NewBooking = () => {
               <div className="result-details">
                 <div className="service-tag">{provider.type}</div>
                 <h3>{provider.name}</h3>
-                <p className="reviews">{provider.reviews} reviews</p>
+                <p className="reviews">{t('reviewsCount', { count: provider.reviews })}</p>
               </div>
             </div>
           ))}
@@ -217,7 +219,7 @@ const NewBooking = () => {
       </div>
 
       <div className="popular-services-container">
-        <h2>Popular Services</h2>
+        <h2>{t('popularServicesTitle')}</h2>
         <div className="services-grid">
           {popularServices.map((service, index) => (
             <div key={index} className="service-card" onClick={() => handleServiceClick(service.name)}>
@@ -231,7 +233,7 @@ const NewBooking = () => {
 
       {searchResults.length > 0 && (
         <div className="search-results-container" ref={resultsRef}>
-          <h2>Search Results</h2>
+          <h2>{t('searchResultsTitle')}</h2>
           <div className="results-grid">
             {searchResults.map((result, index) => (
               <div key={index} className="result-card">
@@ -244,7 +246,7 @@ const NewBooking = () => {
                 <div className="result-details">
                   <div className="service-tag">{result.type}</div>
                   <h3>{result.name}</h3>
-                  <p className="reviews">{result.reviews} reviews</p>
+                  <p className="reviews">{t('reviewsCount', { count: result.reviews })}</p>
                   <p className="description">{result.description}</p>
                   <ul className="features-list">
                     {result.features.map((feature, i) => (
@@ -253,7 +255,7 @@ const NewBooking = () => {
                   </ul>
                   <div className="card-footer">
                     <p className="price">{result.price}</p>
-                    <button className="book-button" onClick={() => navigate(`/service/${result.id}`)}>Book</button>
+                    <button className="book-button" onClick={() => navigate(`/service/${result.id}`)}>{t('bookButton')}</button>
                   </div>
                 </div>
               </div>

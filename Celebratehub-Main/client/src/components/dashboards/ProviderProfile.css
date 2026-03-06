@@ -1,16 +1,16 @@
 .provider-profile-container {
   padding: 2rem;
-  background-color: #f9f9f9;
+  background-color: var(--secondary-color);
 }
 
 .provider-header {
   display: flex;
   align-items: center;
   margin-bottom: 3rem;
-  background-color: white;
+  background-color: var(--card-background);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
 
 .provider-logo {
@@ -19,12 +19,12 @@
   border-radius: 50%;
   object-fit: cover;
   margin-right: 2rem;
-  border: 4px solid #eee;
+  border: 4px solid var(--border-color);
 }
 
 .provider-info h1 {
   font-size: 2.5rem;
-  color: #333;
+  color: var(--text-color);
   margin-bottom: 1rem;
 }
 
@@ -32,7 +32,8 @@
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  color: #777;
+  color: var(--text-color);
+  opacity: 0.7;
   font-size: 1rem;
 }
 
@@ -44,30 +45,31 @@
 
 .average-rating {
   font-weight: 600;
-  color: #333;
+  color: var(--text-color);
 }
 
 .back-button {
-  background-color: #8e2de2;
-  color: white;
+  background-color: var(--primary-color);
+  color: var(--button-text-color);
   border: none;
   padding: 0.8rem 1.5rem;
   font-size: 1rem;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
   margin-bottom: 2rem;
 }
 
 .back-button:hover {
-  background-color: #6a1b9a;
+  background-color: #5847d3;
+  transform: translateY(-2px);
 }
 
 .provider-name {
   text-align: center;
   font-size: 2.5rem;
-  color: #333;
+  color: var(--text-color);
   margin-bottom: 2.5rem;
   font-weight: 700;
 }
@@ -81,9 +83,9 @@
 }
 
 .service-card {
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
@@ -106,13 +108,13 @@
 
 .service-info h3 {
   font-size: 1.5rem;
-  color: #333;
+  color: var(--text-color);
   margin-bottom: 0.5rem;
 }
 
 .service-type {
-  background-color: #e8eaf6;
-  color: #3f51b5;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
   font-size: 0.8rem;
@@ -127,14 +129,15 @@
   gap: 0.4rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #777;
+  color: var(--text-color);
+  opacity: 0.7;
   margin-bottom: 1rem;
 }
 
 .service-price {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #8e2de2;
+  color: var(--primary-color);
 }
 
 .customer-reviews {
@@ -144,7 +147,7 @@
 .customer-reviews h2 {
   text-align: center;
   font-size: 2.5rem;
-  color: #333;
+  color: var(--text-color);
   margin-bottom: 2.5rem;
   font-weight: 700;
 }
@@ -152,10 +155,10 @@
 .review-card {
   display: flex;
   gap: 1.5rem;
-  background-color: white;
+  background-color: var(--card-background);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   margin-bottom: 1.5rem;
   max-width: 800px;
   margin-left: auto;
@@ -171,7 +174,7 @@
 
 .review-content strong {
   font-size: 1.2rem;
-  color: #333;
+  color: var(--text-color);
 }
 
 .review-rating {
@@ -180,6 +183,7 @@
 
 .review-content p {
   font-size: 1rem;
-  color: #777;
+  color: var(--text-color);
+  opacity: 0.7;
   line-height: 1.6;
 }

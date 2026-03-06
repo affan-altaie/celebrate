@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Dashboard.css';
 import logo1 from '../../assets/logo1.png'; // Fallback image
 
 const CustomerProfile = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(location.state?.user || null);
@@ -46,14 +48,14 @@ const CustomerProfile = () => {
         const updatedUser = { ...user, profilePicture: data.profilePicture };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
-        setMessage('Profile picture updated successfully');
+        setMessage(t('profilePictureUpdated'));
         setError('');
       } else {
-        setError(data.message || 'Failed to upload image');
+        setError(data.message || t('imageUploadFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError('An error occurred');
+      setError(t('genericError'));
     }
   };
 
@@ -75,15 +77,15 @@ const CustomerProfile = () => {
         const updatedUser = { ...user, phoneNumber: newPhoneNumber };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
-        setMessage('Phone number updated successfully');
+        setMessage(t('phoneNumberUpdated'));
         setError('');
         setNewPhoneNumber('');
       } else {
-        setError(data.message || 'Failed to update phone number');
+        setError(data.message || t('phoneNumberUpdateFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError('An error occurred');
+      setError(t('genericError'));
     }
   };
 
@@ -92,7 +94,7 @@ const CustomerProfile = () => {
     e.preventDefault();
     
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError('New passwords do not match');
+      setError(t('passwordsDoNotMatchError'));
       return;
     }
 
@@ -111,21 +113,21 @@ const CustomerProfile = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage('Password updated successfully');
+        setMessage(t('passwordUpdated'));
         setError('');
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       } else {
-        setError(data.message || 'Failed to update password');
+        setError(data.message || t('passwordUpdateFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError('An error occurred');
+      setError(t('genericError'));
     }
   };
 
   // Handle Account Deletion
   const handleDeleteAccount = async () => {
-    if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+    if (!window.confirm(t('deleteAccountConfirm'))) {
       return;
     }
 
@@ -139,11 +141,11 @@ const CustomerProfile = () => {
         navigate('/register');
       } else {
         const data = await response.json();
-        setError(data.message || 'Failed to delete account');
+        setError(data.message || t('accountDeletionFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError('An error occurred');
+      setError(t('genericError'));
     }
   };
 
@@ -152,7 +154,7 @@ const CustomerProfile = () => {
   };
 
   if (!user) {
-    return <div>Loading...</div>;
+    return <div>{t('loading')}</div>;
   }
 
   return (
@@ -160,9 +162,9 @@ const CustomerProfile = () => {
       <header className="dashboard-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <button onClick={() => navigate('/customer-dashboard')} className="action-btn" style={{ width: 'auto' }}>
-            Back to Dashboard
+            {t('backToDashboard')}
           </button>
-          <h1>Edit Profile</h1>
+          <h1>{t('editProfile')}</h1>
         </div>
       </header>
 
@@ -171,7 +173,7 @@ const CustomerProfile = () => {
         {error && <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
 
         <div className="dashboard-card" style={{ maxWidth: '600px', margin: '0 auto', marginBottom: '2rem' }}>
-          <h3>Profile Information</h3>
+          <h3>{t('profileInformation')}</h3>
           
           <div style={{ marginBottom: '2rem' }}>
             <img 
@@ -182,7 +184,7 @@ const CustomerProfile = () => {
             />
             <div>
               <label htmlFor="profile-upload" className="action-btn" style={{ display: 'inline-block', width: 'auto', cursor: 'pointer' }}>
-                Change Profile Picture
+                {t('changeProfilePicture')}
               </label>
               <input 
                 id="profile-upload" 
@@ -195,18 +197,18 @@ const CustomerProfile = () => {
           </div>
 
           <div style={{ textAlign: 'left', marginBottom: '2rem' }}>
-            <p><strong>Username:</strong> {user.username}</p>
-            <p><strong>Email:</strong> {user.email}</p>
-            <p><strong>Phone Number:</strong> {user.phoneNumber}</p>
-            <p><strong>Role:</strong> {user.role}</p>
+            <p><strong>{t('usernameLabel')}:</strong> {user.username}</p>
+            <p><strong>{t('emailLabel')}:</strong> {user.email}</p>
+            <p><strong>{t('phoneLabel')}:</strong> {user.phoneNumber}</p>
+            <p><strong>{t('roleLabel')}:</strong> {user.role}</p>
           </div>
 
           <hr />
 
-          <h3>Edit Phone Number</h3>
+          <h3>{t('editPhoneNumber')}</h3>
           <form onSubmit={handlePhoneUpdate} style={{ textAlign: 'left' }}>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label>New Phone Number</label>
+              <label>{t('newPhoneNumberLabel')}</label>
               <input
                 type="tel"
                 value={newPhoneNumber}
@@ -215,15 +217,15 @@ const CustomerProfile = () => {
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
             </div>
-            <button type="submit" className="action-btn">Update Phone Number</button>
+            <button type="submit" className="action-btn">{t('updatePhoneNumber')}</button>
           </form>
 
           <hr />
 
-          <h3>Change Password</h3>
+          <h3>{t('changePassword')}</h3>
           <form onSubmit={handlePasswordChange} style={{ textAlign: 'left' }}>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label>Current Password</label>
+              <label>{t('currentPassword')}</label>
               <input
                 type="password"
                 value={passwordData.currentPassword}
@@ -233,7 +235,7 @@ const CustomerProfile = () => {
               />
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label>New Password</label>
+              <label>{t('newPassword')}</label>
               <input
                 type="password"
                 value={passwordData.newPassword}
@@ -243,7 +245,7 @@ const CustomerProfile = () => {
               />
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label>Confirm New Password</label>
+              <label>{t('confirmNewPassword')}</label>
               <input
                 type="password"
                 value={passwordData.confirmPassword}
@@ -252,15 +254,15 @@ const CustomerProfile = () => {
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
             </div>
-            <button type="submit" className="action-btn">Update Password</button>
+            <button type="submit" className="action-btn">{t('updatePassword')}</button>
           </form>
 
           <hr style={{ margin: '2rem 0' }} />
 
-          <h3>Delete Account</h3>
-          <p style={{ color: 'red' }}>Warning: This action cannot be undone.</p>
+          <h3>{t('deleteAccount')}</h3>
+          <p style={{ color: 'red' }}>{t('deleteAccountWarning')}</p>
           <button onClick={handleDeleteAccount} className="logout-btn" style={{ width: '100%' }}>
-            Delete My Account
+            {t('deleteAccountBtn')}
           </button>
         </div>
       </main>

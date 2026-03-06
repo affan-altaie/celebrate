@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Dashboard.css';
 
 const sampleBookings = [
@@ -11,23 +12,24 @@ const sampleBookings = [
 ];
 
 const BookingHistory = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <h1>Booking History</h1>
-        <button onClick={() => navigate('/customer-dashboard')} className="action-btn">Back to Dashboard</button>
+        <h1>{t('bookingHistory')}</h1>
+        <button onClick={() => navigate('/customer-dashboard')} className="action-btn">{t('backToDashboard')}</button>
       </header>
       <main className="dashboard-content">
         {sampleBookings.map(booking => (
           <div key={booking.id} className="dashboard-card">
             <h3>{booking.service}</h3>
-            <p>Date: {booking.date}</p>
-            <p>Status: {booking.status}</p>
+            <p>{t('dateLabel')}: {booking.date}</p>
+            <p>{t('statusLabel')}: {t(booking.status.toLowerCase())}</p>
             {booking.status === 'Completed' && (
               <button onClick={() => navigate(`/leave-review/${booking.id}`)} className="action-btn review-btn">
-                Leave a Review
+                {t('leaveReview')}
               </button>
             )}
           </div>

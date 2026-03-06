@@ -16,7 +16,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(106, 27, 154, 0.8); 
+  background-color: rgba(106, 90, 249, 0.7); /* Based on var(--primary-color) #6a5af9 */
 }
 
 .content-container {
@@ -42,18 +42,22 @@
 }
 
 .cta-button {
-  background-color: #8e2de2;
-  color: white;
+  background-color: var(--primary-color);
+  color: var(--button-text-color);
   border: none;
   padding: 1rem 2.5rem;
   font-size: 1.1rem;
   font-weight: 600;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
   text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 4px 15px rgba(106, 90, 249, 0.3);
 }
 
 .cta-button:hover {
-  background-color: #6a1b9a;
+  background-color: #5847d3;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(106, 90, 249, 0.4);
 }

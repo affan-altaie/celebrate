@@ -30,29 +30,29 @@ const Register = () => {
   const validate = useCallback(() => {
     const errors = {};
     if (!formData.username) {
-      errors.username = "Username is required";
+      errors.username = t('usernameRequired');
     }
     if (!formData.email) {
-      errors.email = "Email is required";
+      errors.email = t('emailRequired');
     } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(formData.email)) {
-      errors.email = "Email address is invalid";
+      errors.email = t('emailInvalid');
     }
     if (!formData.phoneNumber) {
-      errors.phoneNumber = "Phone number is required";
+      errors.phoneNumber = t('phoneRequired');
     } else if (!/^[79][0-9]{7}$/.test(formData.phoneNumber)) {
-      errors.phoneNumber = "Phone number must be 8 digits and start with 7 or 9";
+      errors.phoneNumber = t('phoneInvalid');
     }
     if (!formData.password) {
-      errors.password = "Password is required";
+      errors.password = t('passwordRequired');
     }
     if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = "Passwords do not match";
+      errors.confirmPassword = t('passwordsDoNotMatch');
     }
     if (formData.role === "provider" && !formData.location) {
-      errors.location = "Business location is required";
+      errors.location = t('locationRequired');
     }
     return errors;
-  }, [formData]);
+  }, [formData, t]);
 
   useEffect(() => {
     const errors = validate();
@@ -111,7 +111,7 @@ const Register = () => {
     }
 
     if (!validatePassword(formData.password)) {
-      setError("Please ensure your password meets all requirements.");
+      setError(t('passwordRequirementsError'));
       return;
     }
 
@@ -136,21 +136,19 @@ const Register = () => {
       if (response.ok) {
         console.log("Registration successful");
         if (formData.role === "provider") {
-          alert(
-            "Registration successful! Your account is pending approval from the administrator."
-          );
+          alert(t('registrationPending'));
         }
         navigate("/login");
       } else {
         if (data.message === "User already registered") {
           navigate("/login");
         } else {
-          setError(data.message || "Registration failed");
+          setError(data.message || t('registrationFailed'));
         }
       }
     } catch (err) {
       console.error("Registration error:", err);
-      setError("An error occurred during registration");
+      setError(t('genericError'));
     }
   };
 

@@ -1,10 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 const ReportsAndFeedback = () => {
+  const { t } = useTranslation();
   return (
-    <div>
-      <h1>Reports & Feedback</h1>
-      <p>This is the Reports & Feedback page.</p>
+    <div className="container">
+      <h1>{t('reportsAndFeedback')}</h1>
+      <p>{t('reportsAndFeedbackDescription')}</p>
     </div>
   );
 };

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Dashboard.css';
 import './AddService.css';
 
 const AddService = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
@@ -35,42 +37,42 @@ const AddService = () => {
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <h1>Add a New Service</h1>
-        <button onClick={() => navigate('/manage-listings')} className="action-btn">Cancel</button>
+        <h1>{t('addNewService')}</h1>
+        <button onClick={() => navigate('/manage-listings')} className="action-btn">{t('cancel')}</button>
       </header>
       <main className="dashboard-content">
         <div className="add-service-container">
           <form onSubmit={handleSubmit} className="add-service-form">
             <div className="form-group">
-              <label>Service Name</label>
+              <label>{t('serviceNameLabel')}</label>
               <input type="text" name="name" value={formData.name} onChange={handleChange} required />
             </div>
             <div className="form-group">
-              <label>Service Type</label>
+              <label>{t('roleLabel')}</label>
               <input type="text" name="type" value={formData.type} onChange={handleChange} required />
             </div>
             <div className="form-group">
-              <label>Price (per hour)</label>
-              <input type="text" name="price" value={formData.price} onChange={handleChange} placeholder="$100 - $400 / hour" required />
+              <label>{t('pricePerHour')}</label>
+              <input type="text" name="price" value={formData.price} onChange={handleChange} placeholder="OMR 100 - OMR 400 / hour" required />
             </div>
             <div className="form-group">
-              <label>Description</label>
+              <label>{t('descriptionLabel')}</label>
               <textarea name="description" value={formData.description} onChange={handleChange} required />
             </div>
             <div className="form-group">
-              <label>Features (comma-separated)</label>
-              <input type="text" name="features" value={formData.features} onChange={handleChange} placeholder="Feature 1, Feature 2, Feature 3" />
+              <label>{t('featuresLabel')}</label>
+              <input type="text" name="features" value={formData.features} onChange={handleChange} placeholder={t('featuresPlaceholder')} />
             </div>
             <div className="form-group">
-              <label>Service Image</label>
+              <label>{t('serviceImage')}</label>
               <input type="file" onChange={handleImageChange} accept="image/*" required />
             </div>
             {/* A more complex UI would be needed for availability, but this is a starting point */}
             <div className="form-group">
-              <label>Availability</label>
-              <p>Availability management will be implemented here.</p>
+              <label>{t('availability')}</label>
+              <p>{t('availabilityManagementPlaceholder')}</p>
             </div>
-            <button type="submit" className="action-btn">Add Service</button>
+            <button type="submit" className="action-btn">{t('addServiceBtn')}</button>
           </form>
         </div>
       </main>

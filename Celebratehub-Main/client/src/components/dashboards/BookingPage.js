@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaCalendarAlt, FaCreditCard, FaStar, FaUserFriends, FaCheckCircle, FaClock } from 'react-icons/fa';
 import './BookingPage.css';
 
@@ -83,6 +84,7 @@ const services = [
   
 
 const BookingPage = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [service, setService] = useState(null);
@@ -133,7 +135,7 @@ const BookingPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!selectedDate || !selectedTime) {
-      alert('Please select an available date and time.');
+      alert(t('selectDateTimeAlert'));
       return;
     }
     const bookingDetails = {
@@ -183,39 +185,39 @@ const BookingPage = () => {
 
     return (
       <div className="calendar-grid">
-        <div className="calendar-header">Sun</div>
-        <div className="calendar-header">Mon</div>
-        <div className="calendar-header">Tue</div>
-        <div className="calendar-header">Wed</div>
-        <div className="calendar-header">Thu</div>
-        <div className="calendar-header">Fri</div>
-        <div className="calendar-header">Sat</div>
+        <div className="calendar-header">{t('sun')}</div>
+        <div className="calendar-header">{t('mon')}</div>
+        <div className="calendar-header">{t('tue')}</div>
+        <div className="calendar-header">{t('wed')}</div>
+        <div className="calendar-header">{t('thu')}</div>
+        <div className="calendar-header">{t('fri')}</div>
+        <div className="calendar-header">{t('sat')}</div>
         {dates}
       </div>
     );
   };
 
   if (!service) {
-    return <div className="loading">Loading...</div>;
+    return <div className="loading">{t('loading')}</div>;
   }
 
   return (
     <div className="booking-page-container-wrapper">
-      <button onClick={() => navigate(-1)} className="back-button">Back to Service Details</button>
+      <button onClick={() => navigate(-1)} className="back-button">{t('backToServiceDetails')}</button>
       <div className="booking-page-container">
         <div className="booking-details-column">
           <img src={service.image} alt={service.name} className="service-image" />
         <h2>{service.name}</h2>
         <div className="service-meta">
           <span><FaStar /> {service.rating}</span>
-          <span><FaUserFriends /> {service.reviews} reviews</span>
+          <span><FaUserFriends /> {t('reviewsCount', { count: service.reviews })}</span>
         </div>
         <p className="service-info"><FaMapMarkerAlt /> {service.location}</p>
         <p className="service-info">{service.price}</p>
-        {service.pricePerPerson && <p className="service-info">{service.pricePerPerson} / person</p>}
+        {service.pricePerPerson && <p className="service-info">{service.pricePerPerson} / {t('personLabel')}</p>}
         <p className="service-description">{service.description}</p>
         <div className="service-features">
-          <h3>Features</h3>
+          <h3>{t('features')}</h3>
           <ul>
             {service.features.map((feature, index) => (
               <li key={index}><FaCheckCircle /> {feature}</li>
@@ -224,43 +226,43 @@ const BookingPage = () => {
         </div>
       </div>
       <div className="booking-form-column">
-        <h2>Book This Service</h2>
+        <h2>{t('bookThisService')}</h2>
         <form onSubmit={handleSubmit} className="booking-form">
           <div className="form-group">
-            <label><FaMapMarkerAlt /> Location Details</label>
+            <label><FaMapMarkerAlt /> {t('locationDetails')}</label>
             <input
               type="text"
               name="location"
               value={formData.location}
               onChange={handleChange}
-              placeholder="Enter your event address"
+              placeholder={t('eventAddressPlaceholder')}
               required
             />
           </div>
           <div className="form-group">
-            <label><FaPhone /> Phone Number</label>
+            <label><FaPhone /> {t('phoneNumber')}</label>
             <input
               type="tel"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="Enter your phone number"
+              placeholder={t('phoneNumberPlaceholder')}
               required
             />
           </div>
           <div className="form-group">
-            <label><FaEnvelope /> Email Address</label>
+            <label><FaEnvelope /> {t('emailAddress')}</label>
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="Enter your email address"
+              placeholder={t('emailAddressPlaceholder')}
               required
             />
           </div>
           <div className="form-group">
-            <label><FaClock /> Enter Number of Hours</label>
+            <label><FaClock /> {t('numberOfHours')}</label>
             <input
               type="number"
               name="hours"
@@ -273,7 +275,7 @@ const BookingPage = () => {
 
           {service.pricePerPerson && (
             <div className="form-group">
-              <label><FaUserFriends /> Enter Number of Persons</label>
+              <label><FaUserFriends /> {t('numberOfPersons')}</label>
               <input
                 type="number"
                 name="persons"
@@ -287,19 +289,19 @@ const BookingPage = () => {
           
           {totalPrice > 0 && (
             <div className="form-group">
-              <label>Total Price</label>
+              <label>{t('totalPrice')}</label>
               <p className="total-price">OMR {totalPrice.toFixed(2)}</p>
             </div>
           )}
 
           <div className="form-group">
-            <label><FaCalendarAlt /> Select an Available Date</label>
+            <label><FaCalendarAlt /> {t('selectAvailableDate')}</label>
             {renderCalendar()}
           </div>
 
           {selectedDate && (
             <div className="form-group">
-              <label>Select an Available Time for {selectedDate}</label>
+              <label>{t('selectAvailableTime', { date: selectedDate })}</label>
               <div className="time-slots-container">
                 {service.availability[selectedDate].map((time, index) => (
                   <button
@@ -316,9 +318,9 @@ const BookingPage = () => {
           )}
 
           <div className="payment-details">
-            <h3><FaCreditCard /> Payment Information</h3>
+            <h3><FaCreditCard /> {t('paymentInformation')}</h3>
             <div className="form-group">
-              <label>Card Number</label>
+              <label>{t('cardNumber')}</label>
               <input
                 type="text"
                 name="cardNumber"
@@ -330,7 +332,7 @@ const BookingPage = () => {
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label>Expiry Date</label>
+                <label>{t('expiryDate')}</label>
                 <input
                   type="text"
                   name="expiryDate"
@@ -341,7 +343,7 @@ const BookingPage = () => {
                 />
               </div>
               <div className="form-group">
-                <label>CVC</label>
+                <label>{t('cvc')}</label>
                 <input
                   type="text"
                   name="cvc"
@@ -354,7 +356,7 @@ const BookingPage = () => {
             </div>
           </div>
           
-          <button type="submit" className="submit-booking-button" disabled={!selectedDate || !selectedTime}>Confirm Booking</button>
+          <button type="submit" className="submit-booking-button" disabled={!selectedDate || !selectedTime}>{t('confirmBooking')}</button>
         </form>
       </div>
     </div>

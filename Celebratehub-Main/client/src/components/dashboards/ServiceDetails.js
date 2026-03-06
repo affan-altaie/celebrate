@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FaStar, FaMapMarkerAlt, FaCalendarAlt, FaCamera } from 'react-icons/fa';
 import './ServiceDetails.css';
 
@@ -115,6 +116,7 @@ const customerReviews = [
   
 
 const ServiceDetails = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [service, setService] = useState(null);
@@ -125,38 +127,38 @@ const ServiceDetails = () => {
   }, [id]);
 
   if (!service) {
-    return <div className="loading">Loading...</div>;
+    return <div className="loading">{t('loading')}</div>;
   }
 
   return (
     <div className="service-details-container">
-      <button onClick={() => navigate(-1)} className="back-button">Back to Search</button>
+      <button onClick={() => navigate(-1)} className="back-button">{t('backToSearch')}</button>
       
       <div className="service-header">
         <img src={service.image} alt={service.name} className="service-main-image" />
         <div className="service-header-info">
           <Link to={`/provider-profile/${service.providerId}`} className="provider-link">
-            <h1>Service Provider: {service.name}</h1>
+            <h1>{t('serviceProviderLabel')}: {service.name}</h1>
           </Link>
           <div className="service-meta">
-            <span><FaStar /> {service.rating} ({service.reviews} reviews)</span>
-            <span><FaMapMarkerAlt /> <strong>Location:</strong> {service.location} (<strong>Distance:</strong> {service.distance})</span>
-            <span><FaCalendarAlt /> <strong>Date of Publish:</strong> {service.publishedDate}</span>
+            <span><FaStar /> {service.rating} ({t('reviewsCount', { count: service.reviews })})</span>
+            <span><FaMapMarkerAlt /> <strong>{t('locationLabel')}:</strong> {service.location} (<strong>{t('distanceLabel')}:</strong> {service.distance})</span>
+            <span><FaCalendarAlt /> <strong>{t('dateOfPublishLabel')}:</strong> {service.publishedDate}</span>
           </div>
           <p className="service-description">{service.description}</p>
           <div className="service-price-book">
             <div className="price-info">
               <span className="price-display">{service.price}</span>
-              {service.pricePerPerson && <span className="price-per-person">{service.pricePerPerson} / person</span>}
+              {service.pricePerPerson && <span className="price-per-person">{service.pricePerPerson} / {t('personLabel')}</span>}
             </div>
-            <button className="book-now-button" onClick={() => navigate(`/booking/${service.id}`)}>Book Now</button>
+            <button className="book-now-button" onClick={() => navigate(`/booking/${service.id}`)}>{t('bookNow')}</button>
           </div>
-          <button onClick={() => navigate(`/report-service/${service.id}`)} className="report-btn">Report Service</button>
+          <button onClick={() => navigate(`/report-service/${service.id}`)} className="report-btn">{t('reportService')}</button>
         </div>
       </div>
 
       <div className="service-gallery">
-        <h2><FaCamera /> Photo Gallery</h2>
+        <h2><FaCamera /> {t('photoGallery')}</h2>
         <div className="photo-grid">
           {service.photos.map((photo, index) => (
             <img key={index} src={photo} alt={`${service.name} gallery ${index + 1}`} className="gallery-photo" />
@@ -165,7 +167,7 @@ const ServiceDetails = () => {
       </div>
 
       <div className="customer-reviews">
-        <h2>Customer Reviews</h2>
+        <h2>{t('customerReviews')}</h2>
         {customerReviews.map(review => (
           <div key={review.id} className="review-card">
             <img src={review.image} alt={review.author} className="review-author-image" />

@@ -8,16 +8,16 @@
   display: inline-block;
   margin-bottom: 1rem;
   padding: 0.5rem 1rem;
-  background-color: #6a5af9;
-  color: white;
+  background-color: var(--primary-color);
+  color: var(--button-text-color);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .back-button:hover {
-  background-color: #5a4ad8;
+  background-color: #5847d3;
 }
 
 .booking-page-container {
@@ -27,15 +27,16 @@
   padding: 2rem;
   max-width: 1200px;
   margin: auto;
-  background-color: #f9f9f9;
+  background-color: var(--secondary-color);
 }
 
 .booking-details-column, .booking-form-column {
-  background-color: #ffffff;
+  background-color: var(--card-background);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   width: 50%;
+  color: var(--text-color);
 }
 
 .service-image {
@@ -48,6 +49,7 @@
 .booking-details-column h2 {
   font-size: 1.8rem;
   margin-bottom: 1rem;
+  color: var(--text-color);
 }
 
 .service-info {
@@ -56,14 +58,16 @@
   gap: 0.5rem;
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
-  color: #555;
+  color: var(--text-color);
+  opacity: 0.8;
 }
 
 .service-meta {
   display: flex;
   gap: 1rem;
   margin-bottom: 1rem;
-  color: #555;
+  color: var(--text-color);
+  opacity: 0.7;
 }
 
 .service-meta span {
@@ -75,12 +79,14 @@
 .service-description {
   margin-bottom: 1.5rem;
   line-height: 1.6;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.8;
 }
 
 .service-features h3 {
   font-size: 1.2rem;
   margin-bottom: 1rem;
+  color: var(--text-color);
 }
 
 .service-features ul {
@@ -94,13 +100,14 @@
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
-  color: #333;
+  color: var(--text-color);
 }
 
 .booking-form-column h2 {
   font-size: 1.8rem;
   margin-bottom: 1.5rem;
   text-align: center;
+  color: var(--text-color);
 }
 
 .booking-form .form-group {
@@ -113,36 +120,40 @@
   gap: 0.5rem;
   font-weight: 500;
   margin-bottom: 0.5rem;
+  color: var(--text-color);
 }
 
 .booking-form input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 .submit-booking-button {
   width: 100%;
   padding: 1rem;
-  background-color: #6a5af9;
-  color: white;
+  background-color: var(--primary-color);
+  color: var(--button-text-color);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--border-radius);
   font-size: 1.1rem;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .submit-booking-button:hover {
-  background-color: #5a4ad8;
+  background-color: #5847d3;
 }
 
 .loading {
   text-align: center;
   padding: 2rem;
   font-size: 1.2rem;
+  color: var(--text-color);
 }
 
 .calendar-grid {
@@ -156,6 +167,7 @@
   font-weight: 600;
   text-align: center;
   padding-bottom: 0.5rem;
+  color: var(--text-color);
 }
 
 .calendar-day {
@@ -165,7 +177,8 @@
   height: 40px;
   border-radius: 50%;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition: all 0.2s ease;
+  color: var(--text-color);
 }
 
 .calendar-day.empty {
@@ -173,16 +186,16 @@
 }
 
 .calendar-day.available {
-  background-color: #e0f7fa;
-  color: #00796b;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
 }
 
 .calendar-day.available:hover {
-  background-color: #b2ebf2;
+  background-color: var(--border-color);
 }
 
 .calendar-day.selected {
-  background-color: #6a5af9;
+  background-color: var(--primary-color);
   color: white;
   font-weight: 600;
 }
@@ -190,13 +203,13 @@
 .selected-date-info {
   margin-top: 1rem;
   font-weight: 500;
-  color: #333;
+  color: var(--text-color);
   text-align: center;
 }
 
 .payment-details {
   margin-top: 2rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-color);
   padding-top: 1.5rem;
 }
 
@@ -206,6 +219,7 @@
   gap: 0.5rem;
   font-size: 1.2rem;
   margin-bottom: 1rem;
+  color: var(--text-color);
 }
 
 .form-row {
@@ -225,20 +239,21 @@
 }
 
 .time-slot-button {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
+  background-color: var(--secondary-color);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  transition: background-color 0.2s, color 0.2s;
+  transition: all 0.2s ease;
+  color: var(--text-color);
 }
 
 .time-slot-button:hover {
-  background-color: #e0e0e0;
+  background-color: var(--border-color);
 }
 
 .time-slot-button.selected {
-  background-color: #6a5af9;
+  background-color: var(--primary-color);
   color: white;
-  border-color: #6a5af9;
+  border-color: var(--primary-color);
 }

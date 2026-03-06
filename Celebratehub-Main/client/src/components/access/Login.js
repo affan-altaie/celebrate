@@ -55,16 +55,16 @@ const Login = () => {
         }
       } else {
         if (data.message === "Your account is pending approval from the administrator.") {
-          setError("Your account is pending approval. You will receive an email once it has been reviewed.");
+          setError(t('loginPending'));
         } else if (data.message === "Your account has been rejected. Please register again.") {
-          setError("Your account has been rejected. Please register again.");
+          setError(t('accountRejected'));
         } else {
-          setError(data.message || 'Login failed');
+          setError(data.message || t('loginFailed'));
         }
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('An error occurred during login');
+      setError(t('genericError'));
     }
   };
 

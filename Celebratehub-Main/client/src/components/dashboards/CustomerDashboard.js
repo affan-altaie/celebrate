@@ -1,37 +1,33 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
 const CustomerDashboard = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
-
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
 
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <h1>Welcome, {user?.username}!</h1>
-        <button onClick={handleLogout} className="logout-btn">Logout</button>
+        <h1>{t('welcomeCustomer', { username: user?.username })}</h1>
       </header>
       <main className="dashboard-content">
         <div className="dashboard-card">
-          <h3>Edit Profile</h3>
-          <p>Update your personal information and preferences</p>
-          <button onClick={() => navigate('/customer-profile')} className="action-btn">Go to Profile</button>
+          <h3>{t('editProfile')}</h3>
+          <p>{t('editCustomerProfileDesc')}</p>
+          <button onClick={() => navigate('/customer-profile')} className="action-btn">{t('goToProfile')}</button>
         </div>
         <div className="dashboard-card">
-          <h3>Booking History</h3>
-          <p>View your past and upcoming event bookings</p>
-          <button onClick={() => navigate('/booking-history')} className="action-btn">View History</button>
+          <h3>{t('bookingHistory')}</h3>
+          <p>{t('bookingHistoryDesc')}</p>
+          <button onClick={() => navigate('/booking-history')} className="action-btn">{t('viewHistory')}</button>
         </div>
         <div className="dashboard-card">
-          <h3>New Booking</h3>
-          <p>Plan a new event and find services</p>
-          <button onClick={() => navigate('/new-booking')} className="action-btn">Book Now</button>
+          <h3>{t('newBooking')}</h3>
+          <p>{t('newBookingDesc')}</p>
+          <button onClick={() => navigate('/new-booking')} className="action-btn">{t('bookNow')}</button>
         </div>
       </main>
     </div>

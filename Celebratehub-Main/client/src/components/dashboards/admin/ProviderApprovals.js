@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import './Admin.css';
 
 const ProviderApprovals = () => {
+  const { t } = useTranslation();
   const [requests, setRequests] = useState([]);
 
   useEffect(() => {
@@ -22,10 +24,10 @@ const ProviderApprovals = () => {
     try {
       await axios.put(`/api/providers/${id}/approve`);
       setRequests(requests.filter(request => request._id !== id));
-      alert('Provider approved successfully!');
+      alert(t('providerApprovedAlert'));
     } catch (error) {
       console.error('Error approving provider:', error);
-      alert('Error approving provider. Please try again.');
+      alert(t('providerApprovalError'));
     }
   };
 
@@ -33,27 +35,27 @@ const ProviderApprovals = () => {
     try {
       await axios.put(`/api/providers/${id}/reject`);
       setRequests(requests.filter(request => request._id !== id));
-      alert('Provider rejected successfully!');
+      alert(t('providerRejectedAlert'));
     } catch (error) {
       console.error('Error rejecting provider:', error);
-      alert('Error rejecting provider. Please try again.');
+      alert(t('providerApprovalError'));
     }
   };
 
   return (
     <div className="admin-container">
-      <h1>Provider Approvals</h1>
-      <p>This page allows administrators to approve or reject new service provider registrations.</p>
+      <h1>{t('providerApprovals')}</h1>
+      <p>{t('providerApprovalsDescription')}</p>
       
       <div className="admin-table-container">
         <table className="admin-table">
           <thead>
             <tr>
-              <th>Request ID</th>
-              <th>Username</th>
-              <th>Contact Email</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{t('requestIdLabel')}</th>
+              <th>{t('usernameLabel')}</th>
+              <th>{t('contactEmailLabel')}</th>
+              <th>{t('statusLabel')}</th>
+              <th>{t('actionsLabel')}</th>
             </tr>
           </thead>
           <tbody>
@@ -64,14 +66,14 @@ const ProviderApprovals = () => {
                 <td>{request.email}</td>
                 <td>
                   <span className={`status ${request.status.toLowerCase()}`}>
-                    {request.status}
+                    {t(request.status.toLowerCase())}
                   </span>
                 </td>
                 <td>
                   {request.status === 'pending' && (
                     <>
-                      <button className="action-btn" onClick={() => handleApprove(request._id)}>Approve</button>
-                      <button className="delete-btn" onClick={() => handleReject(request._id)}>Reject</button>
+                      <button className="action-btn" onClick={() => handleApprove(request._id)}>{t('approve')}</button>
+                      <button className="delete-btn" onClick={() => handleReject(request._id)}>{t('reject')}</button>
                     </>
                   )}
                 </td>

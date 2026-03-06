@@ -8,16 +8,10 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/login');
-  };
-
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>{t('adminDashboard')} - {user?.username}</h1>
-        <button onClick={handleLogout} className="logout-btn">{t('logout')}</button>
       </header>
       <main className="dashboard-content">
         <div className="dashboard-card">

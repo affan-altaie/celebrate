@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './Admin.css';
 
 const UserManagement = () => {
+  const { t } = useTranslation();
   const users = [
     { id: 1, username: 'johndoe', email: 'john.doe@example.com', role: 'Provider' },
     { id: 2, username: 'janesmith', email: 'jane.smith@example.com', role: 'Customer' },
@@ -11,18 +13,18 @@ const UserManagement = () => {
 
   return (
     <div className="admin-container">
-      <h1>User Management</h1>
-      <p>This page allows administrators to view, edit, and delete users.</p>
+      <h1>{t('userManagement')}</h1>
+      <p>{t('userManagementDescription')}</p>
       
       <div className="admin-table-container">
         <table className="admin-table">
           <thead>
             <tr>
-              <th>User ID</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Actions</th>
+              <th>{t('userIdLabel')}</th>
+              <th>{t('usernameLabel')}</th>
+              <th>{t('emailLabel')}</th>
+              <th>{t('roleLabel')}</th>
+              <th>{t('actionsLabel')}</th>
             </tr>
           </thead>
           <tbody>
@@ -33,8 +35,8 @@ const UserManagement = () => {
                 <td>{user.email}</td>
                 <td>{user.role}</td>
                 <td>
-                  <button className="action-btn">Edit</button>
-                  <button className="delete-btn">Delete</button>
+                  <button className="action-btn">{t('edit')}</button>
+                  <button className="delete-btn">{t('delete')}</button>
                 </td>
               </tr>
             ))}

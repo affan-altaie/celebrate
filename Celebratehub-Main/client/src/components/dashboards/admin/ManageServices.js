@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import './Admin.css';
 
 const ManageServices = () => {
+  const { t } = useTranslation();
   const services = [
     { id: 1, name: 'Elite Photography Studios', provider: 'John Doe', status: 'Active' },
     { id: 2, name: 'Gourmet Catering Co.', provider: 'Jane Smith', status: 'Active' },
@@ -11,18 +13,18 @@ const ManageServices = () => {
 
   return (
     <div className="admin-container">
-      <h1>Manage Services</h1>
-      <p>This page allows administrators to view, edit, and delete services.</p>
+      <h1>{t('manageServices')}</h1>
+      <p>{t('manageServicesDescription')}</p>
       
       <div className="admin-table-container">
         <table className="admin-table">
           <thead>
             <tr>
-              <th>Service ID</th>
-              <th>Service Name</th>
-              <th>Provider</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{t('serviceIdLabel')}</th>
+              <th>{t('serviceNameLabel')}</th>
+              <th>{t('providerLabel')}</th>
+              <th>{t('statusLabel')}</th>
+              <th>{t('actionsLabel')}</th>
             </tr>
           </thead>
           <tbody>
@@ -33,12 +35,12 @@ const ManageServices = () => {
                 <td>{service.provider}</td>
                 <td>
                   <span className={`status ${service.status.toLowerCase()}`}>
-                    {service.status}
+                    {t(service.status.toLowerCase())}
                   </span>
                 </td>
                 <td>
-                  <button className="action-btn">Edit</button>
-                  <button className="delete-btn">Delete</button>
+                  <button className="action-btn">{t('edit')}</button>
+                  <button className="delete-btn">{t('delete')}</button>
                 </td>
               </tr>
             ))}

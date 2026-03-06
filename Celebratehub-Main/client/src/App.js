@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import Navbar from './components/Navbar';
 import AuthHeader from './components/AuthHeader';
 import Footer from './components/Footer';
@@ -61,13 +62,20 @@ const ProtectedRoute = ({ children, allowedRoles = [] }) => {
 
 const AppContent = () => {
   const location = useLocation();
+  const { i18n } = useTranslation();
   const showNavbar = !['/login', '/register', '/forgot-password'].includes(location.pathname);
   const showAuthHeader = ['/login', '/register', '/forgot-password'].includes(location.pathname);
 
+  useEffect(() => {
+    document.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
+
   return (
-    <div className="App">
+    <div className="app-container">
       {showNavbar && <Navbar />}
       {showAuthHeader && <AuthHeader />}
+      <main className="main-content">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/customer-dashboard" element={<ProtectedRoute allowedRoles={['customer']}><CustomerDashboard /></ProtectedRoute>} />
@@ -98,6 +106,7 @@ const AppContent = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/terms" element={<Terms />} />
       </Routes>
+      </main>
       <Footer />
     </div>
   );

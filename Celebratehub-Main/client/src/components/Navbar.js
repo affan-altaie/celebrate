@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { MdMenu } from 'react-icons/md';
 import logo2 from '../assets/logo2-cut.png';
 import logo2Dark from '../assets/logo2-cut-darkmode.png';
 import logo1 from '../assets/logo1.png'; // Fallback image
@@ -76,8 +77,8 @@ const Navbar = () => {
               <Link to="/register">{t('signUp')}</Link>
             </>
           )}
-          <button onClick={toggleMenu} className="menu-button">
-            &#9776;
+          <button onClick={toggleMenu} className="menu-button" aria-label="Open settings">
+            <MdMenu />
           </button>
         </div>
       </nav>

@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   FaSearch, FaMapMarkerAlt, FaMoneyBillAlt, FaStar, FaCalendarCheck, FaUserFriends, 
-  FaSearchLocation, FaMapMarkedAlt, FaUtensils, FaCameraRetro, FaMusic, FaCheckCircle
+  FaSearchLocation, FaMapMarkedAlt, FaUtensils, FaCameraRetro, FaMusic, FaCheckCircle,
+  FaTimes, FaHistory, FaTag
 } from 'react-icons/fa';
 import './NewBooking.css';
 
@@ -15,7 +16,12 @@ const NewBooking = () => {
   const [price, setPrice] = useState('');
   const [rating, setRating] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   const resultsRef = useRef(null);
+  const searchInputRef = useRef(null);
 
   const services = [
     {
@@ -71,41 +77,134 @@ const NewBooking = () => {
     }
   ];
 
+  // Enhanced search functionality
+  const generateSearchSuggestions = (term) => {
+    if (!term.trim()) {
+      setSearchSuggestions([]);
+      return;
+    }
+
+    const suggestions = [];
+    const lowerTerm = term.toLowerCase();
+
+    // Add service names as suggestions
+    services.forEach(service => {
+      if (service.name.toLowerCase().includes(lowerTerm) && !suggestions.includes(service.name)) {
+        suggestions.push(service.name);
+      }
+      if (service.type.toLowerCase().includes(lowerTerm) && !suggestions.includes(service.type)) {
+        suggestions.push(service.type);
+      }
+    });
+
+    // Add popular search terms
+    const popularTerms = ['Wedding', 'Birthday', 'Catering', 'Photography', 'Event', 'Party'];
+    popularTerms.forEach(term => {
+      if (term.toLowerCase().includes(lowerTerm) && !suggestions.includes(term)) {
+        suggestions.push(term);
+      }
+    });
+
+    setSearchSuggestions(suggestions.slice(0, 5)); // Limit to 5 suggestions
+  };
+
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    generateSearchSuggestions(value);
+    setShowSuggestions(true);
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setSearchTerm(suggestion);
+    setShowSuggestions(false);
+    handleSearch();
+  };
+
+  const handleSearchHistoryClick = (historyItem) => {
+    setSearchTerm(historyItem.term);
+    setLocation(historyItem.location);
+    setPrice(historyItem.price);
+    setRating(historyItem.rating);
+    setShowSuggestions(false);
+    handleSearch();
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setSearchSuggestions([]);
+    setShowSuggestions(false);
+    searchInputRef.current?.focus();
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+      setShowSuggestions(false);
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
+    }
+  };
+
   const handleSearch = () => {
-    let results = services.filter(service =>
-      service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.type.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    if (location) {
-      results = results.filter(service => service.location.toLowerCase().includes(location.toLowerCase()));
+    if (!searchTerm.trim() && !location && !price && !rating) {
+      return; // Don't search if all fields are empty
     }
 
-    if (price) {
-      results = results.filter(service => {
-        const servicePrice = parseInt(service.price.replace(/\D/g, ''));
-        return servicePrice <= parseInt(price);
-      });
-    }
+    setIsSearching(true);
 
-    if (rating) {
-      results = results.filter(service => service.rating >= parseFloat(rating));
-    }
+    // Add to search history
+    const searchQuery = {
+      term: searchTerm,
+      location,
+      price,
+      rating,
+      timestamp: Date.now()
+    };
+    
+    const newHistory = [searchQuery, ...searchHistory.filter(h => 
+      !(h.term === searchTerm && h.location === location && h.price === price && h.rating === rating)
+    )].slice(0, 10); // Keep only last 10 searches
+    
+    setSearchHistory(newHistory);
 
-    setSearchResults(results);
+    // Simulate search delay for better UX
     setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+      let results = services.filter(service =>
+        service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        service.type.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      if (location) {
+        results = results.filter(service => service.location.toLowerCase().includes(location.toLowerCase()));
+      }
+
+      if (price) {
+        results = results.filter(service => {
+          const servicePrice = parseInt(service.price.replace(/\D/g, ''));
+          return servicePrice <= parseInt(price);
+        });
+      }
+
+      if (rating) {
+        results = results.filter(service => service.rating >= parseFloat(rating));
+      }
+
+      setSearchResults(results);
+      setIsSearching(false);
+      
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }, 300);
   };
 
   const handleServiceClick = (serviceType) => {
-    const results = services.filter(service =>
-      service.type.toLowerCase().includes(serviceType.toLowerCase())
-    );
-    setSearchResults(results);
-    setTimeout(() => {
-      resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+    setSearchTerm(serviceType);
+    setLocation('');
+    setPrice('');
+    setRating('');
+    handleSearch();
   };
 
   const backgroundImageUrl = 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80';
@@ -132,14 +231,60 @@ const NewBooking = () => {
           </div>
           
           <div className="search-box">
-            <div className="search-input">
+            <div className="search-input search-input-main">
               <FaSearch className="icon" />
               <input 
+                ref={searchInputRef}
                 type="text" 
                 placeholder={t('searchPlaceholder')} 
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearchInputChange}
+                onKeyDown={handleKeyDown}
+                onFocus={() => setShowSuggestions(true)}
               />
+              {searchTerm && (
+                <button className="clear-search" onClick={handleClearSearch}>
+                  <FaTimes />
+                </button>
+              )}
+              {showSuggestions && (
+                <div className="search-suggestions">
+                  {searchSuggestions.length > 0 ? (
+                    searchSuggestions.map((suggestion, index) => (
+                      <div 
+                        key={index}
+                        className="suggestion-item"
+                        onClick={() => handleSuggestionClick(suggestion)}
+                      >
+                        <FaTag className="suggestion-icon" />
+                        {suggestion}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="no-suggestions">
+                      No suggestions found
+                    </div>
+                  )}
+                  {searchHistory.length > 0 && (
+                    <div className="suggestions-divider"></div>
+                  )}
+                  {searchHistory.slice(0, 3).map((historyItem, index) => (
+                    <div 
+                      key={index}
+                      className="suggestion-item history-item"
+                      onClick={() => handleSearchHistoryClick(historyItem)}
+                    >
+                      <FaHistory className="suggestion-icon" />
+                      <span className="history-term">{historyItem.term}</span>
+                      {historyItem.location && (
+                        <span className="history-location">
+                          <FaMapMarkerAlt /> {historyItem.location}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="search-input">
               <FaMapMarkerAlt className="icon" />
@@ -169,7 +314,13 @@ const NewBooking = () => {
                 <option value="3">3.0+</option>
               </select>
             </div>
-            <button className="search-button" onClick={handleSearch}>{t('searchButton')}</button>
+            <button className="search-button" onClick={handleSearch} disabled={isSearching}>
+              {isSearching ? (
+                <span className="searching-spinner">Searching...</span>
+              ) : (
+                t('searchButton')
+              )}
+            </button>
           </div>
 
           <div className="features-container">

@@ -45,5 +45,14 @@
   "atLeastOneUppercaseLetter": "At least one uppercase letter",
   "atLeastOneLowercaseLetter": "At least one lowercase letter",
   "atLeastOneNumber": "At least one number",
-  "atLeastOneSpecialCharacter": "At least one special character"
+  "atLeastOneSpecialCharacter": "At least one special character",
+  "footerDescription": "Your trusted platform for discovering events and connecting with top service providers.",
+  "contactUs": "Contact Us",
+  "address": "456 Event Street, Muscat, Oman",
+  "allRightsReserved": "All rights reserved.",
+  "aboutUs": "About Us",
+  "contact": "Contact",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+  "cookiePolicy": "Cookie Policy"
 }

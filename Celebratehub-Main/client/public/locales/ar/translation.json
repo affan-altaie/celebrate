@@ -45,5 +45,14 @@
   "atLeastOneUppercaseLetter": "حرف كبير واحد على الأقل",
   "atLeastOneLowercaseLetter": "حرف صغير واحد على الأقل",
   "atLeastOneNumber": "رقم واحد على الأقل",
-  "atLeastOneSpecialCharacter": "حرف خاص واحد على الأقل"
+  "atLeastOneSpecialCharacter": "حرف خاص واحد على الأقل",
+  "footerDescription": "منصتك الموثوقة لاكتشاف الفعاليات والتواصل مع أفضل مزودي الخدمات.",
+  "contactUs": "اتصل بنا",
+  "address": "456 شارع الفعاليات، مسقط، عمان",
+  "allRightsReserved": "جميع الحقوق محفوظة.",
+  "aboutUs": "من نحن",
+  "contact": "اتصل بنا",
+  "privacyPolicy": "سياسة الخصوصية",
+  "termsOfService": "شروط الخدمة",
+  "cookiePolicy": "سياسة ملفات الارتباط"
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FaFacebookF, FaInstagram, FaMapMarkerAlt, FaEnvelope } from 'react-icons/fa';
+import { FaFacebookF, FaInstagram, FaEnvelope } from 'react-icons/fa';
 import { FaXTwitter } from "react-icons/fa6";
 import './Footer.css';
 
@@ -14,18 +14,17 @@ const Footer = () => {
         <div className="footer-column">
           <h3>CelebrateHub</h3>
           <p>{t('footerDescription')}</p>
+        </div>
+        <div className="footer-column">
+          <h3>{t('contactUs')}</h3>
+          <ul className="contact-info">
+            <li><FaEnvelope /> noreply.celebrate.hub@gmail.com</li>
+          </ul>
           <div className="social-icons">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><FaFacebookF /></a>
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><FaXTwitter /></a>
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><FaInstagram /></a>
           </div>
-        </div>
-        <div className="footer-column">
-          <h3>{t('contactUs')}</h3>
-          <ul className="contact-info">
-            <li><FaMapMarkerAlt /> {t('address')}</li>
-            <li><FaEnvelope /> noreply.celebrate.hub@gmail.com</li>
-          </ul>
         </div>
       </div>
       <div className="footer-bottom">

@@ -114,17 +114,51 @@
   -moz-appearance: none;
   appearance: none;
   cursor: pointer;
-  padding-right: 1.5rem;
-  background-image: linear-gradient(45deg, transparent 50%, var(--primary-color) 50%), 
-                    linear-gradient(135deg, var(--primary-color) 50%, transparent 50%);
-  background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50%;
-  background-size: 5px 5px, 5px 5px;
-  background-repeat: no-repeat;
+  padding-right: 2.5rem;
+  background: transparent;
+  position: relative;
+  border: none;
+  outline: none;
+}
+
+.search-input select::after {
+  content: '▼';
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-color);
+  font-size: 0.7rem;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.search-input select:hover::after {
+  color: var(--text-color);
+  transform: translateY(-50%) rotate(180deg);
 }
 
 .search-input select:focus {
-  background-image: linear-gradient(45deg, transparent 50%, var(--text-color) 50%), 
-                    linear-gradient(135deg, var(--text-color) 50%, transparent 50%);
+  box-shadow: 0 0 0 3px rgba(106, 90, 249, 0.15);
+  border-radius: 8px;
+}
+
+/* Custom dropdown styling for select options */
+.search-input select {
+  background: transparent;
+}
+
+/* For better option styling, we'll need to use a custom dropdown component approach */
+/* But for now, let's enhance the native select with better styling */
+.search-input select option {
+  background-color: var(--card-background);
+  color: var(--text-color);
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.search-input select option:hover {
+  background-color: rgba(106, 90, 249, 0.1);
 }
 
 .clear-search {

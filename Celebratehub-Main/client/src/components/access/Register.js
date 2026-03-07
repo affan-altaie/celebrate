@@ -14,6 +14,7 @@ const Register = () => {
     confirmPassword: "",
     role: "customer",
     location: "",
+    document: null,
   });
   const [error, setError] = useState("");
   const [formErrors, setFormErrors] = useState({});
@@ -73,16 +74,23 @@ const Register = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    const { name, value, files } = e.target;
+    if (name === "document") {
+      setFormData((prevState) => ({
+        ...prevState,
+        document: files[0],
+      }));
+    } else {
+      setFormData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
 
-    if (name === "password") {
-      validatePassword(value);
+      if (name === "password") {
+        validatePassword(value);
+      }
+      if (error) setError("");
     }
-    if (error) setError("");
   };
 
   const handleBlur = (e) => {
@@ -116,19 +124,21 @@ const Register = () => {
     }
 
     try {
+      const formDataObj = new FormData();
+      formDataObj.append("username", formData.username);
+      formDataObj.append("email", formData.email);
+      formDataObj.append("phoneNumber", `+968${formData.phoneNumber}`);
+      formDataObj.append("password", formData.password);
+      formDataObj.append("role", formData.role);
+      formDataObj.append("location", formData.location);
+      
+      if (formData.document) {
+        formDataObj.append("document", formData.document);
+      }
+
       const response = await fetch("/api/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          phoneNumber: `+968${formData.phoneNumber}`,
-          password: formData.password,
-          role: formData.role,
-          location: formData.location,
-        }),
+        body: formDataObj,
       });
 
       const data = await response.json();
@@ -312,6 +322,21 @@ const Register = () => {
               <div className="error-message">{formErrors.confirmPassword}</div>
             )}
           </div>
+
+          {formData.role === "provider" && (
+            <div className="form-group">
+              <label htmlFor="document">{t('businessDocument')}</label>
+              <input
+                type="file"
+                id="document"
+                name="document"
+                accept="image/*,.pdf,.doc,.docx"
+                onChange={handleChange}
+                className="document-input"
+              />
+              <small className="form-hint">{t('documentHint')}</small>
+            </div>
+          )}
 
           <button type="submit" className="submit-btn">
             {t('createAccount')}

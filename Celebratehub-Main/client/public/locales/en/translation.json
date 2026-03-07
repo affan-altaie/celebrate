@@ -247,5 +247,7 @@
   "availability": "Availability",
   "addServiceBtn": "Add Service",
   "featuresLabel": "Features (comma-separated)",
-  "availabilityManagementPlaceholder": "Availability management will be implemented here."
+  "availabilityManagementPlaceholder": "Availability management will be implemented here.",
+  "businessDocument": "Business Document",
+  "documentHint": "Upload your business license, certificate, or any relevant document (PDF, DOC, DOCX, or image files up to 5MB)"
 }

@@ -3,9 +3,47 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../modals/User");
 const nodemailer = require("nodemailer");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+
+// Configure multer for document uploads
+const uploadDir = path.join(__dirname, "../uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  },
+  fileFilter: function (req, file, cb) {
+    // Accept images and documents
+    const filetypes = /jpeg|jpg|png|pdf|doc|docx/;
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = filetypes.test(file.mimetype);
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Error: File type not allowed!'));
+    }
+  }
+});
 
 // Register Endpoint
-router.post("/register", async (req, res) => {
+router.post("/register", upload.single("document"), async (req, res) => {
   console.log("Register request received:", req.body);
   try {
     console.log("Request body:", req.body);
@@ -42,7 +80,8 @@ router.post("/register", async (req, res) => {
       password: hashedPassword,
       role: role || "customer",
       location: role === "provider" ? location : "",
-      status: role === "provider" ? "pending" : "approved"
+      status: role === "provider" ? "pending" : "approved",
+      document: req.file ? req.file.filename : null
     });
 
     console.log("Saving user to database...");

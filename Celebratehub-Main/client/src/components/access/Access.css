@@ -229,3 +229,18 @@
   .password-requirements li.invalid::before {
     content: "✗";
   }
+
+.document-input {
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background-color: var(--background-color);
+  cursor: pointer;
+  width: 100%;
+}
+
+.form-hint {
+  color: var(--text-color);
+  font-size: 12px;
+  margin-top: 5px;
+}

@@ -31,10 +31,7 @@ const Footer = () => {
         <p>&copy; 2025 CelebrateHub. {t('allRightsReserved')}</p>
         <div className="footer-legal">
           <Link to="/about">{t('aboutUs')}</Link>
-          <Link to="/contact">{t('contact')}</Link>
-          <Link to="/privacy-policy">{t('privacyPolicy')}</Link>
           <Link to="/terms">{t('termsOfService')}</Link>
-          <Link to="/cookie-policy">{t('cookiePolicy')}</Link>
         </div>
       </div>
     </footer>

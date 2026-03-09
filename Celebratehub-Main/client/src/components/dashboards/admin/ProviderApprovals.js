@@ -54,6 +54,7 @@ const ProviderApprovals = () => {
               <th>{t('requestIdLabel')}</th>
               <th>{t('usernameLabel')}</th>
               <th>{t('contactEmailLabel')}</th>
+              <th>{t('documentLabel')}</th> {/* Added document label */}
               <th>{t('statusLabel')}</th>
               <th>{t('actionsLabel')}</th>
             </tr>
@@ -64,6 +65,19 @@ const ProviderApprovals = () => {
                 <td>{request._id}</td>
                 <td>{request.username}</td>
                 <td>{request.email}</td>
+                <td>
+                  {request.document ? (
+                    <a
+                      href={`http://localhost:5000/uploads/${request.document}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {t('viewDocument')}
+                    </a>
+                  ) : (
+                    t('noDocument')
+                  )}
+                </td>
                 <td>
                   <span className={`status ${request.status.toLowerCase()}`}>
                     {t(request.status.toLowerCase())}

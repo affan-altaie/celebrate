@@ -49,8 +49,13 @@ const Register = () => {
     if (formData.password !== formData.confirmPassword) {
       errors.confirmPassword = t('passwordsDoNotMatch');
     }
-    if (formData.role === "provider" && !formData.location) {
-      errors.location = t('locationRequired');
+    if (formData.role === "provider") {
+      if (!formData.location) {
+        errors.location = t('locationRequired');
+      }
+      if (!formData.document) { // New validation for document
+        errors.document = t('documentRequired');
+      }
     }
     return errors;
   }, [formData, t]);
@@ -112,6 +117,7 @@ const Register = () => {
         password: true,
         confirmPassword: true,
         location: true,
+        document: true,
     });
 
     if (Object.keys(errors).length > 0) {
@@ -332,8 +338,13 @@ const Register = () => {
                 name="document"
                 accept="image/*,.pdf,.doc,.docx"
                 onChange={handleChange}
+                onBlur={handleBlur}
                 className="document-input"
+                required
               />
+              {touched.document && formErrors.document && (
+                <div className="error-message">{formErrors.document}</div>
+              )}
               <small className="form-hint">{t('documentHint')}</small>
             </div>
           )}

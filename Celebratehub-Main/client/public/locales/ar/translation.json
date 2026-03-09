@@ -249,5 +249,8 @@
   "featuresLabel": "الميزات (مفصولة بفاصلة)",
   "availabilityManagementPlaceholder": "سيتم تنفيذ إدارة التوفر هنا.",
   "businessDocument": "وثيقة العمل",
-  "documentHint": "قم برفع رخصة عملك، شهادتك، أو أي وثيقة ذات صلة (ملفات PDF، DOC، DOCX، أو صور بحد أقصى 5 ميجابايت)"
+  "documentHint": "قم برفع رخصة عملك، شهادتك، أو أي وثيقة ذات صلة (ملفات PDF، DOC، DOCX، أو صور بحد أقصى 5 ميجابايت)",
+  "documentLabel": "الوثيقة",
+  "viewDocument": "عرض الوثيقة",
+  "noDocument": "لا توجد وثيقة"
 }

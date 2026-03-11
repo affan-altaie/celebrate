@@ -8,17 +8,7 @@ const CustomerReviews = () => {
   const user = JSON.parse(localStorage.getItem('user'));
 
   useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await fetch(`/api/reviews/provider/${user.id}`);
-        const data = await response.json();
-        setReviews(data);
-      } catch (error) {
-        console.error('Failed to fetch reviews:', error);
-      }
-    };
     if (user) {
-      // fetchReviews();
       setReviews([
         { _id: 1, serviceId: { name: 'Elegant Wedding Halls', image: 'https://www.shangri-la.com/-/media/Shangri-La/muscat_barraljissahresort/settings/weddings-celebrations/SLMU_Events_Spaces_1920x940.jpg' }, customerId: { username: 'John Doe', profilePicture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80' }, rating: 5, comment: 'Beautiful venue and great service!' },
         { _id: 2, serviceId: { name: 'Elegant Wedding Halls', image: 'https://www.shangri-la.com/-/media/Shangri-La/muscat_barraljissahresort/settings/weddings-celebrations/SLMU_Events_Spaces_1920x940.jpg' }, customerId: { username: 'Jane Smith', profilePicture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80' }, rating: 4, comment: 'The staff was very helpful.' },

@@ -2,12 +2,24 @@ const express = require("express");
 const router = express.Router();
 const User = require("../modals/User");
 const nodemailer = require("nodemailer");
+const supabase = require("../supabase");
 
 // Get pending providers
 router.get("/pending", async (req, res) => {
   try {
     const pendingProviders = await User.find({ role: "provider", status: "pending" });
-    res.json(pendingProviders);
+
+    const providersWithDocUrls = pendingProviders.map((provider) => {
+      if (provider.document) {
+        const { data } = supabase.storage
+          .from("celebrate-doc")
+          .getPublicUrl(provider.document);
+        return { ...provider.toObject(), document: data.publicUrl };
+      }
+      return provider.toObject();
+    });
+
+    res.json(providersWithDocUrls);
   } catch (error) {
     console.error("Error fetching pending providers:", error);
     res.status(500).json({ message: "Server error" });

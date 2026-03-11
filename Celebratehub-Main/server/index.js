@@ -6,6 +6,7 @@ const session = require("express-session");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
+const bodyParser = require("body-parser");
 
 const app = express();
 
@@ -51,6 +52,8 @@ app.use(cors({
   origin: "http://localhost:3000", // Allow requests from the client
   credentials: true
 }));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 app.use("/uploads", express.static("uploads"));
 

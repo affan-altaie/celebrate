@@ -4,50 +4,14 @@ const bcrypt = require("bcryptjs");
 const User = require("../modals/User");
 const nodemailer = require("nodemailer");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
-
-// Configure multer for document uploads
-const uploadDir = path.join(__dirname, "../uploads");
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ 
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  },
-  fileFilter: function (req, file, cb) {
-    // Accept images and documents
-    const filetypes = /jpeg|jpg|png|pdf|doc|docx/;
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
-    
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error('Error: File type not allowed!'));
-    }
-  }
-});
+const upload = multer();
 
 // Register Endpoint
-router.post("/register", upload.single("document"), async (req, res) => {
+router.post("/register", upload.none(), async (req, res) => {
   console.log("Register request received:", req.body);
   try {
     console.log("Request body:", req.body);
-    const { username, email, phoneNumber, password, role, location } = req.body;
+    const { username, email, phoneNumber, password, role, location, document } = req.body;
 
     if (email === "admin@admin.com") {
       return res.status(400).json({ message: "This email is not allowed for registration" });
@@ -57,7 +21,10 @@ router.post("/register", upload.single("document"), async (req, res) => {
     console.log("Checking for existing user...");
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      if (existingUser.role === 'provider' && role === 'customer') {
+      if (existingUser.status === 'rejected') {
+        // If user is rejected, allow them to register again by deleting the old record
+        await User.deleteOne({ email });
+      } else if (existingUser.role === 'provider' && role === 'customer') {
         return res.status(400).json({ message: "This email is already registered as a service provider. Please use a different email to register as a customer." });
       } else if (existingUser.role === 'customer' && role === 'provider') {
         return res.status(400).json({ message: "This email is already registered as a customer. Please use a different email to register as a service provider." });
@@ -81,7 +48,7 @@ router.post("/register", upload.single("document"), async (req, res) => {
       role: role || "customer",
       location: role === "provider" ? location : "",
       status: role === "provider" ? "pending" : "approved",
-      document: req.file ? req.file.filename : null
+      document: document || null
     });
 
     console.log("Saving user to database...");

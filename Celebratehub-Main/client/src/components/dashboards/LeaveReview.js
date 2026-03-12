@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { FaStar, FaCamera } from 'react-icons/fa';
 import './LeaveReview.css';
 
 const LeaveReview = () => {
+  const { t } = useTranslation();
   const { bookingId } = useParams();
   const navigate = useNavigate();
   const [rating, setRating] = useState(0);
@@ -16,7 +18,7 @@ const LeaveReview = () => {
 
   const handleImageChange = (e) => {
     if (e.target.files.length > 4) {
-      alert('You can only upload a maximum of 4 images.');
+      alert(t('max4Images'));
       return;
     }
     setImages([...e.target.files]);
@@ -31,13 +33,13 @@ const LeaveReview = () => {
 
   return (
     <div className="leave-review-container">
-      <button onClick={() => navigate(-1)} className="back-button">Back to Booking History</button>
+      <button onClick={() => navigate(-1)} className="back-button">{t('backToBookingHistory')}</button>
       <div className="review-form-card">
-        <h2>Leave a Review</h2>
-        <p>Booking ID: {bookingId}</p>
+        <h2>{t('leaveReviewTitle')}</h2>
+        <p>{t('bookingId')}: {bookingId}</p>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Your Rating</label>
+            <label>{t('yourRating')}</label>
             <div className="star-rating">
               {[...Array(5)].map((_, index) => {
                 const starValue = index + 1;
@@ -53,19 +55,19 @@ const LeaveReview = () => {
             </div>
           </div>
           <div className="form-group">
-            <label>Your Comments</label>
+            <label>{t('yourComments')}</label>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Tell us about your experience..."
+              placeholder={t('tellUsExperience')}
               required
             />
           </div>
           <div className="form-group">
-            <label>Add Photos (up to 4)</label>
+            <label>{t('addPhotos')}</label>
             <div className="image-upload-container">
               <FaCamera />
-              <p>Drag & drop or click to upload</p>
+              <p>{t('dragDrop')}</p>
               <input
                 type="file"
                 multiple
@@ -80,7 +82,7 @@ const LeaveReview = () => {
               ))}
             </div>
           </div>
-          <button type="submit" className="submit-review-button">Submit Review</button>
+          <button type="submit" className="submit-review-button">{t('submitReview')}</button>
         </form>
       </div>
     </div>

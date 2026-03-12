@@ -1,8 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Dashboard.css';
 
 const ManageListings = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const services = [
@@ -35,22 +37,22 @@ const ManageListings = () => {
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <h1>Manage Your Services</h1>
-        <button onClick={() => navigate('/provider-dashboard')} className="action-btn">Back to Dashboard</button>
+        <h1>{t("manageServicesTitle")}</h1>
+        <button onClick={() => navigate("/provider-dashboard")} className="action-btn">{t("backToDashboard")}</button>
       </header>
       <main className="dashboard-content">
         <div className="dashboard-card full-width">
           <div className="listing-header">
-            <h3>Your Services</h3>
-            <button onClick={() => navigate('/add-service')} className="action-btn">Add New Service</button>
+            <h3>{t("yourServices")}</h3>
+            <button onClick={() => navigate("/add-service")} className="action-btn">{t("addNewServiceButton")}</button>
           </div>
           <table className="listing-table">
             <thead>
               <tr>
-                <th>Service Name</th>
-                <th>Status</th>
-                <th>Bookings</th>
-                <th>Actions</th>
+                <th>{t("serviceName")}</th>
+                <th>{t("statusLabel")}</th>
+                <th>{t("bookings")}</th>
+                <th>{t("actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -66,12 +68,12 @@ const ManageListings = () => {
                     </div>
                   </td>
                   <td>
-                    <span className={`status ${service.status.toLowerCase()}`}>{service.status}</span>
+                    <span className={`status ${service.status.toLowerCase()}`}>{t(service.status.toLowerCase())}</span>
                   </td>
                   <td>{service.bookings}</td>
                   <td>
-                    <button onClick={() => navigate(`/edit-listing/${service._id}`)} className="action-btn">Edit</button>
-                    <button className="delete-btn">Delete</button>
+                    <button onClick={() => navigate(`/edit-listing/${service._id}`)} className="action-btn">{t("edit")}</button>
+                    <button className="delete-btn">{t("delete")}</button>
                   </td>
                 </tr>
               ))}

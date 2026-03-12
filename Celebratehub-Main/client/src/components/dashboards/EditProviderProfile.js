@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Dashboard.css';
 import logo1 from '../../assets/logo1.png'; // Fallback image
 
 const EditProviderProfile = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState('');
@@ -44,7 +46,7 @@ const EditProviderProfile = () => {
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/user/${user.id}`, {
+      const response = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -60,14 +62,14 @@ const EditProviderProfile = () => {
       if (response.ok) {
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
-        setMessage('Profile updated successfully');
+        setMessage(t('profileUpdated'));
         setError('');
       } else {
-        setError(data.message || 'Failed to update profile');
+        setError(data.message || t('profileUpdateFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError('An error occurred');
+      setError(t('genericError'));
     }
   };
 
@@ -80,7 +82,7 @@ const EditProviderProfile = () => {
     formData.append('profilePicture', file);
 
     try {
-      const response = await fetch(`/api/user/${user.id}/profile-picture`, {
+      const response = await fetch(`/api/users/${user.id}/profile-picture`, {
         method: 'PUT',
         body: formData
       });
@@ -91,14 +93,14 @@ const EditProviderProfile = () => {
         const updatedUser = { ...user, profilePicture: data.profilePicture };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
-        setMessage('Profile picture updated successfully');
+        setMessage(t('profilePictureUpdated'));
         setError('');
       } else {
-        setError(data.message || 'Failed to upload image');
+        setError(data.message || t('imageUploadFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError('An error occurred');
+      setError(t('genericError'));
     }
   };
 
@@ -107,12 +109,12 @@ const EditProviderProfile = () => {
     e.preventDefault();
     
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError('New passwords do not match');
+      setError(t('passwordsDoNotMatchError'));
       return;
     }
 
     try {
-      const response = await fetch(`/api/user/${user.id}/password`, {
+      const response = await fetch(`/api/users/${user.id}/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -126,44 +128,44 @@ const EditProviderProfile = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage('Password updated successfully');
+        setMessage(t('passwordUpdated'));
         setError('');
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       } else {
-        setError(data.message || 'Failed to update password');
+        setError(data.message || t('passwordUpdateFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError('An error occurred');
+      setError(t('genericError'));
     }
   };
 
   // Handle Account Deletion
   const handleDeleteAccount = async () => {
-    if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+    if (!window.confirm(t('deleteAccountConfirm'))) {
       return;
     }
 
     try {
-      const response = await fetch(`/api/user/${user.id}`, {
+      const response = await fetch(`/api/users/${user.id}`, {
         method: 'DELETE'
       });
 
       if (response.ok) {
         localStorage.removeItem('user');
-        navigate('/register');
+        navigate('/login');
       } else {
         const data = await response.json();
-        setError(data.message || 'Failed to delete account');
+        setError(data.message || t('accountDeletionFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError('An error occurred');
+      setError(t('genericError'));
     }
   };
   
   if (!user) {
-    return <div>Loading...</div>
+    return <div>{t('loading')}</div>
   }
 
   return (
@@ -171,9 +173,9 @@ const EditProviderProfile = () => {
       <header className="dashboard-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <button onClick={() => navigate('/provider-dashboard')} className="action-btn" style={{ width: 'auto' }}>
-            Back to Dashboard
+            {t('backToDashboard')}
           </button>
-          <h1>Edit Profile</h1>
+          <h1>{t('editProfile')}</h1>
         </div>
       </header>
 
@@ -182,7 +184,7 @@ const EditProviderProfile = () => {
         {error && <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
 
         <div className="dashboard-card" style={{ maxWidth: '600px', margin: '0 auto', marginBottom: '2rem' }}>
-          <h3>Profile Information</h3>
+          <h3>{t('profileInformation')}</h3>
           
           <div style={{ marginBottom: '2rem' }}>
             <img 
@@ -192,7 +194,7 @@ const EditProviderProfile = () => {
             />
             <div>
               <label htmlFor="profile-upload" className="action-btn" style={{ display: 'inline-block', width: 'auto', cursor: 'pointer' }}>
-                Change Profile Picture
+                {t('changeProfilePicture')}
               </label>
               <input 
                 id="profile-upload" 
@@ -205,20 +207,20 @@ const EditProviderProfile = () => {
           </div>
 
           <div style={{ textAlign: 'left', marginBottom: '2rem' }}>
-            <p><strong>Username:</strong> {user.username}</p>
-            <p><strong>Email:</strong> {user.email}</p>
-            <p><strong>Role:</strong> {user.role}</p>
-            <p><strong>Location:</strong> {user.location}</p>
-            <p><strong>Contact:</strong> {user.contact}</p>
-            <p><strong>Phone Number:</strong> {user.phoneNumber}</p>
+            <p><strong>{t('usernameLabel')}:</strong> {user.username}</p>
+            <p><strong>{t('emailLabel')}:</strong> {user.email}</p>
+            <p><strong>{t('roleLabel')}:</strong> {user.role}</p>
+            <p><strong>{t('location')}:</strong> {user.location}</p>
+            <p><strong>{t('contact')}:</strong> {user.contact}</p>
+            <p><strong>{t('phoneNumber')}:</strong> {user.phoneNumber}</p>
           </div>
 
           <hr />
 
-          <h3>Edit Information</h3>
+          <h3>{t('editInformation')}</h3>
           <form onSubmit={handleProfileUpdate} style={{ textAlign: 'left' }}>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label>Location</label>
+              <label>{t('location')}</label>
               <input
                 type="text"
                 name="location"
@@ -228,7 +230,7 @@ const EditProviderProfile = () => {
               />
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label>Contact</label>
+              <label>{t('contact')}</label>
               <input
                 type="text"
                 name="contact"
@@ -238,7 +240,7 @@ const EditProviderProfile = () => {
               />
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label>Phone Number</label>
+              <label>{t('phoneNumber')}</label>
               <input
                 type="tel"
                 name="phoneNumber"
@@ -247,15 +249,15 @@ const EditProviderProfile = () => {
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
             </div>
-            <button type="submit" className="action-btn">Update Information</button>
+            <button type="submit" className="action-btn">{t('updateInformation')}</button>
           </form>
 
           <hr />
 
-          <h3>Change Password</h3>
+          <h3>{t('changePassword')}</h3>
           <form onSubmit={handlePasswordChange} style={{ textAlign: 'left' }}>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label>Current Password</label>
+              <label>{t('currentPassword')}</label>
               <input
                 type="password"
                 value={passwordData.currentPassword}
@@ -265,7 +267,7 @@ const EditProviderProfile = () => {
               />
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label>New Password</label>
+              <label>{t('newPassword')}</label>
               <input
                 type="password"
                 value={passwordData.newPassword}
@@ -275,7 +277,7 @@ const EditProviderProfile = () => {
               />
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label>Confirm New Password</label>
+              <label>{t('confirmNewPassword')}</label>
               <input
                 type="password"
                 value={passwordData.confirmPassword}
@@ -284,15 +286,15 @@ const EditProviderProfile = () => {
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
             </div>
-            <button type="submit" className="action-btn">Update Password</button>
+            <button type="submit" className="action-btn">{t('updatePassword')}</button>
           </form>
 
           <hr style={{ margin: '2rem 0' }} />
 
-          <h3>Delete Account</h3>
-          <p style={{ color: 'red' }}>Warning: This action cannot be undone.</p>
+          <h3>{t('deleteAccount')}</h3>
+          <p style={{ color: 'red' }}>{t('deleteAccountWarning')}</p>
           <button onClick={handleDeleteAccount} className="logout-btn" style={{ width: '100%' }}>
-            Delete My Account
+            {t('deleteAccountBtn')}
           </button>
         </div>
       </main>

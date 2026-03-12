@@ -1,6 +1,7 @@
-// src/__test__/Register.test.js
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '../i18n'; // Import your i18n instance
 import Register from '../components/access/Register';
 
 // Mock react-router-dom
@@ -19,54 +20,60 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-const renderComponent = () => render(<Register />);
+const renderComponent = () =>
+  render(
+    <I18nextProvider i18n={i18n}>
+      <Register />
+    </I18nextProvider>
+  );
 
 describe('Register Component', () => {
   test('renders all basic inputs', () => {
     renderComponent();
 
-    expect(screen.getByLabelText(/Username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Email Address/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Phone Number/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^Password$/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Confirm Password/i)).toBeInTheDocument();
-    expect(screen.getByText(/Create Account/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/emailAddress/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/phoneNumber/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/confirmPassword/i)).toBeInTheDocument();
+    expect(screen.getByText(/createAccount/i)).toBeInTheDocument();
   });
 
   test('shows location input when role is provider', () => {
     renderComponent();
 
-    fireEvent.change(screen.getByLabelText(/I want to register as a/i), {
+    fireEvent.change(screen.getByLabelText(/iWantToRegisterAsA/i), {
       target: { value: 'provider' },
     });
 
-    expect(screen.getByLabelText(/Location of Business/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/locationOfBusiness/i)).toBeInTheDocument();
   });
 
   test('shows error if password is invalid', async () => {
     renderComponent();
 
-    fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'abc' } });
-    fireEvent.change(screen.getByLabelText(/Confirm Password/i), { target: { value: 'abc' } });
+    fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'testuser' } });
+    fireEvent.change(screen.getByLabelText(/emailAddress/i), { target: { value: 'test@test.com' } });
+    fireEvent.change(screen.getByLabelText(/phoneNumber/i), { target: { value: '91234567' } });
+    fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'abc' } });
+    fireEvent.change(screen.getByLabelText(/confirmPassword/i), { target: { value: 'abc' } });
 
-    fireEvent.click(screen.getByText(/Create Account/i));
+    fireEvent.click(screen.getByText(/createAccount/i));
 
-    await waitFor(() => {
-      expect(screen.getByText(/Password must be at least 8 characters long/i)).toBeInTheDocument();
-    });
+    await expect(screen.findByText(/passwordRequirementsError/i)).resolves.toBeInTheDocument();
   });
 
   test('shows error if phone number is invalid', async () => {
     renderComponent();
 
-    fireEvent.change(screen.getByLabelText(/Phone Number/i), { target: { value: '12345678' } });
-    fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'Abcdef1!' } });
-    fireEvent.change(screen.getByLabelText(/Confirm Password/i), { target: { value: 'Abcdef1!' } });
+    fireEvent.change(screen.getByLabelText(/phoneNumber/i), { target: { value: '12345678' } });
+    fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'Abcdef1!' } });
+    fireEvent.change(screen.getByLabelText(/confirmPassword/i), { target: { value: 'Abcdef1!' } });
 
-    fireEvent.click(screen.getByText(/Create Account/i));
+    fireEvent.click(screen.getByText(/createAccount/i));
 
     await waitFor(() => {
-      expect(screen.getByText(/Phone number must start with 7 or 9/i)).toBeInTheDocument();
+      expect(screen.getByText(/phoneInvalid/i)).toBeInTheDocument();
     });
   });
 
@@ -78,13 +85,13 @@ describe('Register Component', () => {
 
     renderComponent();
 
-    fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'test@test.com' } });
-    fireEvent.change(screen.getByLabelText(/Phone Number/i), { target: { value: '91234567' } });
-    fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'Abcdef1!' } });
-    fireEvent.change(screen.getByLabelText(/Confirm Password/i), { target: { value: 'Abcdef1!' } });
+    fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'testuser' } });
+    fireEvent.change(screen.getByLabelText(/emailAddress/i), { target: { value: 'test@test.com' } });
+    fireEvent.change(screen.getByLabelText(/phoneNumber/i), { target: { value: '91234567' } });
+    fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'Abcdef1!' } });
+    fireEvent.change(screen.getByLabelText(/confirmPassword/i), { target: { value: 'Abcdef1!' } });
 
-    fireEvent.click(screen.getByText(/Create Account/i));
+    fireEvent.click(screen.getByText(/createAccount/i));
 
     await waitFor(() => {
       expect(mockedNavigate).toHaveBeenCalledWith('/login');
@@ -99,13 +106,13 @@ describe('Register Component', () => {
 
     renderComponent();
 
-    fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'testuser' } });
-    fireEvent.change(screen.getByLabelText(/Email Address/i), { target: { value: 'test@test.com' } });
-    fireEvent.change(screen.getByLabelText(/Phone Number/i), { target: { value: '91234567' } });
-    fireEvent.change(screen.getByLabelText(/^Password$/i), { target: { value: 'Abcdef1!' } });
-    fireEvent.change(screen.getByLabelText(/Confirm Password/i), { target: { value: 'Abcdef1!' } });
+    fireEvent.change(screen.getByLabelText(/username/i), { target: { value: 'testuser' } });
+    fireEvent.change(screen.getByLabelText(/emailAddress/i), { target: { value: 'test@test.com' } });
+    fireEvent.change(screen.getByLabelText(/phoneNumber/i), { target: { value: '91234567' } });
+    fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'Abcdef1!' } });
+    fireEvent.change(screen.getByLabelText(/confirmPassword/i), { target: { value: 'Abcdef1!' } });
 
-    fireEvent.click(screen.getByText(/Create Account/i));
+    fireEvent.click(screen.getByText(/createAccount/i));
 
     await waitFor(() => {
       expect(mockedNavigate).toHaveBeenCalledWith('/login');

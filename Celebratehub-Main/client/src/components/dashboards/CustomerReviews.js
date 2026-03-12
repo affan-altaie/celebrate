@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Dashboard.css';
 
 const CustomerReviews = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [reviews, setReviews] = useState([]);
   const user = JSON.parse(localStorage.getItem('user'));
@@ -18,7 +20,7 @@ const CustomerReviews = () => {
   }, [user]);
 
   if (!user) {
-    return <div>Loading...</div>;
+    return <div>{t('loading')}</div>;
   }
 
   const groupedReviews = reviews.reduce((acc, review) => {
@@ -36,8 +38,8 @@ const CustomerReviews = () => {
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <h1>Customer Reviews</h1>
-        <button onClick={() => navigate(-1)} className="action-btn">Back to Dashboard</button>
+        <h1>{t('customerReviewsTitle')}</h1>
+        <button onClick={() => navigate(-1)} className="action-btn">{t('backToDashboard')}</button>
       </header>
       <main className="dashboard-content">
         {Object.keys(groupedReviews).length > 0 ? (
@@ -65,7 +67,7 @@ const CustomerReviews = () => {
           ))
         ) : (
           <div className="dashboard-card full-width">
-            <p>No reviews found.</p>
+            <p>{t('noReviewsFound')}</p>
           </div>
         )}
       </main>

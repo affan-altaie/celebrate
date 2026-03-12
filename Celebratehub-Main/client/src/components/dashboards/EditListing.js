@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Dashboard.css';
 
 const EditListing = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
   const [formData, setFormData] = useState({
@@ -71,13 +73,13 @@ const EditListing = () => {
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <h1>Edit Listing</h1>
+        <h1>{t('editListing')}</h1>
       </header>
       <main className="dashboard-content">
         <div className="dashboard-card full-width">
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="name">Service Name</label>
+              <label htmlFor="name">{t('serviceName')}</label>
               <input
                 type="text"
                 id="name"
@@ -87,7 +89,7 @@ const EditListing = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="type">Service Type</label>
+              <label htmlFor="type">{t('serviceType')}</label>
               <input
                 type="text"
                 id="type"
@@ -97,7 +99,7 @@ const EditListing = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="location">Location</label>
+              <label htmlFor="location">{t('location')}</label>
               <input
                 type="text"
                 id="location"
@@ -107,7 +109,7 @@ const EditListing = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="price">Price</label>
+              <label htmlFor="price">{t('price')}</label>
               <input
                 type="text"
                 id="price"
@@ -117,7 +119,7 @@ const EditListing = () => {
               />
             </div>
             <div className="form-group">
-              <label htmlFor="description">Description</label>
+              <label htmlFor="description">{t('description')}</label>
               <textarea
                 id="description"
                 name="description"
@@ -126,7 +128,7 @@ const EditListing = () => {
               />
             </div>
             <div className="form-group">
-              <label>Features</label>
+              <label>{t('features')}</label>
               {formData.features.map((feature, index) => (
                 <input
                   key={index}
@@ -138,7 +140,7 @@ const EditListing = () => {
               ))}
             </div>
             <div className="form-group">
-              <label htmlFor="image">Image URL</label>
+              <label htmlFor="image">{t('imageUrl')}</label>
               <input
                 type="text"
                 id="image"
@@ -147,7 +149,7 @@ const EditListing = () => {
                 onChange={handleChange}
               />
             </div>
-            <button type="submit" className="action-btn">Save Changes</button>
+            <button type="submit" className="action-btn">{t('saveChanges')}</button>
           </form>
         </div>
       </main>

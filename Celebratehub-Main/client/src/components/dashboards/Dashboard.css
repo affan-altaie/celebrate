@@ -23,6 +23,22 @@
   font-weight: 600;
 }
 
+.wallet-display {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 1.2rem;
+  background-color: var(--secondary-color);
+  border-radius: 20px;
+  color: var(--primary-color);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.wallet-display svg {
+  font-size: 1.2rem;
+}
+
 .logout-btn {
   padding: 0.7rem 1.5rem;
   background-color: var(--accent-color);

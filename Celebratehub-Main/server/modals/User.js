@@ -48,6 +48,15 @@ const userSchema = new mongoose.Schema({
   otpExpires: {
     type: Date,
     default: undefined
+  },
+  walletBalance: {
+    type: Number,
+    default: 1000
+  },
+  savedCard: {
+    cardNumber: { type: String, default: "" },
+    expiryDate: { type: String, default: "" },
+    cardHolderName: { type: String, default: "" }
   }
 });
 

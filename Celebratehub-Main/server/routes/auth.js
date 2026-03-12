@@ -48,7 +48,8 @@ router.post("/register", upload.none(), async (req, res) => {
       role: role || "customer",
       location: role === "provider" ? location : "",
       status: role === "provider" ? "pending" : "approved",
-      document: document || null
+      document: document || null,
+      walletBalance: 1000
     });
 
     console.log("Saving user to database...");

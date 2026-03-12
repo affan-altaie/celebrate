@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaCalendarAlt, FaCreditCard, FaStar, FaUserFriends, FaCheckCircle, FaClock } from 'react-icons/fa';
 import './BookingPage.css';
 
@@ -93,6 +94,7 @@ const BookingPage = () => {
   const [hours, setHours] = useState(1);
   const [numberOfPersons, setNumberOfPersons] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [saveCard, setSaveCard] = useState(false);
   const [formData, setFormData] = useState({
     location: '',
     phone: '',
@@ -100,11 +102,30 @@ const BookingPage = () => {
     cardNumber: '',
     expiryDate: '',
     cvc: '',
+    cardHolderName: '',
   });
 
   useEffect(() => {
     const selectedService = services.find(s => s.id === parseInt(id));
     setService(selectedService);
+
+    // Fetch saved card info
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const userId = storedUser?.id || storedUser?._id;
+    if (userId) {
+      axios.get(`/api/payments/balance/${userId}`)
+        .then(res => {
+          if (res.data.savedCard && res.data.savedCard.cardNumber) {
+            setFormData(prev => ({
+              ...prev,
+              cardNumber: res.data.savedCard.cardNumber,
+              expiryDate: res.data.savedCard.expiryDate,
+              cardHolderName: res.data.savedCard.cardHolderName,
+            }));
+          }
+        })
+        .catch(err => console.error("Error fetching saved card:", err));
+    }
   }, [id]);
 
   useEffect(() => {
@@ -132,22 +153,57 @@ const BookingPage = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedDate || !selectedTime) {
       alert(t('selectDateTimeAlert'));
       return;
     }
-    const bookingDetails = {
-      service,
-      booking: {
-        ...formData,
-        date: selectedDate,
-        time: selectedTime,
-      },
-    };
-    console.log('Booking submitted:', bookingDetails);
-    navigate('/booking-confirmation', { state: { bookingDetails } });
+
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const userId = storedUser?.id || storedUser?._id;
+
+    if (!storedUser || !userId) {
+      alert('Please login to book a service');
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/payments/process', {
+        userId: userId,
+        serviceId: service.id,
+        serviceName: service.name,
+        amount: totalPrice,
+        cardHolderName: formData.cardHolderName,
+        cardNumber: formData.cardNumber,
+        expiryDate: formData.expiryDate,
+        saveCard: saveCard,
+        bookingDetails: {
+          ...formData,
+          date: selectedDate,
+          time: selectedTime,
+          hours: hours,
+        }
+      });
+
+      if (response.data.success) {
+        const bookingDetails = {
+          service,
+          booking: {
+            ...formData,
+            date: selectedDate,
+            time: selectedTime,
+            transactionId: response.data.transactionId,
+            newBalance: response.data.newBalance
+          },
+        };
+        navigate('/booking-confirmation', { state: { bookingDetails } });
+      }
+    } catch (error) {
+      console.error('Booking/Payment error:', error);
+      alert(error.response?.data?.message || 'Booking failed. Please try again.');
+    }
   };
 
   const renderCalendar = () => {
@@ -320,6 +376,17 @@ const BookingPage = () => {
           <div className="payment-details">
             <h3><FaCreditCard /> {t('paymentInformation')}</h3>
             <div className="form-group">
+              <label>{t('cardHolderName') || 'Card Holder Name'}</label>
+              <input
+                type="text"
+                name="cardHolderName"
+                value={formData.cardHolderName}
+                onChange={handleChange}
+                placeholder="Name on Card"
+                required
+              />
+            </div>
+            <div className="form-group">
               <label>{t('cardNumber')}</label>
               <input
                 type="text"
@@ -353,6 +420,18 @@ const BookingPage = () => {
                   required
                 />
               </div>
+            </div>
+            <div className="form-group-checkbox" style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input
+                type="checkbox"
+                id="saveCard"
+                checked={saveCard}
+                onChange={(e) => setSaveCard(e.target.checked)}
+                style={{ width: 'auto', margin: 0 }}
+              />
+              <label htmlFor="saveCard" style={{ margin: 0, cursor: 'pointer' }}>
+                {t('saveCardForFuture') || 'Save this card for future payments'}
+              </label>
             </div>
           </div>
           

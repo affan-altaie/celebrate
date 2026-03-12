@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import "./Access.css";
 import logo2 from "../../assets/logo2-cut.png";
 
 const ForgotPassword = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -30,11 +32,11 @@ const ForgotPassword = () => {
         setOtpSent(true);
         setMessage(data.message);
       } else {
-        setError(data.message || "Error sending OTP");
+        setError(data.message || t("errorSendingOtp"));
       }
     } catch (err) {
       console.error("OTP send error:", err);
-      setError("An error occurred. Please try again.");
+      setError(t("genericError"));
     }
   };
 
@@ -43,12 +45,12 @@ const ForgotPassword = () => {
     setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("passwordsDoNotMatch"));
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
+      setError(t("passwordTooShort"));
       return;
     }
 
@@ -62,14 +64,14 @@ const ForgotPassword = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        setMessage("Password reset successful. You can now login.");
+        setMessage(t("passwordResetSuccess"));
         setTimeout(() => navigate("/login"), 3000);
       } else {
-        setError(data.message || "Error resetting password");
+        setError(data.message || t("passwordResetError"));
       }
     } catch (err) {
       console.error("Password reset error:", err);
-      setError("An error occurred. Please try again.");
+      setError(t("genericError"));
     }
   };
 
@@ -77,7 +79,7 @@ const ForgotPassword = () => {
     <div className="access-container">
       <div className="access-card">
         <img src={logo2} alt="CelebrateHub Logo" className="access-logo" />
-        <h3 className="access-subtitle">Forgot Password</h3>
+        <h3 className="access-subtitle">{t("forgotPasswordTitle")}</h3>
 
         {error && <div className="error-message">{error}</div>}
         {message && <div className="success-message">{message}</div>}
@@ -85,92 +87,92 @@ const ForgotPassword = () => {
         {!otpSent ? (
           <form className="access-form" onSubmit={handleSendOtp}>
             <div className="form-group">
-              <label htmlFor="email">Email Address</label>
+              <label htmlFor="email">{t("emailAddressLabel")}</label>
               <input
                 type="email"
                 id="email"
                 name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder={t("emailAddressPlaceholder")}
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="phoneNumber">Phone Number</label>
+              <label htmlFor="phoneNumber">{t("phoneNumberLabel")}</label>
               <input
                 type="tel"
                 id="phoneNumber"
                 name="phoneNumber"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="Enter your phone number"
+                placeholder={t("phoneNumberPlaceholder")}
                 required
               />
             </div>
 
             <div className="form-buttons">
               <button type="submit" className="submit-btn">
-                Send OTP
+                {t("sendOtpButton")}
               </button>
               <button type="button" className="cancel-btn" onClick={() => navigate("/login")}>
-                Cancel
+                {t("cancelButton")}
               </button>
             </div>
           </form>
         ) : (
           <form className="access-form" onSubmit={handleResetPassword}>
             <div className="form-group">
-              <label htmlFor="otp">OTP</label>
+              <label htmlFor="otp">{t("otpLabel")}</label>
               <input
                 type="text"
                 id="otp"
                 name="otp"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
-                placeholder="Enter the OTP"
+                placeholder={t("otpPlaceholder")}
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">New Password</label>
+              <label htmlFor="password">{t("newPasswordLabel")}</label>
               <input
                 type="password"
                 id="password"
                 name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your new password"
+                placeholder={t("newPasswordPlaceholder")}
                 required
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm New Password</label>
+              <label htmlFor="confirmPassword">{t("confirmNewPasswordLabel")}</label>
               <input
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm your new password"
+                placeholder={t("confirmNewPasswordPlaceholder")}
                 required
               />
             </div>
 
             <div className="form-buttons">
               <button type="submit" className="submit-btn">
-                Reset Password
+                {t("resetPasswordButton")}
               </button>
             </div>
           </form>
         )}
 
         <div className="access-footer">
-          Remember your password? 
-          <Link to="/login" className="access-link">Sign in</Link>
+          {t("rememberPassword")}
+          <Link to="/login" className="access-link">{t("signInLink")}</Link>
         </div>
       </div>
     </div>

@@ -37,7 +37,7 @@ const CustomerProfile = () => {
     formData.append('profilePicture', file);
 
     try {
-      const response = await fetch(`/api/user/${user.id}/profile-picture`, {
+      const response = await fetch(`/api/users/${user.id}/profile-picture`, {
         method: 'PUT',
         body: formData
       });
@@ -63,7 +63,7 @@ const CustomerProfile = () => {
   const handlePhoneUpdate = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`/api/user/${user.id}`, {
+      const response = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -99,7 +99,7 @@ const CustomerProfile = () => {
     }
 
     try {
-      const response = await fetch(`/api/user/${user.id}/password`, {
+      const response = await fetch(`/api/users/${user.id}/password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -132,13 +132,13 @@ const CustomerProfile = () => {
     }
 
     try {
-      const response = await fetch(`/api/user/${user.id}`, {
+      const response = await fetch(`/api/users/${user.id}`, {
         method: 'DELETE'
       });
 
       if (response.ok) {
         localStorage.removeItem('user');
-        navigate('/register');
+        navigate('/login');
       } else {
         const data = await response.json();
         setError(data.message || t('accountDeletionFailed'));

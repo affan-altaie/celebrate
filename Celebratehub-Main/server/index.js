@@ -1,9 +1,9 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const session = require("express-session");
-const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
 const bodyParser = require("body-parser");
@@ -77,11 +77,13 @@ const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
 const serviceRoutes = require("./routes/services");
 const providerRoutes = require("./routes/providers");
+const paymentRoutes = require("./routes/payments");
 
 app.use("/api", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/providers", providerRoutes);
+app.use("/api/payments", paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

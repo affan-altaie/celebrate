@@ -21,9 +21,9 @@ const Footer = () => {
             <li><FaEnvelope /> noreply.celebrate.hub@gmail.com</li>
           </ul>
           <div className="social-icons">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><FaFacebookF /></a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><FaXTwitter /></a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><FaInstagram /></a>
+            <a href="https://www.facebook.com/share/1RpFVMEQ4g/" target="_blank" rel="noopener noreferrer"><FaFacebookF /></a>
+            <a href="https://x.com/celebratehub1?s=11&t=qUydlJmpYkwu5EazB_QN2Q" target="_blank" rel="noopener noreferrer"><FaXTwitter /></a>
+            <a href="https://www.instagram.com/celebrate.hub1?igsh=aTRyemExbDRyeWVs&utm_source=qr" target="_blank" rel="noopener noreferrer"><FaInstagram /></a>
           </div>
         </div>
       </div>

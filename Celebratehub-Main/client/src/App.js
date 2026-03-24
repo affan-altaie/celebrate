@@ -71,6 +71,10 @@ const AppContent = () => {
     document.documentElement.lang = i18n.language;
   }, [i18n.language]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   return (
     <div className="app-container">
       {showNavbar && <Navbar />}

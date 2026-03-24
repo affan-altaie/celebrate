@@ -113,4 +113,26 @@ router.get('/user-bookings/:userId', async (req, res) => {
   }
 });
 
+// Update saved card details
+router.put('/update-card/:userId', async (req, res) => {
+  try {
+    const { cardHolderName, cardNumber, expiryDate } = req.body;
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    user.savedCard = {
+      cardHolderName,
+      cardNumber,
+      expiryDate
+    };
+
+    await user.save();
+    res.status(200).json({ success: true, message: "Card details updated successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = router;

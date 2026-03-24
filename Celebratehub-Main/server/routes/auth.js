@@ -65,8 +65,10 @@ router.post("/register", upload.none(), async (req, res) => {
 // Forgot Password Endpoint
 router.post("/forgot-password", async (req, res) => {
   try {
-    const { email, phoneNumber } = req.body;
-    const user = await User.findOne({ email, phoneNumber });
+    const { email } = req.body;
+    console.log("Received email for forgot password:", email);
+    const user = await User.findOne({ email });
+    console.log("User found in database:", user);
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }

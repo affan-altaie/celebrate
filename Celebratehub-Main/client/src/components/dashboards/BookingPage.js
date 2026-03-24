@@ -95,6 +95,8 @@ const BookingPage = () => {
   const [numberOfPersons, setNumberOfPersons] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
   const [saveCard, setSaveCard] = useState(false);
+  const [useSavedCard, setUseSavedCard] = useState(false);
+  const [savedCardData, setSavedCardData] = useState(null);
   const [formData, setFormData] = useState({
     location: '',
     phone: '',
@@ -116,6 +118,9 @@ const BookingPage = () => {
       axios.get(`/api/payments/balance/${userId}`)
         .then(res => {
           if (res.data.savedCard && res.data.savedCard.cardNumber) {
+            setSavedCardData(res.data.savedCard);
+            setUseSavedCard(true);
+            setSaveCard(true);
             setFormData(prev => ({
               ...prev,
               cardNumber: res.data.savedCard.cardNumber,
@@ -375,63 +380,136 @@ const BookingPage = () => {
 
           <div className="payment-details">
             <h3><FaCreditCard /> {t('paymentInformation')}</h3>
-            <div className="form-group">
-              <label>{t('cardHolderName') || 'Card Holder Name'}</label>
-              <input
-                type="text"
-                name="cardHolderName"
-                value={formData.cardHolderName}
-                onChange={handleChange}
-                placeholder="Name on Card"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>{t('cardNumber')}</label>
-              <input
-                type="text"
-                name="cardNumber"
-                value={formData.cardNumber}
-                onChange={handleChange}
-                placeholder="0000 0000 0000 0000"
-                required
-              />
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label>{t('expiryDate')}</label>
-                <input
-                  type="text"
-                  name="expiryDate"
-                  value={formData.expiryDate}
-                  onChange={handleChange}
-                  placeholder="MM/YY"
-                  required
-                />
-              </div>
-              <div className="form-group">
+            
+            <div className="payment-section-container">
+              {(formData.cardNumber || formData.cardHolderName) && (
+                <div className="card-visualization" style={{ marginBottom: '2rem' }}>
+                  <div className="card-chip"></div>
+                  <div className="card-number">
+                    {formData.cardNumber ? formData.cardNumber.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim() : '**** **** **** ****'}
+                  </div>
+                  <div className="card-info-row">
+                    <div className="card-holder">
+                      <div className="card-holder-label">{t('cardHolderName')}</div>
+                      <div className="card-holder-name">{formData.cardHolderName || 'Your Name'}</div>
+                    </div>
+                    <div className="card-expiry">
+                      <div className="card-expiry-label">{t('expiryDate')}</div>
+                      <div className="card-expiry-date">{formData.expiryDate || 'MM/YY'}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {savedCardData && (
+                <div 
+                  className={`saved-card-badge ${useSavedCard ? 'selected' : ''}`} 
+                  onClick={() => {
+                    setUseSavedCard(true);
+                    setFormData(prev => ({
+                      ...prev,
+                      cardNumber: savedCardData.cardNumber,
+                      expiryDate: savedCardData.expiryDate,
+                      cardHolderName: savedCardData.cardHolderName,
+                    }));
+                  }}
+                  style={{ cursor: 'pointer', border: useSavedCard ? '2px solid var(--primary-color)' : '1px dashed var(--primary-color)' }}
+                >
+                  <FaCreditCard />
+                  <div className="saved-card-info">
+                    <span className="label">{t('savedCard')}</span>
+                    <span className="value">**** **** **** {savedCardData.cardNumber.slice(-4)}</span>
+                  </div>
+                </div>
+              )}
+
+              {!useSavedCard && (
+                <>
+                  <div className="form-group" style={{ marginBottom: '1rem' }}>
+                    <label>{t('cardHolderName')}</label>
+                    <input
+                      type="text"
+                      name="cardHolderName"
+                      value={formData.cardHolderName}
+                      onChange={handleChange}
+                      placeholder="Name on Card"
+                      required
+                    />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: '1rem' }}>
+                    <label>{t('cardNumber')}</label>
+                    <input
+                      type="text"
+                      name="cardNumber"
+                      value={formData.cardNumber}
+                      onChange={handleChange}
+                      placeholder="0000 0000 0000 0000"
+                      required
+                    />
+                  </div>
+                  <div className="form-group" style={{ marginBottom: '1rem' }}>
+                    <label>{t('expiryDate')}</label>
+                    <input
+                      type="text"
+                      name="expiryDate"
+                      value={formData.expiryDate}
+                      onChange={handleChange}
+                      placeholder="MM/YY"
+                      required
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="form-group" style={{ marginBottom: '1rem' }}>
                 <label>{t('cvc')}</label>
                 <input
                   type="text"
-                  name="cvc"
-                  value={formData.cvc}
+                  name="cvv"
+                  value={formData.cvv}
                   onChange={handleChange}
                   placeholder="123"
                   required
                 />
               </div>
-            </div>
-            <div className="form-group-checkbox" style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <input
-                type="checkbox"
-                id="saveCard"
-                checked={saveCard}
-                onChange={(e) => setSaveCard(e.target.checked)}
-                style={{ width: 'auto', margin: 0 }}
-              />
-              <label htmlFor="saveCard" style={{ margin: 0, cursor: 'pointer' }}>
-                {t('saveCardForFuture') || 'Save this card for future payments'}
-              </label>
+
+              {savedCardData && (
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    if (useSavedCard) {
+                      setUseSavedCard(false);
+                      setFormData(prev => ({ ...prev, cardNumber: '', expiryDate: '', cardHolderName: '' }));
+                    } else {
+                      setUseSavedCard(true);
+                      setFormData(prev => ({
+                        ...prev,
+                        cardNumber: savedCardData.cardNumber,
+                        expiryDate: savedCardData.expiryDate,
+                        cardHolderName: savedCardData.cardHolderName,
+                      }));
+                    }
+                  }}
+                  style={{ background: 'none', border: 'none', color: 'var(--primary-color)', cursor: 'pointer', marginTop: '1rem', marginBottom: '1rem', padding: 0, fontSize: '0.9rem', fontWeight: '600', display: 'block' }}
+                >
+                  {useSavedCard ? t('addNewCard') : t('useSavedCard')}
+                </button>
+              )}
+
+              {!useSavedCard && (
+                <div className="form-group-checkbox" style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <input
+                    type="checkbox"
+                    id="saveCard"
+                    checked={saveCard}
+                    onChange={(e) => setSaveCard(e.target.checked)}
+                    style={{ width: 'auto', margin: 0 }}
+                  />
+                  <label htmlFor="saveCard" style={{ margin: 0, cursor: 'pointer', fontSize: '0.9rem', opacity: 0.9 }}>
+                    {t('saveCardForFuture')}
+                  </label>
+                </div>
+              )}
             </div>
           </div>
           

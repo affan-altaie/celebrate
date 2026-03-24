@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { MdClose, MdSettings, MdLanguage, MdPalette, MdLogout } from 'react-icons/md';
+import { MdClose, MdSettings, MdLanguage, MdPalette, MdLogout, MdHistory, MdDashboard } from 'react-icons/md';
 import LanguageSwitcher from './LanguageSwitcher';
 import ThemeSwitcher from './ThemeSwitcher';
 import './SideMenu.css';
@@ -50,6 +50,15 @@ const SideMenu = ({ isOpen, onClose }) => {
     navigate('/login');
   };
 
+  const getDashboardLink = () => {
+    if (!user) return '/';
+    switch (user.role) {
+      case 'admin': return '/admin-dashboard';
+      case 'provider': return '/provider-dashboard';
+      default: return '/customer-dashboard';
+    }
+  };
+
   return (
     <>
       <div className={`side-menu-backdrop ${isOpen ? 'open' : ''}`} onClick={onClose} />
@@ -94,6 +103,27 @@ const SideMenu = ({ isOpen, onClose }) => {
           {user && (
             <>
               <div className="menu-divider" />
+              <div className="menu-section">
+                <div className="section-header">
+                  <MdDashboard className="section-icon" />
+                  <h4>{t('navigation') || 'Navigation'}</h4>
+                </div>
+                <div className="section-content">
+                  <button onClick={() => { navigate(getDashboardLink()); onClose(); }} className="side-menu-nav-btn">
+                    <MdDashboard className="logout-icon" />
+                    <span>{t('dashboard') || 'Dashboard'}</span>
+                  </button>
+                  {user.role === 'customer' && (
+                    <button onClick={() => { navigate('/booking-history'); onClose(); }} className="side-menu-nav-btn">
+                      <MdHistory className="logout-icon" />
+                      <span>{t('bookingHistory')}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="menu-divider" />
+              
               <div className="menu-section">
                 <button onClick={handleLogout} className="side-menu-logout-btn">
                   <MdLogout className="logout-icon" />

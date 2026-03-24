@@ -34,6 +34,17 @@
   align-items: center;
 }
 
+.navbar-user-link {
+  display: flex;
+  align-items: center;
+  color: inherit;
+  transition: opacity 0.2s ease;
+}
+
+.navbar-user-link:hover {
+  opacity: 0.7;
+}
+
 .navbar-user-profile {
   height: 40px;
   width: 40px;

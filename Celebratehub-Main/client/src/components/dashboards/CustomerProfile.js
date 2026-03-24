@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
+import { FaCreditCard } from 'react-icons/fa';
 import './Dashboard.css';
 import logo1 from '../../assets/logo1.png'; // Fallback image
 
@@ -12,6 +14,12 @@ const CustomerProfile = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
+  const [isEditingCard, setIsEditingCard] = useState(false);
+  const [cardData, setCardData] = useState({
+    cardHolderName: '',
+    cardNumber: '',
+    expiryDate: ''
+  });
   
   useEffect(() => {
     if (!user) {
@@ -19,6 +27,23 @@ const CustomerProfile = () => {
       if (storedUser) {
         setUser(storedUser);
       }
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const userId = user?.id || user?._id;
+    if (userId) {
+      axios.get(`/api/payments/balance/${userId}`)
+        .then(res => {
+          if (res.data.savedCard) {
+            setCardData({
+              cardHolderName: res.data.savedCard.cardHolderName || '',
+              cardNumber: res.data.savedCard.cardNumber || '',
+              expiryDate: res.data.savedCard.expiryDate || ''
+            });
+          }
+        })
+        .catch(err => console.error("Error fetching card details:", err));
     }
   }, [user]);
   
@@ -125,6 +150,25 @@ const CustomerProfile = () => {
     }
   };
 
+  // Handle Card Update
+  const handleCardUpdate = async (e) => {
+    e.preventDefault();
+    const userId = user?.id || user?._id;
+    try {
+      const response = await axios.put(`/api/payments/update-card/${userId}`, cardData);
+      if (response.data.success) {
+        setMessage(t('cardUpdated') || 'Card details updated successfully');
+        setError('');
+        setIsEditingCard(false);
+      } else {
+        setError(response.data.message || t('cardUpdateFailed') || 'Failed to update card details');
+      }
+    } catch (err) {
+      console.error(err);
+      setError(t('genericError'));
+    }
+  };
+
   // Handle Account Deletion
   const handleDeleteAccount = async () => {
     if (!window.confirm(t('deleteAccountConfirm'))) {
@@ -219,6 +263,95 @@ const CustomerProfile = () => {
             </div>
             <button type="submit" className="action-btn">{t('updatePhoneNumber')}</button>
           </form>
+
+          <hr />
+
+          <h3><FaCreditCard /> {t('paymentInformation')}</h3>
+          
+          <div className="payment-section-container">
+            {(cardData.cardNumber || cardData.cardHolderName) && (
+              <div className="card-visualization" style={{ marginBottom: isEditingCard ? '2rem' : '1rem' }}>
+                <div className="card-chip"></div>
+                <div className="card-number">
+                  {cardData.cardNumber ? cardData.cardNumber.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim() : '**** **** **** ****'}
+                </div>
+                <div className="card-info-row">
+                  <div className="card-holder">
+                    <div className="card-holder-label">{t('cardHolderName')}</div>
+                    <div className="card-holder-name">{cardData.cardHolderName || 'Your Name'}</div>
+                  </div>
+                  <div className="card-expiry">
+                    <div className="card-expiry-label">{t('expiryDate')}</div>
+                    <div className="card-expiry-date">{cardData.expiryDate || 'MM/YY'}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!isEditingCard ? (
+              <button 
+                onClick={() => setIsEditingCard(true)} 
+                className="action-btn" 
+                style={{ width: '100%', borderRadius: '10px' }}
+              >
+                {cardData.cardNumber ? t('edit') : t('addNewCard')}
+              </button>
+            ) : (
+              <form onSubmit={handleCardUpdate} style={{ textAlign: 'left' }}>
+                <div className="form-group" style={{ marginBottom: '1.2rem' }}>
+                  <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
+                    {t('cardHolderName')}
+                  </label>
+                  <input
+                    type="text"
+                    value={cardData.cardHolderName}
+                    onChange={(e) => setCardData({...cardData, cardHolderName: e.target.value})}
+                    placeholder="e.g. John Doe"
+                    style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
+                  />
+                </div>
+                <div className="form-row" style={{ marginBottom: '1.5rem' }}>
+                  <div className="form-group">
+                    <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
+                      {t('cardNumber')}
+                    </label>
+                    <input
+                      type="text"
+                      value={cardData.cardNumber}
+                      onChange={(e) => setCardData({...cardData, cardNumber: e.target.value})}
+                      placeholder="0000 0000 0000 0000"
+                      style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
+                      {t('expiryDate')}
+                    </label>
+                    <input
+                      type="text"
+                      value={cardData.expiryDate}
+                      onChange={(e) => setCardData({...cardData, expiryDate: e.target.value})}
+                      placeholder="MM/YY"
+                      style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
+                    />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button type="submit" className="action-btn" style={{ flex: 2, borderRadius: '10px', padding: '12px' }}>
+                    {t('saveChanges')}
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => setIsEditingCard(false)} 
+                    className="logout-btn" 
+                    style={{ flex: 1, borderRadius: '10px', padding: '12px', background: '#ccc', color: '#333' }}
+                  >
+                    {t('cancel')}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
 
           <hr />
 

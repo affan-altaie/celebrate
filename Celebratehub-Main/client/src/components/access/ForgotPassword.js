@@ -8,7 +8,7 @@ const ForgotPassword = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,7 +25,7 @@ const ForgotPassword = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, phoneNumber }),
+        body: JSON.stringify({ email }),
       });
       const data = await response.json();
       if (response.ok) {
@@ -95,19 +95,6 @@ const ForgotPassword = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t("emailAddressPlaceholder")}
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="phoneNumber">{t("phoneNumberLabel")}</label>
-              <input
-                type="tel"
-                id="phoneNumber"
-                name="phoneNumber"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder={t("phoneNumberPlaceholder")}
                 required
               />
             </div>

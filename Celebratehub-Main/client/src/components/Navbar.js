@@ -38,6 +38,16 @@ const Navbar = () => {
     }
   };
 
+  const getProfileLink = () => {
+    if (!user) return '/';
+    switch (user.role) {
+      case 'provider':
+        return '/edit-provider-profile';
+      default:
+        return '/customer-profile';
+    }
+  };
+
   const toggleMenu = () => {
     setMenuOpen(!isMenuOpen);
   };
@@ -58,17 +68,15 @@ const Navbar = () => {
           {user ? (
             <div className="navbar-user">
               {user.role !== 'admin' && (
-                <>
-                  <Link to={getDashboardLink()}>
-                    <img
-                      src={user.profilePicture ? user.profilePicture : logo1}
-                      alt="Profile"
-                      className="navbar-user-profile"
-                      onError={handleImageError}
-                    />
-                  </Link>
+                <Link to={getProfileLink()} className="navbar-user-link">
+                  <img
+                    src={user.profilePicture ? user.profilePicture : logo1}
+                    alt="Profile"
+                    className="navbar-user-profile"
+                    onError={handleImageError}
+                  />
                   <span className="navbar-user-name">{user.username}</span>
-                </>
+                </Link>
               )}
             </div>
           ) : (

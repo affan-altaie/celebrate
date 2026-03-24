@@ -50,6 +50,9 @@ const BookingConfirmation = () => {
           <Link to="/customer-dashboard" className="dashboard-link no-print">
             {t('goToDashboard')}
           </Link>
+          <Link to="/booking-history" className="dashboard-link no-print" style={{ backgroundColor: '#28a745' }}>
+            {t('viewHistory')}
+          </Link>
           <button onClick={handlePrint} className="print-button no-print">
             <FaPrint /> {t('printReceipt')}
           </button>

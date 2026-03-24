@@ -19,6 +19,7 @@ const ForgotPassword = () => {
   const handleSendOtp = async (e) => {
     e.preventDefault();
     setError("");
+    console.log("Sending OTP to:", email);
     try {
       const response = await fetch("/api/forgot-password", {
         method: "POST",
@@ -28,6 +29,7 @@ const ForgotPassword = () => {
         body: JSON.stringify({ email }),
       });
       const data = await response.json();
+      console.log("Response from server:", data);
       if (response.ok) {
         setOtpSent(true);
         setMessage(data.message);

@@ -47,7 +47,7 @@ router.post("/register", upload.none(), async (req, res) => {
       password: hashedPassword,
       role: role || "customer",
       location: role === "provider" ? location : "",
-      status: role === "provider" ? "pending" : "approved",
+      status: "pending", // For customers: pending for OTP, for providers: pending for admin approval
       document: document || null,
       walletBalance: 1000
     });
@@ -55,7 +55,46 @@ router.post("/register", upload.none(), async (req, res) => {
     console.log("Saving user to database...");
     await newUser.save();
     console.log("User saved successfully");
-    res.status(201).json({ message: "User registered successfully" });
+
+    let responseMessage = "User registered successfully.";
+
+    if (newUser.role === "customer") {
+      // Generate OTP
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      newUser.otp = otp;
+      newUser.otpExpires = Date.now() + 600000; // 10 minutes
+      await newUser.save();
+
+      // Send OTP via email
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS
+        }
+      });
+
+      const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: newUser.email,
+        subject: "Verify your email",
+        text: `Your OTP for email verification is: ${otp}`
+      };
+
+      try {
+          await transporter.sendMail(mailOptions);
+      } catch (error) {
+          console.error("Error sending OTP email:", error);
+          return res.status(500).json({ message: "Error sending OTP email" });
+      }
+      responseMessage += " Please check your email for OTP.";
+    } else if (newUser.role === "provider") {
+      // For providers, status is pending admin approval, no OTP needed here.
+      responseMessage += " Your account is pending admin approval.";
+    }
+
+    req.session.user = { email: newUser.email };
+    res.status(201).json({ message: responseMessage });
   } catch (error) {
     console.error("Registration error:", error);
     res.status(500).json({ message: "Server error during registration" });
@@ -65,6 +104,10 @@ router.post("/register", upload.none(), async (req, res) => {
 // Forgot Password Endpoint
 router.post("/forgot-password", async (req, res) => {
   try {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+      console.error("Email credentials are not set.");
+      return res.status(500).json({ message: "Email service is not configured." });
+    }
     const { email } = req.body;
     console.log("Received email for forgot password:", email);
     const user = await User.findOne({ email });
@@ -95,9 +138,14 @@ router.post("/forgot-password", async (req, res) => {
       text: `Your OTP for password reset is: ${otp}`
     };
 
-    await transporter.sendMail(mailOptions);
-
-    res.json({ message: "OTP sent to your email" });
+    try {
+        await transporter.sendMail(mailOptions);
+        req.session.user = { email: user.email };
+        res.json({ message: "OTP sent to your email" });
+    } catch (error) {
+        console.error("Error sending OTP email:", error);
+        return res.status(500).json({ message: "Error sending OTP email" });
+    }
   } catch (error) {
     console.error("Forgot password error:", error);
     res.status(500).json({ message: "Server error" });
@@ -150,12 +198,16 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Invalid email or password" });
     }
 
-    if (user.role === "provider" && user.status === "pending") {
-      return res.status(401).json({ message: "Your account is pending approval from the administrator." });
+    if (user.status === "pending") {
+      if (user.role === "customer") {
+        return res.status(401).json({ message: "Your account is pending email verification. Please check your email for an OTP." });
+      } else if (user.role === "provider") {
+        return res.status(401).json({ message: "Your account is pending admin approval." });
+      }
     }
 
     if (user.role === "provider" && user.status === "rejected") {
-      return res.status(401).json({ message: "Your account has been rejected. Please register again." });
+      return res.status(401).json({ message: "Your provider account has been rejected. Please register again or contact support." });
     }
 
     // Create session

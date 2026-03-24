@@ -320,5 +320,14 @@
   "other": "Other",
   "detailedDescription": "Detailed Description",
   "provideDetails": "Please provide as much detail as possible...",
-  "submitReport": "Submit Report"
+  "submitReport": "Submit Report",
+  "loginPendingVerification": "Your account is pending verification. Please check your email for an OTP.",
+  "verifyHere": "Verify here",
+  "otpSentTo": "OTP sent to {{email}}",
+  "enterOtp": "Enter OTP",
+  "verifying": "Verifying...",
+  "verify": "Verify",
+  "resendOtp": "Resend OTP",
+  "resendOtpFailed": "Failed to resend OTP",
+  "resendOtpCooldown": "Resend OTP in {{seconds}}s"
 }

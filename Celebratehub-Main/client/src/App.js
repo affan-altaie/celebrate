@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import Home from './components/Home';
 import Login from './components/access/Login';
 import Register from './components/access/Register';
+import OtpVerification from './components/access/OtpVerification';
 import ForgotPassword from './components/access/ForgotPassword';
 import About from './components/About';
 import Contact from './components/Contact';
@@ -105,6 +106,7 @@ const AppContent = () => {
         <Route path="/admin/reports-and-feedback" element={<ProtectedRoute allowedRoles={['admin']}><ReportsAndFeedback /></ProtectedRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/otp-verification" element={<OtpVerification />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />

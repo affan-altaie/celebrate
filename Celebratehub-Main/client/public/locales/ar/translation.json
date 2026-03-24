@@ -320,5 +320,14 @@
   "other": "أخرى",
   "detailedDescription": "وصف مفصل",
   "provideDetails": "يرجى تقديم أكبر قدر ممكن من التفاصيل ...",
-  "submitReport": "إرسال تقرير"
+  "submitReport": "إرسال تقرير",
+  "loginPendingVerification": "حسابك قيد التحقق. يرجى التحقق من بريدك الإلكتروني للحصول على OTP.",
+  "verifyHere": "تحقق هنا",
+  "otpSentTo": "تم إرسال الرمز إلى {{email}}",
+  "enterOtp": "أدخل OTP",
+  "verifying": "جار التحقق ...",
+  "verify": "تحقق",
+  "resendOtp": "إعادة إرسال OTP",
+  "resendOtpFailed": "فشل إرسال OTP مرة أخرى",
+  "resendOtpCooldown": "إعادة إرسال الرمز في {{seconds}} ثانية"
 }

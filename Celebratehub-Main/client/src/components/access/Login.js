@@ -54,8 +54,13 @@ const Login = () => {
             navigate('/customer-dashboard', { state: { user: data.user } });
         }
       } else {
-        if (data.message === "Your account is pending approval from the administrator.") {
-          setError(t('loginPending'));
+        if (data.message === "Your account is pending verification. Please check your email for an OTP.") {
+          setError(<>
+            {t('loginPendingVerification')}&nbsp;
+            <Link to="/otp-verification" state={{ email: formData.email }}>
+              {t('verifyHere')}
+            </Link>
+          </>);
         } else if (data.message === "Your account has been rejected. Please register again.") {
           setError(t('accountRejected'));
         } else {

@@ -186,15 +186,20 @@ const Register = () => {
 
       if (response.ok) {
         console.log("Registration successful");
-        if (formData.role === "provider") {
-          alert(t("registrationPending"));
+        if (formData.role === "customer") {
+          navigate("/otp-verification", { state: { email: formData.email } });
+        } else if (formData.role === "provider") {
+          // Display the message from the server for providers awaiting admin approval
+          setError(data.message || t("registrationSuccessProviderPending"));
+          // Optionally navigate to login or a dedicated info page after a delay
+          setTimeout(() => {
+            navigate("/login");
+          }, 3000); // Navigate to login after 3 seconds
         }
-        navigate("/login");
       } else {
         if (data.message === "User already registered") {
           navigate("/login");
-        }
-        else {
+        } else {
           setError(data.message || t("registrationFailed"));
         }
       }

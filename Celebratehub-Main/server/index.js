@@ -1,5 +1,5 @@
 const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, ".env") });
+require("dotenv").config({ path: path.join(__dirname, "server", ".env") });
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -78,8 +78,10 @@ const userRoutes = require("./routes/users");
 const serviceRoutes = require("./routes/services");
 const providerRoutes = require("./routes/providers");
 const paymentRoutes = require("./routes/payments");
+const otpRoutes = require("./routes/otp");
 
 app.use("/api", authRoutes);
+app.use("/api", otpRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/providers", providerRoutes);

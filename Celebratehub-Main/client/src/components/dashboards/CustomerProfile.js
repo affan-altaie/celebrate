@@ -212,7 +212,7 @@ const CustomerProfile = () => {
         </div>
       </header>
 
-      <main className="dashboard-content" style={{ display: 'block' }}>
+      <main className="dashboard-content">
         {message && <div className="success-message" style={{ color: 'green', marginBottom: '1rem', textAlign: 'center' }}>{message}</div>}
         {error && <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
 
@@ -404,3 +404,4 @@ const CustomerProfile = () => {
 };
 
 export default CustomerProfile;
+

@@ -1,7 +1,17 @@
+/* ServiceDetails.css */
+
 .service-details-container {
-    padding: 2rem;
-    color: var(--text-color);
-  }
+  padding: 2rem;
+  color: var(--text-color);
+}
+
+.service-details-content {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 2rem;
+  background-color: var(--card-background);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
   
   .back-button {
     background-color: var(--primary-color);

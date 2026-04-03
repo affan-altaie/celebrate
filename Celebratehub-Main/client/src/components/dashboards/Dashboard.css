@@ -190,7 +190,9 @@
   padding: 1.5rem;
   border-radius: 12px;
   border: 1px solid var(--border-color);
-  margin: 1rem 0;
+  margin: 1rem auto; /* Center the container */
+  max-width: 400px; /* Set a max-width */
+  width: 100%;
 }
 
 .saved-card-badge {
@@ -287,4 +289,20 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
+}
+
+.message-placeholder {
+  height: 2rem;
+  line-height: 2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+.success-message {
+  color: green;
+}
+
+.error-message {
+  color: red;
 }

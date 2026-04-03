@@ -64,7 +64,7 @@ const services = [
     photos: [
         'https://www.shangri-la.com/-/media/Shangri-La/muscat_barraljissahresort/settings/weddings-celebrations/SLMU_Events_Spaces_1920x940.jpg',
         'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60',
-        'https://images.unsplash.com/photo-1505238680356-667803448bb6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60'
+        'https://images.unsplash.com.com/photo-1505238680356-667803448bb6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60'
     ]
   },
   {
@@ -132,64 +132,66 @@ const ServiceDetails = () => {
 
   return (
     <div className="service-details-container">
-      <button onClick={() => navigate(-1)} className="back-button">{t('backToSearch')}</button>
-      
-      <div className="service-header">
-        <img src={service.image} alt={service.name} className="service-main-image" />
-        <div className="service-header-info">
-          <Link to={`/provider-profile/${service.providerId}`} className="provider-link">
-            <h1>{t('serviceProviderLabel')}: {service.name}</h1>
-          </Link>
-          <div className="service-meta">
-            <span><FaStar /> {service.rating} ({t('reviewsCount', { count: service.reviews })})</span>
-            <span><FaMapMarkerAlt /> <strong>{t('locationLabel')}:</strong> {service.location} (<strong>{t('distanceLabel')}:</strong> {service.distance})</span>
-            <span><FaCalendarAlt /> <strong>{t('dateOfPublishLabel')}:</strong> {service.publishedDate}</span>
-          </div>
-          <p className="service-description">{service.description}</p>
-          <div className="service-price-book">
-            <div className="price-info">
-              <span className="price-display">{service.price}</span>
-              {service.pricePerPerson && <span className="price-per-person">{service.pricePerPerson} / {t('personLabel')}</span>}
+      <div className="service-details-content">
+        <button onClick={() => navigate(-1)} className="back-button">{t('backToSearch')}</button>
+        
+        <div className="service-header">
+          <img src={service.image} alt={service.name} className="service-main-image" />
+          <div className="service-header-info">
+            <Link to={`/provider-profile/${service.providerId}`} className="provider-link">
+              <h1>{t('serviceProviderLabel')}: {service.name}</h1>
+            </Link>
+            <div className="service-meta">
+              <span><FaStar /> {service.rating} ({t('reviewsCount', { count: service.reviews })})</span>
+              <span><FaMapMarkerAlt /> <strong>{t('locationLabel')}:</strong> {service.location} (<strong>{t('distanceLabel')}:</strong> {service.distance})</span>
+              <span><FaCalendarAlt /> <strong>{t('dateOfPublishLabel')}:</strong> {service.publishedDate}</span>
             </div>
-            <button className="book-now-button" onClick={() => navigate(`/booking/${service.id}`)}>{t('bookNow')}</button>
+            <p className="service-description">{service.description}</p>
+            <div className="service-price-book">
+              <div className="price-info">
+                <span className="price-display">{service.price}</span>
+                {service.pricePerPerson && <span className="price-per-person">{service.pricePerPerson} / {t('personLabel')}</span>}
+              </div>
+              <button className="book-now-button" onClick={() => navigate(`/booking/${service.id}`)}>{t('bookNow')}</button>
+            </div>
+            <button onClick={() => navigate(`/report-service/${service.id}`)} className="report-btn">{t('reportService')}</button>
           </div>
-          <button onClick={() => navigate(`/report-service/${service.id}`)} className="report-btn">{t('reportService')}</button>
         </div>
-      </div>
 
-      <div className="service-gallery">
-        <h2><FaCamera /> {t('photoGallery')}</h2>
-        <div className="photo-grid">
-          {service.photos.map((photo, index) => (
-            <img key={index} src={photo} alt={`${service.name} gallery ${index + 1}`} className="gallery-photo" />
+        <div className="service-gallery">
+          <h2><FaCamera /> {t('photoGallery')}</h2>
+          <div className="photo-grid">
+            {service.photos.map((photo, index) => (
+              <img key={index} src={photo} alt={`${service.name} gallery ${index + 1}`} className="gallery-photo" />
+            ))}
+          </div>
+        </div>
+
+        <div className="customer-reviews">
+          <h2>{t('customerReviews')}</h2>
+          {customerReviews.map(review => (
+            <div key={review.id} className="review-card">
+              <img src={review.image} alt={review.author} className="review-author-image" />
+              <div className="review-content">
+                <div className="review-header">
+                  <strong>{review.author}</strong>
+                  <div className="review-rating">
+                    {[...Array(review.rating)].map((_, i) => <FaStar key={i} color="#ffc107" />)}
+                    {[...Array(5 - review.rating)].map((_, i) => <FaStar key={i} color="#e4e5e9" />)}
+                  </div>
+                </div>
+                <p>{review.comment}</p>
+                {review.photos && (
+                  <div className="review-photos">
+                    {review.photos.map((photo, index) => (
+                      <img key={index} src={photo} alt={`${review.author} review ${index + 1}`} className="review-photo" />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           ))}
         </div>
-      </div>
-
-      <div className="customer-reviews">
-        <h2>{t('customerReviews')}</h2>
-        {customerReviews.map(review => (
-          <div key={review.id} className="review-card">
-            <img src={review.image} alt={review.author} className="review-author-image" />
-            <div className="review-content">
-              <div className="review-header">
-                <strong>{review.author}</strong>
-                <div className="review-rating">
-                  {[...Array(review.rating)].map((_, i) => <FaStar key={i} color="#ffc107" />)}
-                  {[...Array(5 - review.rating)].map((_, i) => <FaStar key={i} color="#e4e5e9" />)}
-                </div>
-              </div>
-              <p>{review.comment}</p>
-              {review.photos && (
-                <div className="review-photos">
-                  {review.photos.map((photo, index) => (
-                    <img key={index} src={photo} alt={`${review.author} review ${index + 1}`} className="review-photo" />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );

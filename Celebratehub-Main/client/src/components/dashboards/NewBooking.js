@@ -118,7 +118,7 @@ const NewBooking = () => {
   const handleSuggestionClick = (suggestion) => {
     setSearchTerm(suggestion);
     setShowSuggestions(false);
-    handleSearch();
+    handleSearch({ term: suggestion });
   };
 
   const handleSearchHistoryClick = (historyItem) => {
@@ -127,7 +127,7 @@ const NewBooking = () => {
     setPrice(historyItem.price);
     setRating(historyItem.rating);
     setShowSuggestions(false);
-    handleSearch();
+    handleSearch({ term: historyItem.term, location: historyItem.location, price: historyItem.price, rating: historyItem.rating });
   };
 
   const handleClearSearch = () => {
@@ -146,8 +146,13 @@ const NewBooking = () => {
     }
   };
 
-  const handleSearch = () => {
-    if (!searchTerm.trim() && !location && !price && !rating) {
+  const handleSearch = (searchParams) => {
+    const termToSearch = searchParams && typeof searchParams.term !== 'undefined' ? searchParams.term : searchTerm;
+    const locationToSearch = searchParams && typeof searchParams.location !== 'undefined' ? searchParams.location : location;
+    const priceToSearch = searchParams && typeof searchParams.price !== 'undefined' ? searchParams.price : price;
+    const ratingToSearch = searchParams && typeof searchParams.rating !== 'undefined' ? searchParams.rating : rating;
+
+    if (!termToSearch.trim() && !locationToSearch && !priceToSearch && !ratingToSearch) {
       return; // Don't search if all fields are empty
     }
 
@@ -155,15 +160,15 @@ const NewBooking = () => {
 
     // Add to search history
     const searchQuery = {
-      term: searchTerm,
-      location,
-      price,
-      rating,
+      term: termToSearch,
+      location: locationToSearch,
+      price: priceToSearch,
+      rating: ratingToSearch,
       timestamp: Date.now()
     };
     
     const newHistory = [searchQuery, ...searchHistory.filter(h => 
-      !(h.term === searchTerm && h.location === location && h.price === price && h.rating === rating)
+      !(h.term === termToSearch && h.location === locationToSearch && h.price === priceToSearch && h.rating === ratingToSearch)
     )].slice(0, 10); // Keep only last 10 searches
     
     setSearchHistory(newHistory);
@@ -171,23 +176,23 @@ const NewBooking = () => {
     // Simulate search delay for better UX
     setTimeout(() => {
       let results = services.filter(service =>
-        service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        service.type.toLowerCase().includes(searchTerm.toLowerCase())
+        service.name.toLowerCase().includes(termToSearch.toLowerCase()) ||
+        service.type.toLowerCase().includes(termToSearch.toLowerCase())
       );
 
-      if (location) {
-        results = results.filter(service => service.location.toLowerCase().includes(location.toLowerCase()));
+      if (locationToSearch) {
+        results = results.filter(service => service.location.toLowerCase().includes(locationToSearch.toLowerCase()));
       }
 
-      if (price) {
+      if (priceToSearch) {
         results = results.filter(service => {
           const servicePrice = parseInt(service.price.replace(/\D/g, ''));
-          return servicePrice <= parseInt(price);
+          return servicePrice <= parseInt(priceToSearch);
         });
       }
 
-      if (rating) {
-        results = results.filter(service => service.rating >= parseFloat(rating));
+      if (ratingToSearch) {
+        results = results.filter(service => service.rating >= parseFloat(ratingToSearch));
       }
 
       setSearchResults(results);
@@ -204,7 +209,7 @@ const NewBooking = () => {
     setLocation('');
     setPrice('');
     setRating('');
-    handleSearch();
+    handleSearch({ term: serviceType, location: '', price: '', rating: '' });
   };
 
   const backgroundImageUrl = 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80';
@@ -314,7 +319,7 @@ const NewBooking = () => {
                 <option value="3">3.0+</option>
               </select>
             </div>
-            <button className="search-button" onClick={handleSearch} disabled={isSearching}>
+            <button className="search-button" onClick={() => handleSearch()} disabled={isSearching}>
               {isSearching ? (
                 <span className="searching-spinner">Searching...</span>
               ) : (

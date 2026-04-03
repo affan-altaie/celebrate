@@ -13,8 +13,10 @@ const CustomerProfile = () => {
   const [user, setUser] = useState(location.state?.user || null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [paymentError, setPaymentError] = useState('');
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
   const [isEditingCard, setIsEditingCard] = useState(false);
+  const [originalCardData, setOriginalCardData] = useState(null);
   const [cardData, setCardData] = useState({
     cardHolderName: '',
     cardNumber: '',
@@ -56,8 +58,9 @@ const CustomerProfile = () => {
       const response = await axios.delete(`/api/payments/delete-card/${userId}`);
       if (response.data.success) {
         setMessage(t("cardDeleted") || "Card details deleted successfully.");
-        setCardData({ cardHolderName: "", cardNumber: "", expiryDate: "" }); // Clear card data
+        setCardData({ cardHolderName: "", cardNumber: "", expiryDate: "" });
         setError("");
+        setPaymentError('');
       } else {
         setError(response.data.message || t("cardDeletionFailed") || "Failed to delete card details.");
       }
@@ -73,13 +76,16 @@ const CustomerProfile = () => {
     confirmPassword: ""
   });
 
-  // Handle Profile Picture Upload
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     const formData = new FormData();
     formData.append('profilePicture', file);
+    
+    setMessage('');
+    setError('');
+    setPaymentError('');
 
     try {
       const response = await fetch(`/api/users/${user.id}/profile-picture`, {
@@ -94,7 +100,6 @@ const CustomerProfile = () => {
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
         setMessage(t('profilePictureUpdated'));
-        setError('');
       } else {
         setError(data.message || t('imageUploadFailed'));
       }
@@ -104,9 +109,11 @@ const CustomerProfile = () => {
     }
   };
 
-  // Handle Phone Number Update
   const handlePhoneUpdate = async (e) => {
     e.preventDefault();
+    setMessage('');
+    setError('');
+    setPaymentError('');
     try {
       const response = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
@@ -123,7 +130,6 @@ const CustomerProfile = () => {
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
         setMessage(t('phoneNumberUpdated'));
-        setError('');
         setNewPhoneNumber('');
       } else {
         setError(data.message || t('phoneNumberUpdateFailed'));
@@ -134,9 +140,11 @@ const CustomerProfile = () => {
     }
   };
 
-  // Handle Password Change
   const handlePasswordChange = async (e) => {
     e.preventDefault();
+    setMessage('');
+    setError('');
+    setPaymentError('');
     
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       setError(t('passwordsDoNotMatchError'));
@@ -159,7 +167,6 @@ const CustomerProfile = () => {
 
       if (response.ok) {
         setMessage(t('passwordUpdated'));
-        setError('');
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       } else {
         setError(data.message || t('passwordUpdateFailed'));
@@ -170,42 +177,53 @@ const CustomerProfile = () => {
     }
   };
 
-  // Handle Card Update
   const handleCardUpdate = async (e) => {
     e.preventDefault();
     const userId = user?.id || user?._id;
-
-    // Validate expiry date
-    const [month, year] = cardData.expiryDate.split("/");
-    const currentYear = new Date().getFullYear() % 100; // Get last two digits of year
-    const currentMonth = new Date().getMonth() + 1; // Month is 0-indexed
-
+  
+    setMessage('');
+    setError('');
+    setPaymentError('');
+  
+    const cardNumberDigits = cardData.cardNumber.replace(/\D/g, '');
+    if (cardNumberDigits.length !== 16) {
+      setPaymentError(t('invalidCardNumber') || 'Card number must be 16 digits.');
+      return;
+    }
+  
+    const [month, year] = cardData.expiryDate.split('/');
+    const currentYear = new Date().getFullYear() % 100;
+    const currentMonth = new Date().getMonth() + 1;
+  
     if (!month || !year || parseInt(month, 10) < 1 || parseInt(month, 10) > 12) {
-      setError(t("invalidExpiryDate") || "Invalid expiry date format. Please use MM/YY.");
+      setPaymentError(t("invalidExpiryDate") || "Invalid expiry date format. Please use MM/YY.");
       return;
     }
-
+  
     if (parseInt(year, 10) < currentYear || (parseInt(year, 10) === currentYear && parseInt(month, 10) < currentMonth)) {
-      setError(t("expiredCardError") || "Card has expired. Please enter a valid expiry date.");
+      setPaymentError(t("expiredCardError") || "Card has expired. Please enter a valid expiry date.");
       return;
     }
-
+  
     try {
-      const response = await axios.put(`/api/payments/update-card/${userId}`, cardData);
+      const response = await axios.put(`/api/payments/update-card/${userId}`, {
+        ...cardData,
+        cardNumber: cardNumberDigits
+      });
+  
       if (response.data.success) {
         setMessage(t("cardUpdated") || "Card details updated successfully");
-        setError("");
         setIsEditingCard(false);
+        setCardData(prev => ({ ...prev, cardNumber: cardData.cardNumber }));
       } else {
-        setError(response.data.message || t("cardUpdateFailed") || "Failed to update card details");
+        setPaymentError(response.data.message || t("cardUpdateFailed") || "Failed to update card details");
       }
     } catch (err) {
       console.error(err);
-      setError(t("genericError"));
+      setPaymentError(t("genericError") || "An error occurred");
     }
   };
 
-  // Handle Account Deletion
   const handleDeleteAccount = async () => {
     if (!window.confirm(t('deleteAccountConfirm'))) {
       return;
@@ -248,14 +266,16 @@ const CustomerProfile = () => {
         </div>
       </header>
 
-      <main className="dashboard-content">
-        {message && <div className="success-message" style={{ color: 'green', marginBottom: '1rem', textAlign: 'center' }}>{message}</div>}
-        {error && <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
+      <main className="dashboard-content" style={{ display: 'block' }}>
+        <div className="message-placeholder">
+          {message && <div className="success-message">{message}</div>}
+          {error && <div className="error-message">{error}</div>}
+        </div>
 
         <div className="dashboard-card" style={{ maxWidth: '600px', margin: '0 auto', marginBottom: '2rem' }}>
           <h3>{t('profileInformation')}</h3>
           
-          <div style={{ marginBottom: '2rem' }}>
+          <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
             <img 
               src={user.profilePicture ? user.profilePicture : logo1} 
               alt="Profile" 
@@ -285,7 +305,7 @@ const CustomerProfile = () => {
 
           <hr />
 
-          <h3>{t('editPhoneNumber')}</h3>
+          <h3 style={{ textAlign: 'center' }}>{t('editPhoneNumber')}</h3>
           <form onSubmit={handlePhoneUpdate} style={{ textAlign: 'left' }}>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('newPhoneNumberLabel')}</label>
@@ -302,11 +322,11 @@ const CustomerProfile = () => {
 
           <hr />
 
-          <h3><FaCreditCard /> {t('paymentInformation')}</h3>
+          <h3 style={{ textAlign: 'center' }}><FaCreditCard /> {t('paymentInformation')}</h3>
           
           <div className="payment-section-container">
-            {(cardData.cardNumber || cardData.cardHolderName) && (
-              <div className="card-visualization" style={{ marginBottom: isEditingCard ? '2rem' : '1rem' }}>
+            {(cardData.cardNumber || cardData.cardHolderName) && !isEditingCard && (
+              <div className="card-visualization" style={{ marginBottom: '1rem' }}>
                 <div className="card-chip"></div>
                 <div className="card-number">
                   {cardData.cardNumber ? cardData.cardNumber.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim() : '**** **** **** ****'}
@@ -327,7 +347,10 @@ const CustomerProfile = () => {
             {!isEditingCard ? (
               <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
                 <button 
-                  onClick={() => setIsEditingCard(true)} 
+                  onClick={() => {
+                    setOriginalCardData(cardData);
+                    setIsEditingCard(true);
+                  }} 
                   className="action-btn" 
                   style={{ flex: 1, borderRadius: '10px' }}
                 >
@@ -345,6 +368,23 @@ const CustomerProfile = () => {
               </div>
             ) : (
               <form onSubmit={handleCardUpdate} style={{ textAlign: 'left' }}>
+                <div className="card-visualization" style={{ marginBottom: '2rem' }}>
+                    <div className="card-chip"></div>
+                    <div className="card-number">
+                    {cardData.cardNumber ? cardData.cardNumber.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim() : '**** **** **** ****'}
+                    </div>
+                    <div className="card-info-row">
+                    <div className="card-holder">
+                        <div className="card-holder-label">{t('cardHolderName')}</div>
+                        <div className="card-holder-name">{cardData.cardHolderName || 'Your Name'}</div>
+                    </div>
+                    <div className="card-expiry">
+                        <div className="card-expiry-label">{t('expiryDate')}</div>
+                        <div className="card-expiry-date">{cardData.expiryDate || 'MM/YY'}</div>
+                    </div>
+                    </div>
+                </div>
+
                 <div className="form-group" style={{ marginBottom: '1.2rem' }}>
                   <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
                     {t('cardHolderName')}
@@ -361,48 +401,38 @@ const CustomerProfile = () => {
                     style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)', textTransform: 'uppercase' }}
                   />
                 </div>
-                <div className="form-row" style={{ marginBottom: '1.5rem' }}>
-                  <div className="form-group">
+                <div className="form-row" style={{ marginBottom: '1.5rem', alignItems: 'flex-end' }}>
+                  <div className="form-group" style={{ flex: 2 }}>
                     <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
                       {t('cardNumber')}
                     </label>
                     <input
                       type="text"
                       inputMode="numeric"
-                      maxLength="19" // 16 digits + 3 spaces
-                      value={cardData.cardNumber
-                        .replace(/\D/g, "")
-                        .replace(/(\d{4})(?=\d)/g, "$1 ")
-                        .trim()}
+                      maxLength="19"
+                      value={cardData.cardNumber.replace(/\D/g, '').replace(/(\d{4})(?=\d)/g, '$1 ').trim()}
                       onChange={(e) => {
-                        const formattedValue = e.target.value
-                          .replace(/\D/g, "")
-                          .substring(0, 16)
-                          .replace(/(\d{4})(?=\d)/g, "$1 ");
+                        const formattedValue = e.target.value.replace(/\D/g, '');
                         setCardData({...cardData, cardNumber: formattedValue});
                       }}
                       placeholder="0000 0000 0000 0000"
                       style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
                     />
                   </div>
-                  <div className="form-group">
+                  <div className="form-group" style={{ flex: 1 }}>
                     <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
                       {t('expiryDate')}
                     </label>
                     <input
                       type="text"
                       inputMode="numeric"
-                      pattern="[0-9/]{4}"
                       maxLength="5"
-                      value={cardData.expiryDate
-                        .replace(/\D/g, "")
-                        .replace(/(\d{2})(?=\d{2})/g, "$1/")
-                        .substring(0, 5)}
+                      value={cardData.expiryDate}
                       onChange={(e) => {
-                        const input = e.target.value.replace(/\D/g, "");
+                        const input = e.target.value.replace(/\D/g, '');
                         let formattedValue = input;
                         if (input.length > 2) {
-                          formattedValue = input.substring(0, 2) + "/" + input.substring(2, 4);
+                          formattedValue = input.substring(0, 2) + '/' + input.substring(2, 4);
                         }
                         setCardData({...cardData, expiryDate: formattedValue});
                       }}
@@ -411,13 +441,22 @@ const CustomerProfile = () => {
                     />
                   </div>
                 </div>
+
+                {paymentError && <div className="error-message" style={{ textAlign: 'center', marginBottom: '1rem' }}>{paymentError}</div>}
+                
                 <div style={{ display: 'flex', gap: '1rem' }}>
                   <button type="submit" className="action-btn" style={{ flex: 2, borderRadius: '10px', padding: '12px' }}>
                     {t('saveChanges')}
                   </button>
                   <button 
                     type="button" 
-                    onClick={() => setIsEditingCard(false)} 
+                    onClick={() => {
+                      if (originalCardData) {
+                        setCardData(originalCardData);
+                      }
+                      setIsEditingCard(false); 
+                      setPaymentError(''); 
+                    }} 
                     className="logout-btn" 
                     style={{ flex: 1, borderRadius: '10px', padding: '12px', background: '#ccc', color: '#333' }}
                   >
@@ -430,7 +469,7 @@ const CustomerProfile = () => {
 
           <hr />
 
-          <h3>{t('changePassword')}</h3>
+          <h3 style={{ textAlign: 'center' }}>{t('changePassword')}</h3>
           <form onSubmit={handlePasswordChange} style={{ textAlign: 'left' }}>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('currentPassword')}</label>
@@ -467,8 +506,8 @@ const CustomerProfile = () => {
 
           <hr style={{ margin: '2rem 0' }} />
 
-          <h3>{t('deleteAccount')}</h3>
-          <p style={{ color: 'red' }}>{t('deleteAccountWarning')}</p>
+          <h3 style={{ textAlign: 'center' }}>{t('deleteAccount')}</h3>
+          <p style={{ color: 'red', textAlign: 'center' }}>{t('deleteAccountWarning')}</p>
           <button onClick={handleDeleteAccount} className="logout-btn" style={{ width: '100%' }}>
             {t('deleteAccountBtn')}
           </button>

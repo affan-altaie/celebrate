@@ -86,11 +86,24 @@ const Register = () => {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "document") {
-      setSelectedFile(files[0]);
-      setFormData((prevState) => ({
-        ...prevState,
-        document: files[0],
-      }));
+      const file = files[0];
+      if (file) {
+        const allowedTypes = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp"];
+        if (!allowedTypes.includes(file.type)) {
+          setError(t("unsupportedFileType"));
+          setSelectedFile(null);
+          setFormData((prevState) => ({
+            ...prevState,
+            document: null,
+          }));
+          return;
+        }
+        setSelectedFile(file);
+        setFormData((prevState) => ({
+          ...prevState,
+          document: file,
+        }));
+      }
     }
     else {
       setFormData((prevState) => ({

@@ -329,5 +329,6 @@
   "verify": "Verify",
   "resendOtp": "Resend OTP",
   "resendOtpFailed": "Failed to resend OTP",
-  "resendOtpCooldown": "Resend OTP in {{seconds}}s"
+  "resendOtpCooldown": "Resend OTP in {{seconds}}s",
+  "unsupportedFileType": "Unsupported file type. Only PDF, DOC, DOCX, and image files are allowed."
 }

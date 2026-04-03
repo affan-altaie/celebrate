@@ -46,11 +46,31 @@ const CustomerProfile = () => {
         .catch(err => console.error("Error fetching card details:", err));
     }
   }, [user]);
+
+  const handleDeleteCard = async () => {
+    if (!window.confirm(t("confirmDeleteCard") || "Are you sure you want to delete your saved card?")) {
+      return;
+    }
+    const userId = user?.id || user?._id;
+    try {
+      const response = await axios.delete(`/api/payments/delete-card/${userId}`);
+      if (response.data.success) {
+        setMessage(t("cardDeleted") || "Card details deleted successfully.");
+        setCardData({ cardHolderName: "", cardNumber: "", expiryDate: "" }); // Clear card data
+        setError("");
+      } else {
+        setError(response.data.message || t("cardDeletionFailed") || "Failed to delete card details.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError(t("genericError"));
+    }
+  };
   
   const [passwordData, setPasswordData] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: ""
   });
 
   // Handle Profile Picture Upload
@@ -154,18 +174,34 @@ const CustomerProfile = () => {
   const handleCardUpdate = async (e) => {
     e.preventDefault();
     const userId = user?.id || user?._id;
+
+    // Validate expiry date
+    const [month, year] = cardData.expiryDate.split("/");
+    const currentYear = new Date().getFullYear() % 100; // Get last two digits of year
+    const currentMonth = new Date().getMonth() + 1; // Month is 0-indexed
+
+    if (!month || !year || parseInt(month, 10) < 1 || parseInt(month, 10) > 12) {
+      setError(t("invalidExpiryDate") || "Invalid expiry date format. Please use MM/YY.");
+      return;
+    }
+
+    if (parseInt(year, 10) < currentYear || (parseInt(year, 10) === currentYear && parseInt(month, 10) < currentMonth)) {
+      setError(t("expiredCardError") || "Card has expired. Please enter a valid expiry date.");
+      return;
+    }
+
     try {
       const response = await axios.put(`/api/payments/update-card/${userId}`, cardData);
       if (response.data.success) {
-        setMessage(t('cardUpdated') || 'Card details updated successfully');
-        setError('');
+        setMessage(t("cardUpdated") || "Card details updated successfully");
+        setError("");
         setIsEditingCard(false);
       } else {
-        setError(response.data.message || t('cardUpdateFailed') || 'Failed to update card details');
+        setError(response.data.message || t("cardUpdateFailed") || "Failed to update card details");
       }
     } catch (err) {
       console.error(err);
-      setError(t('genericError'));
+      setError(t("genericError"));
     }
   };
 
@@ -289,13 +325,24 @@ const CustomerProfile = () => {
             )}
 
             {!isEditingCard ? (
-              <button 
-                onClick={() => setIsEditingCard(true)} 
-                className="action-btn" 
-                style={{ width: '100%', borderRadius: '10px' }}
-              >
-                {cardData.cardNumber ? t('edit') : t('addNewCard')}
-              </button>
+              <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
+                <button 
+                  onClick={() => setIsEditingCard(true)} 
+                  className="action-btn" 
+                  style={{ flex: 1, borderRadius: '10px' }}
+                >
+                  {cardData.cardNumber ? t('edit') : t('addNewCard')}
+                </button>
+                {cardData.cardNumber && (
+                  <button 
+                    onClick={handleDeleteCard} 
+                    className="logout-btn" 
+                    style={{ flex: 1, borderRadius: '10px' }}
+                  >
+                    {t('deleteCard') || "Delete Card"}
+                  </button>
+                )}
+              </div>
             ) : (
               <form onSubmit={handleCardUpdate} style={{ textAlign: 'left' }}>
                 <div className="form-group" style={{ marginBottom: '1.2rem' }}>
@@ -304,10 +351,14 @@ const CustomerProfile = () => {
                   </label>
                   <input
                     type="text"
-                    value={cardData.cardHolderName}
-                    onChange={(e) => setCardData({...cardData, cardHolderName: e.target.value})}
+                    value={cardData.cardHolderName.toUpperCase()}
+                    onChange={(e) => {
+                        const formattedValue = e.target.value.replace(/[^a-zA-Z ]/g, "");
+                        setCardData({...cardData, cardHolderName: formattedValue.toUpperCase()});
+                    }}
                     placeholder="e.g. John Doe"
-                    style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
+                    maxLength="20"
+                    style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)', textTransform: 'uppercase' }}
                   />
                 </div>
                 <div className="form-row" style={{ marginBottom: '1.5rem' }}>
@@ -317,8 +368,19 @@ const CustomerProfile = () => {
                     </label>
                     <input
                       type="text"
-                      value={cardData.cardNumber}
-                      onChange={(e) => setCardData({...cardData, cardNumber: e.target.value})}
+                      inputMode="numeric"
+                      maxLength="19" // 16 digits + 3 spaces
+                      value={cardData.cardNumber
+                        .replace(/\D/g, "")
+                        .replace(/(\d{4})(?=\d)/g, "$1 ")
+                        .trim()}
+                      onChange={(e) => {
+                        const formattedValue = e.target.value
+                          .replace(/\D/g, "")
+                          .substring(0, 16)
+                          .replace(/(\d{4})(?=\d)/g, "$1 ");
+                        setCardData({...cardData, cardNumber: formattedValue});
+                      }}
                       placeholder="0000 0000 0000 0000"
                       style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
                     />
@@ -329,8 +391,21 @@ const CustomerProfile = () => {
                     </label>
                     <input
                       type="text"
-                      value={cardData.expiryDate}
-                      onChange={(e) => setCardData({...cardData, expiryDate: e.target.value})}
+                      inputMode="numeric"
+                      pattern="[0-9/]{4}"
+                      maxLength="5"
+                      value={cardData.expiryDate
+                        .replace(/\D/g, "")
+                        .replace(/(\d{2})(?=\d{2})/g, "$1/")
+                        .substring(0, 5)}
+                      onChange={(e) => {
+                        const input = e.target.value.replace(/\D/g, "");
+                        let formattedValue = input;
+                        if (input.length > 2) {
+                          formattedValue = input.substring(0, 2) + "/" + input.substring(2, 4);
+                        }
+                        setCardData({...cardData, expiryDate: formattedValue});
+                      }}
                       placeholder="MM/YY"
                       style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
                     />
@@ -404,4 +479,3 @@ const CustomerProfile = () => {
 };
 
 export default CustomerProfile;
-

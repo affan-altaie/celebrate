@@ -106,6 +106,7 @@ const BookingPage = () => {
     cvc: '',
     cardHolderName: '',
   });
+  const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
     const selectedService = services.find(s => s.id === parseInt(id));
@@ -156,26 +157,127 @@ const BookingPage = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    let errors = { ...formErrors };
+
+    switch (name) {
+      case "cardHolderName":
+        if (value.length > 50) {
+          errors.cardHolderName = t("cardHolderNameTooLong");
+        } else if (!/^[a-zA-Z\s]+$/.test(value)) {
+          errors.cardHolderName = t("cardHolderNameInvalid");
+        } else {
+          delete errors.cardHolderName;
+        }
+        break;
+      case "cardNumber":
+        const cleanedCardNumber = value.replace(/\s/g, "");
+        if (cleanedCardNumber.length > 16) {
+          errors.cardNumber = t("cardNumberTooLong");
+        } else if (!/^[0-9]{16}$/.test(cleanedCardNumber)) {
+          errors.cardNumber = t("cardNumberInvalid");
+        } else {
+          delete errors.cardNumber;
+        }
+        break;
+      case "expiryDate":
+        const [month, year] = value.split("/");
+        const currentYear = new Date().getFullYear() % 100; // Get last two digits of year
+        const currentMonth = new Date().getMonth() + 1; // Month is 0-indexed
+
+        if (!month || !year || parseInt(month, 10) < 1 || parseInt(month, 10) > 12 || value.length !== 5) {
+          errors.expiryDate = t("invalidExpiryDate") || "Invalid expiry date format. Please use MM/YY.";
+        } else if (parseInt(year, 10) < currentYear || (parseInt(year, 10) === currentYear && parseInt(month, 10) < currentMonth)) {
+          errors.expiryDate = t("expiredCardError") || "Card has expired. Please enter a valid expiry date.";
+        } else {
+          delete errors.expiryDate;
+        }
+        break;
+      case "cvc":
+        if (value.length > 4) {
+          errors.cvc = t("cvcTooLong");
+        } else if (!/^[0-9]{3,4}$/.test(value)) {
+          errors.cvc = t("cvcInvalid");
+        } else {
+          delete errors.cvc;
+        }
+        break;
+      default:
+        break;
+    }
+    setFormErrors(errors);
+  };
+
+  const validateForm = () => {
+    let errors = {};
+    const { cardHolderName, cardNumber, expiryDate, cvc } = formData;
+
+    if (!cardHolderName.trim()) {
+      errors.cardHolderName = t("cardHolderNameRequired");
+    } else if (cardHolderName.length > 50) {
+      errors.cardHolderName = t("cardHolderNameTooLong");
+    } else if (!/^[a-zA-Z\s]+$/.test(cardHolderName)) {
+      errors.cardHolderName = t("cardHolderNameInvalid");
+    }
+
+    const cleanedCardNumber = cardNumber.replace(/\s/g, "");
+    if (!cleanedCardNumber) {
+      errors.cardNumber = t("cardNumberRequired");
+    } else if (cleanedCardNumber.length > 16) {
+      errors.cardNumber = t("cardNumberTooLong");
+    } else if (!/^[0-9]{16}$/.test(cleanedCardNumber)) {
+      errors.cardNumber = t("cardNumberInvalid");
+    }
+
+    if (!expiryDate) {
+      errors.expiryDate = t("expiryDateRequired");
+    } else {
+      const [month, year] = expiryDate.split("/");
+      const currentYear = new Date().getFullYear() % 100; // Get last two digits of year
+      const currentMonth = new Date().getMonth() + 1; // Month is 0-indexed
+
+      if (!month || !year || parseInt(month, 10) < 1 || parseInt(month, 10) > 12 || expiryDate.length !== 5) {
+        errors.expiryDate = t("invalidExpiryDate") || "Invalid expiry date format. Please use MM/YY.";
+      } else if (parseInt(year, 10) < currentYear || (parseInt(year, 10) === currentYear && parseInt(month, 10) < currentMonth)) {
+        errors.expiryDate = t("expiredCardError") || "Card has expired. Please enter a valid expiry date.";
+      }
+    }
+
+    if (!cvc) {
+      errors.cvc = t("cvcRequired");
+    } else if (cvc.length > 4) {
+      errors.cvc = t("cvcTooLong");
+    } else if (!/^[0-9]{3,4}$/.test(cvc)) {
+      errors.cvc = t("cvcInvalid");
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedDate || !selectedTime) {
-      alert(t('selectDateTimeAlert'));
+      alert(t("selectDateTimeAlert"));
       return;
     }
 
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (!validateForm()) {
+      alert(t("paymentValidationErrors"));
+      return;
+    }
+
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     const userId = storedUser?.id || storedUser?._id;
 
     if (!storedUser || !userId) {
-      alert('Please login to book a service');
-      navigate('/login');
+      alert("Please login to book a service");
+      navigate("/login");
       return;
     }
 
     try {
-      const response = await axios.post('/api/payments/process', {
+      const response = await axios.post("/api/payments/process", {
         userId: userId,
         serviceId: service.id,
         serviceName: service.name,
@@ -183,13 +285,14 @@ const BookingPage = () => {
         cardHolderName: formData.cardHolderName,
         cardNumber: formData.cardNumber,
         expiryDate: formData.expiryDate,
+        cvc: formData.cvc,
         saveCard: saveCard,
         bookingDetails: {
           ...formData,
           date: selectedDate,
           time: selectedTime,
           hours: hours,
-        }
+        },
       });
 
       if (response.data.success) {
@@ -200,14 +303,14 @@ const BookingPage = () => {
             date: selectedDate,
             time: selectedTime,
             transactionId: response.data.transactionId,
-            newBalance: response.data.newBalance
+            newBalance: response.data.newBalance,
           },
         };
-        navigate('/booking-confirmation', { state: { bookingDetails } });
+        navigate("/booking-confirmation", { state: { bookingDetails } });
       }
     } catch (error) {
-      console.error('Booking/Payment error:', error);
-      alert(error.response?.data?.message || 'Booking failed. Please try again.');
+      console.error("Booking/Payment error:", error);
+      alert(error.response?.data?.message || "Booking failed. Please try again.");
     }
   };
 
@@ -430,33 +533,64 @@ const BookingPage = () => {
                     <input
                       type="text"
                       name="cardHolderName"
-                      value={formData.cardHolderName}
-                      onChange={handleChange}
+                      value={formData.cardHolderName.toUpperCase()}
+                      onChange={(e) => {
+                        const formattedValue = e.target.value.replace(/[^a-zA-Z ]/g, "");
+                        setFormData(prev => ({...prev, cardHolderName: formattedValue.toUpperCase()}));
+                      }}
                       placeholder="Name on Card"
                       required
+                      maxLength={50}
                     />
+                    {formErrors.cardHolderName && <p className="error-message">{formErrors.cardHolderName}</p>}
                   </div>
                   <div className="form-group" style={{ marginBottom: '1rem' }}>
                     <label>{t('cardNumber')}</label>
                     <input
                       type="text"
                       name="cardNumber"
-                      value={formData.cardNumber}
-                      onChange={handleChange}
+                      inputMode="numeric"
+                      maxLength="19" // 16 digits + 3 spaces
+                      value={formData.cardNumber
+                        .replace(/\D/g, "")
+                        .replace(/(\d{4})(?=\d)/g, "$1 ")
+                        .trim()}
+                      onChange={(e) => {
+                        const formattedValue = e.target.value
+                          .replace(/\D/g, "")
+                          .substring(0, 16)
+                          .replace(/(\d{4})(?=\d)/g, "$1 ");
+                        setFormData(prev => ({...prev, cardNumber: formattedValue}));
+                      }}
                       placeholder="0000 0000 0000 0000"
                       required
                     />
+                    {formErrors.cardNumber && <p className="error-message">{formErrors.cardNumber}</p>}
                   </div>
                   <div className="form-group" style={{ marginBottom: '1rem' }}>
                     <label>{t('expiryDate')}</label>
                     <input
                       type="text"
                       name="expiryDate"
-                      value={formData.expiryDate}
-                      onChange={handleChange}
+                      inputMode="numeric"
+                      pattern="[0-9/]{4}"
+                      maxLength="5"
+                      value={formData.expiryDate
+                        .replace(/\D/g, "")
+                        .replace(/(\d{2})(?=\d{2})/g, "$1/")
+                        .substring(0, 5)}
+                      onChange={(e) => {
+                        const input = e.target.value.replace(/\D/g, "");
+                        let formattedValue = input;
+                        if (input.length > 2) {
+                          formattedValue = input.substring(0, 2) + "/" + input.substring(2, 4);
+                        }
+                        setFormData(prev => ({...prev, expiryDate: formattedValue}));
+                      }}
                       placeholder="MM/YY"
                       required
                     />
+                    {formErrors.expiryDate && <p className="error-message">{formErrors.expiryDate}</p>}
                   </div>
                 </>
               )}
@@ -465,12 +599,14 @@ const BookingPage = () => {
                 <label>{t('cvc')}</label>
                 <input
                   type="text"
-                  name="cvv"
-                  value={formData.cvv}
+                  name="cvc"
+                  value={formData.cvc}
                   onChange={handleChange}
                   placeholder="123"
                   required
+                  maxLength={4}
                 />
+                {formErrors.cvc && <p className="error-message">{formErrors.cvc}</p>}
               </div>
 
               {savedCardData && (
@@ -513,7 +649,7 @@ const BookingPage = () => {
             </div>
           </div>
           
-          <button type="submit" className="submit-booking-button" disabled={!selectedDate || !selectedTime}>{t('confirmBooking')}</button>
+          <button type="submit" className="submit-booking-button" disabled={!selectedDate || !selectedTime || Object.keys(formErrors).length > 0}>{t('confirmBooking')}</button>
         </form>
       </div>
     </div>

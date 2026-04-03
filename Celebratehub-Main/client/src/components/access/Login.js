@@ -1,35 +1,35 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import './Access.css';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import "./Access.css";
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    keepMeSignedIn: false
+    email: "",
+    password: "",
+    keepMeSignedIn: false,
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prevState => ({
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
-    if (error) setError('');
+    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
+      const response = await fetch("/api/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -37,78 +37,93 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log('Login successful', data);
+        console.log("Login successful", data);
         // Store token or user info if needed
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
+        localStorage.setItem("user", JSON.stringify(data.user));
+
         // Redirect based on role
-        switch(data.user.role) {
-          case 'admin':
-            navigate('/admin-dashboard', { state: { user: data.user } });
+        switch (data.user.role) {
+          case "admin":
+            navigate("/admin-dashboard", { state: { user: data.user } });
             break;
-          case 'provider':
-            navigate('/provider-dashboard', { state: { user: data.user } });
+          case "provider":
+            navigate("/provider-dashboard", { state: { user: data.user } });
             break;
-          case 'customer':
+          case "customer":
           default:
-            navigate('/customer-dashboard', { state: { user: data.user } });
+            navigate("/customer-dashboard", { state: { user: data.user } });
         }
       } else {
-        if (data.message === "Your account is pending verification. Please check your email for an OTP.") {
-          setError(<>
-            {t('loginPendingVerification')}&nbsp;
-            <Link to="/otp-verification" state={{ email: formData.email }}>
-              {t('verifyHere')}
-            </Link>
-          </>);
-        } else if (data.message === "Your account has been rejected. Please register again.") {
-          setError(t('accountRejected'));
+        if (
+          data.message ===
+          "Your account is pending email verification. Please check your email for an OTP."
+        ) {
+          setError(
+            <div className="error-message">
+              {t("loginPendingVerification")}{" "}
+              <Link
+                to="/otp-verification"
+                state={{ email: formData.email }}
+                className="access-link"
+                style={{ color: "#c62828", textDecoration: "underline" }}
+              >
+                {t("verifyHere")}
+              </Link>
+            </div>
+          );
+        } else if (
+          data.message ===
+          "Your account has been rejected. Please register again."
+        ) {
+          setError(t("accountRejected"));
         } else {
-          setError(data.message || t('loginFailed'));
+          setError(data.message || t("loginFailed"));
         }
       }
     } catch (err) {
-      console.error('Login error:', err);
-      setError(t('genericError'));
+      console.error("Login error:", err);
+      setError(t("genericError"));
     }
   };
 
   return (
     <div className="access-container">
       <div className="access-card">
-        <h3 className="access-subtitle">{t('signInToYourAccount')}</h3>
+        <h3 className="access-subtitle">{t("signInToYourAccount")}</h3>
 
         {error && <div className="error-message">{error}</div>}
-        
+
         <form className="access-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">{t('emailAddress')}</label>
+            <label htmlFor="email">{t("emailAddress")}</label>
             <input
               type="email"
               id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder={t('enterYourEmail')}
+              placeholder={t("enterYourEmail")}
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">{t('password')}</label>
+            <label htmlFor="password">{t("password")}</label>
             <input
               type="password"
               id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder={t('enterYourPassword')}
+              placeholder={t("enterYourPassword")}
               required
             />
           </div>
 
           <div className="form-options">
-            <Link to="/forgot-password" className="forgot-password-link">{t('forgotPassword')}</Link>
+            <Link to="/forgot-password" className="forgot-password-link">
+              {t("forgotPassword")}
+            </Link>
             <div className="form-check">
               <input
                 type="checkbox"
@@ -118,18 +133,22 @@ const Login = () => {
                 onChange={handleChange}
                 className="form-check-input"
               />
-              <label htmlFor="keepMeSignedIn" className="form-check-label">{t('keepMeSignedIn')}</label>
+              <label htmlFor="keepMeSignedIn" className="form-check-label">
+                {t("keepMeSignedIn")}
+              </label>
             </div>
           </div>
 
           <button type="submit" className="submit-btn">
-            {t('signIn')}
+            {t("signIn")}
           </button>
         </form>
 
         <div className="access-footer">
-          {t('dontHaveAnAccount')}
-          <Link to="/register" className="access-link">{t('signUp')}</Link>
+          {t("dontHaveAnAccount")}{" "}
+          <Link to="/register" className="access-link">
+            {t("signUp")}
+          </Link>
         </div>
       </div>
     </div>

@@ -329,5 +329,6 @@
   "verify": "تحقق",
   "resendOtp": "إعادة إرسال OTP",
   "resendOtpFailed": "فشل إرسال OTP مرة أخرى",
-  "resendOtpCooldown": "إعادة إرسال الرمز في {{seconds}} ثانية"
+  "resendOtpCooldown": "إعادة إرسال الرمز في {{seconds}} ثانية",
+  "unsupportedFileType": "نوع الملف غير مدعوم. يُسمح فقط بملفات PDF و DOC و DOCX والصور."
 }

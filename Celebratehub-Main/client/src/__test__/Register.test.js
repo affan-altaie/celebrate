@@ -94,7 +94,7 @@ describe('Register Component', () => {
     fireEvent.click(screen.getByText(/createAccount/i));
 
     await waitFor(() => {
-      expect(mockedNavigate).toHaveBeenCalledWith('/login');
+      expect(mockedNavigate).toHaveBeenCalledWith('/otp-verification', { state: { email: 'test@test.com' } });
     });
   });
 

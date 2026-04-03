@@ -1,20 +1,23 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Payment = require('../modals/Payment');
-const User = require('../modals/User');
-const Booking = require('../modals/Booking');
+const Payment = require("../modals/Payment");
+const User = require("../modals/User");
+const Booking = require("../modals/Booking");
+const { validate, paymentCardValidation } = require("../middleware/validation");
 
 // Process dummy payment
-router.post('/process', async (req, res) => {
+router.post("/process", paymentCardValidation, validate, async (req, res) => {
   try {
-    const { 
-      userId, 
-      serviceId, 
-      serviceName, 
-      amount, 
-      cardHolderName, 
-      cardNumber, 
-      bookingDetails 
+    const {
+      userId,
+      serviceId,
+      serviceName,
+      amount,
+      cardHolderName,
+      cardNumber,
+      expiryDate,
+      cvc,
+      bookingDetails,
     } = req.body;
 
     // 1. Find user and check balance
@@ -24,9 +27,9 @@ router.post('/process', async (req, res) => {
     }
 
     if (user.walletBalance < amount) {
-      return res.status(400).json({ 
-        success: false, 
-        message: `Insufficient dummy funds! Your balance is OMR ${user.walletBalance.toFixed(2)}` 
+      return res.status(400).json({
+        success: false,
+        message: `Insufficient dummy funds! Your balance is OMR ${user.walletBalance.toFixed(2)}`,
       });
     }
 
@@ -40,7 +43,7 @@ router.post('/process', async (req, res) => {
       hours: bookingDetails.hours,
       totalPrice: amount,
       location: bookingDetails.location,
-      status: 'confirmed'
+      status: "confirmed",
     });
     await newBooking.save();
 
@@ -51,8 +54,9 @@ router.post('/process', async (req, res) => {
     if (req.body.saveCard) {
       user.savedCard = {
         cardNumber: cardNumber,
-        expiryDate: req.body.expiryDate,
-        cardHolderName: cardHolderName
+        expiryDate: expiryDate,
+        cardHolderName: cardHolderName,
+        cvc: cvc,
       };
     }
 
@@ -60,7 +64,7 @@ router.post('/process', async (req, res) => {
 
     // 4. Create Payment record
     const lastFour = cardNumber.slice(-4);
-    const transactionId = 'CH-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    const transactionId = "CH-" + Math.random().toString(36).substr(2, 9).toUpperCase();
 
     const newPayment = new Payment({
       bookingId: newBooking._id,
@@ -69,15 +73,15 @@ router.post('/process', async (req, res) => {
       cardHolderName,
       lastFourDigits: lastFour,
       transactionId,
-      status: 'completed'
+      status: "completed",
     });
     await newPayment.save();
 
-    res.status(200).json({ 
-      success: true, 
-      transactionId, 
+    res.status(200).json({
+      success: true,
+      transactionId,
       newBalance: user.walletBalance,
-      bookingId: newBooking._id 
+      bookingId: newBooking._id,
     });
   } catch (error) {
     console.error("Payment error:", error);
@@ -86,17 +90,17 @@ router.post('/process', async (req, res) => {
 });
 
 // Get user balance and saved card
-router.get('/balance/:userId', async (req, res) => {
+router.get("/balance/:userId", async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     // Return default 1000 if walletBalance is missing (for older accounts)
-    const balance = (typeof user.walletBalance === 'number') ? user.walletBalance : 1000;
-    res.json({ 
+    const balance = typeof user.walletBalance === "number" ? user.walletBalance : 1000;
+    res.json({
       balance,
-      savedCard: user.savedCard || null 
+      savedCard: user.savedCard || null,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -104,7 +108,7 @@ router.get('/balance/:userId', async (req, res) => {
 });
 
 // Get user bookings
-router.get('/user-bookings/:userId', async (req, res) => {
+router.get("/user-bookings/:userId", async (req, res) => {
   try {
     const bookings = await Booking.find({ userId: req.params.userId }).sort({ createdAt: -1 });
     res.json(bookings);
@@ -114,9 +118,9 @@ router.get('/user-bookings/:userId', async (req, res) => {
 });
 
 // Update saved card details
-router.put('/update-card/:userId', async (req, res) => {
+router.put("/update-card/:userId", paymentCardValidation, validate, async (req, res) => {
   try {
-    const { cardHolderName, cardNumber, expiryDate } = req.body;
+    const { cardHolderName, cardNumber, expiryDate, cvc } = req.body;
     const user = await User.findById(req.params.userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -125,11 +129,28 @@ router.put('/update-card/:userId', async (req, res) => {
     user.savedCard = {
       cardHolderName,
       cardNumber,
-      expiryDate
+      expiryDate,
+      cvc,
     };
 
     await user.save();
     res.status(200).json({ success: true, message: "Card details updated successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Delete saved card details
+router.delete("/delete-card/:userId", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    user.savedCard = null; // Or set to an empty object, depending on schema
+    await user.save();
+    res.status(200).json({ success: true, message: "Card details deleted successfully" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

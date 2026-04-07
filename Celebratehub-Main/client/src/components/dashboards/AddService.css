@@ -1,8 +1,20 @@
-.add-service-container {
-    background-color: #ffffff;
+.add-service-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  
+  .service-preview-column {
+    background-color: var(--secondary-color);
     padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius);
+  }
+  
+  .add-service-form-column {
+    background-color: var(--card-background);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
   }
   
   .add-service-form {
@@ -20,14 +32,17 @@
     font-weight: 500;
     margin-bottom: 0.5rem;
     text-align: left;
+    color: var(--text-color);
   }
   
   .add-service-form input[type="text"],
   .add-service-form textarea {
     padding: 0.75rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     font-size: 1rem;
+    background-color: var(--background-color);
+    color: var(--text-color);
   }
   
   .add-service-form textarea {
@@ -40,9 +55,10 @@
   }
   
   .availability-manager {
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     padding: 1rem;
     border-radius: 8px;
+    color: var(--text-color);
   }
   
   .availability-calendar .calendar-navigation {
@@ -63,6 +79,7 @@
     padding: 0.5rem;
     border-radius: 50%;
     cursor: pointer;
+    color: var(--text-color);
   }
   
   .calendar-day.empty {
@@ -75,14 +92,14 @@
   }
   
   .calendar-day.selected {
-    background-color: #007bff;
-    color: white;
+    background-color: var(--primary-color);
+    color: var(--button-text-color);
   }
   
   .time-slots-manager {
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--border-color);
   }
   
   .time-slots-list {
@@ -93,12 +110,13 @@
   }
   
   .time-slot-chip {
-    background-color: #f0f0f0;
+    background-color: var(--secondary-color);
     padding: 0.5rem 1rem;
     border-radius: 16px;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    color: var(--text-color);
   }
   
   .time-slot-chip button {
@@ -117,21 +135,24 @@
   .add-time-slot input[type="time"] {
     padding: 0.5rem;
     border-radius: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
+    background-color: var(--background-color);
+    color: var(--text-color);
   }
   
   .image-upload-container {
-    border: 2px dashed #ccc;
+    border: 2px dashed var(--border-color);
     border-radius: 8px;
     padding: 2rem;
     text-align: center;
     cursor: pointer;
     transition: background-color 0.3s, border-color 0.3s;
+    color: var(--text-color);
   }
   
   .image-upload-container.drag-over {
-    background-color: #f0f8ff;
-    border-color: #007bff;
+    background-color: var(--secondary-color);
+    border-color: var(--primary-color);
   }
   
   .image-upload-input {
@@ -147,6 +168,13 @@
   
   .image-preview-container {
     position: relative;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 8px;
+  }
+
+  .image-preview-container.main {
+    border-color: var(--primary-color);
   }
   
   .image-preview {
@@ -171,10 +199,107 @@
     text-align: center;
     font-size: 1rem;
   }
+
+  .main-image-label {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+  }
   
   .error-message {
     color: #ff0000;
     font-size: 0.9rem;
     margin-top: 0.5rem;
   }
+
+  .service-preview-card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    background-color: var(--card-background);
+    color: var(--text-color);
+  }
   
+  .service-image-container img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+  }
+  
+  .image-placeholder {
+    width: 100%;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--secondary-color);
+    color: #888;
+  }
+  
+  .service-details {
+    padding: 1.5rem;
+  }
+  
+  .service-details h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+  }
+  
+  .service-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    color: #fbbc05;
+  }
+  
+  .service-location {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+  }
+  
+  .service-pricing p {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+    color: var(--text-color);
+  }
+  
+  .service-description {
+    margin-bottom: 1.5rem;
+    color: var(--text-color);
+  }
+  
+  .service-features h4 {
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+  }
+  
+  .service-features ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .service-features li {
+    margin-bottom: 0.25rem;
+    color: var(--text-color);
+  }
+  
+  body.dark .calendar-day.available {
+    background-color: #3e5e4b;
+    color: #a7d7b4;
+  }
+
+  body.dark .add-service-form-column {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  }

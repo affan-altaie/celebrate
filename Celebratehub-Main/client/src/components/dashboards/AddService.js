@@ -1,11 +1,68 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FaCamera } from 'react-icons/fa';
+import { FaCamera, FaRegStar, FaStar, FaMapMarkerAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './Dashboard.css';
 import './AddService.css';
+
+const ServicePreview = ({ service, mainImageIndex }) => {
+  const { t } = useTranslation();
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 !== 0;
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+    return (
+      <div className="star-rating">
+        {[...Array(fullStars)].map((_, i) => <FaStar key={`full-${i}`} />)}
+        {halfStar && <FaStar key="half" style={{ clipPath: 'inset(0 50% 0 0)' }} />}
+        {[...Array(emptyStars)].map((_, i) => <FaRegStar key={`empty-${i}`} />)}
+      </div>
+    );
+  };
+
+  return (
+    <div className="service-preview-card">
+      <div className="service-image-container">
+        {service.images.length > 0 ? (
+          <img src={URL.createObjectURL(service.images[mainImageIndex])} alt="Service Preview" />
+        ) : (
+          <div className="image-placeholder">
+            <FaCamera />
+            <p>{t('imagePreview')}</p>
+          </div>
+        )}
+      </div>
+      <div className="service-details">
+        <h2>{service.name || t('serviceNameExample')}</h2>
+        <div className="service-rating">
+          {renderStars(4.8)}
+          <span>4.8 (89 reviews)</span>
+        </div>
+        <div className="service-location">
+          <FaMapMarkerAlt />
+          <span>{service.location || 'Salalah, Oman'}</span>
+        </div>
+        <div className="service-pricing">
+          {service.pricePerHour && <p>OMR {service.pricePerHour} / hour</p>}
+          {service.pricePerPerson && <p>OMR {service.pricePerPerson} / person</p>}
+        </div>
+        <p className="service-description">
+          {service.description || 'Exceptional culinary experiences tailored to your event needs and preferences.'}
+        </p>
+        <div className="service-features">
+          <h4>{t('features')}</h4>
+          <ul>
+            {(service.features || 'Menu Planning, Food Service, Beverage Service').split(',').map((feature, index) => (
+              <li key={index}>? {feature.trim()}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const AddService = () => {
   const { t } = useTranslation();
@@ -21,6 +78,7 @@ const AddService = () => {
     images: [],
     availability: {},
   });
+  const [mainImageIndex, setMainImageIndex] = useState(0);
   const [imageError, setImageError] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState(null);
@@ -91,6 +149,16 @@ const AddService = () => {
     const newImages = [...formData.images];
     newImages.splice(index, 1);
     setFormData(prev => ({ ...prev, images: newImages }));
+
+    if (index === mainImageIndex) {
+      setMainImageIndex(0);
+    } else if (index < mainImageIndex) {
+      setMainImageIndex(mainImageIndex - 1);
+    }
+  };
+
+  const setMainImage = (index) => {
+    setMainImageIndex(index);
   };
 
   const handleDateClick = (date) => {
@@ -134,7 +202,7 @@ const AddService = () => {
       return;
     }
     // Form submission logic
-    console.log('New service submitted:', formData);
+    console.log('New service submitted:', { ...formData, mainImage: mainImageIndex });
     toast.success('Service added successfully!');
     navigate('/manage-listings');
   };
@@ -224,74 +292,88 @@ const AddService = () => {
         <h1>{t('addNewService')}</h1>
         <button onClick={() => navigate('/manage-listings')} className="action-btn">{t('cancel')}</button>
       </header>
-      <main className="dashboard-content">
-        <div className="add-service-container">
-          <form onSubmit={handleSubmit} className="add-service-form">
-            <div className="form-group">
-              <label>{t('serviceNameLabel')}</label>
-              <input type="text" name="name" value={formData.name} onChange={handleChange} required />
-            </div>
-            <div className="form-group">
-              <label>{t('roleLabel')}</label>
-              <input type="text" name="type" value={formData.type} onChange={handleChange} required />
-            </div>
-            <div className="form-group">
-              <label>{t('locationLabel')}</label>
-              <input type="text" name="location" value={formData.location} onChange={handleChange} placeholder="e.g. Salalah, Oman" required />
-            </div>
-            <div className="form-group">
-              <label>{t('pricePerHour')}</label>
-              <input type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} placeholder="OMR 20 / hour" required />
-            </div>
-            <div className="form-group">
-              <label>{t('pricePerPerson')}</label>
-              <input type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} placeholder="OMR 2 / person" />
-            </div>
-            <div className="form-group">
-              <label>{t('descriptionLabel')}</label>
-              <textarea name="description" value={formData.description} onChange={handleChange} required />
-            </div>
-            <div className="form-group">
-              <label>{t('featuresLabel')}</label>
-              <input type="text" name="features" value={formData.features} onChange={handleChange} placeholder={t('featuresPlaceholder')} />
-            </div>
-            <div className="form-group">
-              <label>{t('serviceImage', 'Service Images')}</label>
-               <div 
-                className={`image-upload-container ${isDragging ? 'drag-over' : ''}`}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onClick={() => document.getElementById('image-upload-input').click()}
-              >
-                <input
-                  type="file"
-                  id="image-upload-input"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="image-upload-input"
-                />
-                <FaCamera />
-                <p>{t('dragDrop')}</p>
-                 <p className="upload-guidelines">{t('imageUploadGuidelines', 'Min 2, Max 8 images. Max 5MB each.')}</p>
+      <main className="add-service-layout">
+        <div className="service-preview-column">
+            <ServicePreview service={formData} mainImageIndex={mainImageIndex} />
+        </div>
+        <div className="add-service-form-column">
+            <form onSubmit={handleSubmit} className="add-service-form">
+              <div className="form-group">
+                <label>{t('serviceNameLabel')}</label>
+                <input type="text" name="name" value={formData.name} onChange={handleChange} required />
               </div>
-              {imageError && <p className="error-message">{imageError}</p>}
-              <div className="image-previews">
-                {formData.images.map((image, index) => (
-                  <div key={index} className="image-preview-container">
-                    <img src={URL.createObjectURL(image)} alt={`preview ${index}`} className="image-preview" />
-                    <button type="button" onClick={() => removeImage(index)} className="remove-image-btn">&times;</button>
-                  </div>
-                ))}
+              <div className="form-group">
+                <label>{t('roleLabel')}</label>
+                <input type="text" name="type" value={formData.type} onChange={handleChange} required />
               </div>
-            </div>
-            <div className="form-group">
-              <label>{t('availability')}</label>
-              {renderAvailabilityManager()}
-            </div>
-            <button type="submit" className="action-btn">{t('addServiceBtn')}</button>
-          </form>
+              <div className="form-group">
+                <label>{t('locationLabel')}</label>
+                <input type="text" name="location" value={formData.location} onChange={handleChange} placeholder="e.g. Salalah, Oman" required />
+              </div>
+              <div className="form-group">
+                <label>{t('pricePerHour')}</label>
+                <input type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} placeholder="OMR 20 / hour" required />
+              </div>
+              <div className="form-group">
+                <label>{t('pricePerPerson')}</label>
+                <input type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} placeholder="OMR 2 / person" />
+              </div>
+              <div className="form-group">
+                <label>{t('descriptionLabel')}</label>
+                <textarea name="description" value={formData.description} onChange={handleChange} required />
+              </div>
+              <div className="form-group">
+                <label>{t('featuresLabel')}</label>
+                <input type="text" name="features" value={formData.features} onChange={handleChange} placeholder={t('featuresPlaceholder')} />
+              </div>
+              <div className="form-group">
+                <label>{t('serviceImage', 'Service Images')}</label>
+                 <div 
+                  className={`image-upload-container ${isDragging ? 'drag-over' : ''}`}
+                  onDrop={handleDrop}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onClick={() => document.getElementById('image-upload-input').click()}
+                >
+                  <input
+                    type="file"
+                    id="image-upload-input"
+                    multiple
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="image-upload-input"
+                  />
+                  <FaCamera />
+                  <p>{t('dragDrop')}</p>
+                   <p className="upload-guidelines">{t('imageUploadGuidelines', 'Min 2, Max 8 images. Max 5MB each.')}</p>
+                </div>
+                {imageError && <p className="error-message">{imageError}</p>}
+                <div className="image-previews">
+                  {formData.images.map((image, index) => (
+                    <div 
+                        key={index} 
+                        className={`image-preview-container ${index === mainImageIndex ? 'main' : ''}`}
+                        onClick={() => setMainImage(index)}
+                    >
+                      <img src={URL.createObjectURL(image)} alt={`preview ${index}`} className="image-preview" />
+                      <button 
+                        type="button" 
+                        onClick={(e) => { e.stopPropagation(); removeImage(index); }} 
+                        className="remove-image-btn"
+                      >
+                        &times;
+                      </button>
+                      {index === mainImageIndex && <div className="main-image-label">{t('main')}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="form-group">
+                <label>{t('availability')}</label>
+                {renderAvailabilityManager()}
+              </div>
+              <button type="submit" className="action-btn">{t('addServiceBtn')}</button>
+            </form>
         </div>
       </main>
     </div>

@@ -69,6 +69,7 @@ const AppContent = () => {
   const { i18n } = useTranslation();
   const showNavbar = !['/login', '/register', '/forgot-password'].includes(location.pathname);
   const showAuthHeader = ['/login', '/register', '/forgot-password'].includes(location.pathname);
+  const toastPosition = i18n.language === 'ar' ? 'top-right' : 'top-left';
 
   useEffect(() => {
     document.dir = i18n.language === 'ar' ? 'rtl' : 'ltr';
@@ -81,7 +82,7 @@ const AppContent = () => {
 
   return (
     <div className="app-container">
-      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
+      <ToastContainer position={toastPosition} autoClose={5000} hideProgressBar={false} />
       {showNavbar && <Navbar />}
       {showAuthHeader && <AuthHeader />}
       <main className="main-content">
@@ -106,7 +107,7 @@ const AppContent = () => {
         <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/manage-services" element={<ProtectedRoute allowedRoles={['admin']}><ManageServices /></ProtectedRoute>} />
         <Route path="/admin/user-management" element={<ProtectedRoute allowedRoles={['admin']}><UserManagement /></ProtectedRoute>} />
-        <Route path="/admin/provider-approvals" element={<ProtectedRoute allowedRoles={['admin']}><ProviderApprovals /></ProtectedRoute>} />
+        <Route path="/admin/provider-approvals" element={<ProtectedRoute allowed_roles={['admin']}><ProviderApprovals /></ProtectedRoute>} />
         <Route path="/admin/reports-and-feedback" element={<ProtectedRoute allowedRoles={['admin']}><ReportsAndFeedback /></ProtectedRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

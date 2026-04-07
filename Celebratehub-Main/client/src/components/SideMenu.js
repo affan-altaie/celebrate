@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { MdClose, MdSettings, MdLanguage, MdPalette, MdLogout, MdHistory, MdDashboard } from 'react-icons/md';
 import LanguageSwitcher from './LanguageSwitcher';
 import ThemeSwitcher from './ThemeSwitcher';
@@ -44,6 +45,7 @@ const SideMenu = ({ isOpen, onClose }) => {
   }, [isOpen, onClose]);
 
   const handleLogout = () => {
+    toast.success(t('loggedOutSuccess'));
     localStorage.removeItem('user');
     setUser(null);
     onClose();

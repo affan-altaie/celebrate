@@ -15,6 +15,7 @@ const CustomerProfile = () => {
   const [error, setError] = useState('');
   const [paymentError, setPaymentError] = useState('');
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
+  const [phoneNumberError, setPhoneNumberError] = useState('');
   const [isEditingCard, setIsEditingCard] = useState(false);
   const [originalCardData, setOriginalCardData] = useState(null);
   const [cardData, setCardData] = useState({
@@ -75,6 +76,55 @@ const CustomerProfile = () => {
     newPassword: "",
     confirmPassword: ""
   });
+  const [passwordErrors, setPasswordErrors] = useState({});
+  const [passwordRequirementsVisible, setPasswordRequirementsVisible] = useState(false);
+  const [passwordValidity, setPasswordValidity] = useState({
+    length: false,
+    lowercase: false,
+    uppercase: false,
+    number: false,
+    specialChar: false,
+  });
+
+  const validatePassword = (password) => {
+    const newValidity = {
+      length: password.length >= 8,
+      lowercase: /[a-z]/.test(password),
+      uppercase: /[A-Z]/.test(password),
+      number: /[0-9]/.test(password),
+      specialChar: /[!@#$%^&*]/.test(password),
+    };
+    setPasswordValidity(newValidity);
+    return Object.values(newValidity).every((v) => v);
+  };
+
+  const handlePasswordDataChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    setMessage(''); // Clear general messages on input change
+    setError('');   // Clear general errors on input change
+
+    if (name === "newPassword") {
+      const isValid = validatePassword(value);
+      setPasswordErrors(prev => ({ ...prev, newPassword: isValid ? '' : t("passwordRequirementsError") }));
+      
+      if (passwordData.confirmPassword && value !== passwordData.confirmPassword) {
+        setPasswordErrors(prev => ({ ...prev, confirmPassword: t("passwordsDoNotMatchError") }));
+      } else if (passwordData.confirmPassword && value === passwordData.confirmPassword) {
+        setPasswordErrors(prev => { const { confirmPassword, ...rest } = prev; return rest; });
+      }
+    } else if (name === "confirmPassword") {
+      if (passwordData.newPassword && value !== passwordData.newPassword) {
+        setPasswordErrors(prev => ({ ...prev, confirmPassword: t("passwordsDoNotMatchError") }));
+      } else {
+        setPasswordErrors(prev => { const { confirmPassword, ...rest } = prev; return rest; });
+      }
+    }
+  };
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -114,6 +164,14 @@ const CustomerProfile = () => {
     setMessage('');
     setError('');
     setPaymentError('');
+    setPhoneNumberError(''); // Clear previous phone number errors
+
+    const phoneRegex = /^[79][0-9]{7}$/;
+    if (!phoneRegex.test(newPhoneNumber)) {
+      setPhoneNumberError(t("phoneInvalid") || "Phone number must be an 8-digit number starting with 7 or 9.");
+      return;
+    }
+
     try {
       const response = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
@@ -131,6 +189,7 @@ const CustomerProfile = () => {
         setUser(updatedUser);
         setMessage(t('phoneNumberUpdated'));
         setNewPhoneNumber('');
+        setPhoneNumberError(''); // Ensure error is cleared on successful API update
       } else {
         setError(data.message || t('phoneNumberUpdateFailed'));
       }
@@ -145,9 +204,21 @@ const CustomerProfile = () => {
     setMessage('');
     setError('');
     setPaymentError('');
-    
+    setPasswordErrors({}); // Clear all password errors at the start of submission
+
+    const newErrors = {};
+    const isNewPasswordValid = validatePassword(passwordData.newPassword);
+
+    if (!isNewPasswordValid) {
+      newErrors.newPassword = t("passwordRequirementsError");
+    }
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError(t('passwordsDoNotMatchError'));
+      newErrors.confirmPassword = t("passwordsDoNotMatchError");
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setPasswordErrors(newErrors);
       return;
     }
 
@@ -168,6 +239,15 @@ const CustomerProfile = () => {
       if (response.ok) {
         setMessage(t('passwordUpdated'));
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        setPasswordValidity({
+          length: false,
+          lowercase: false,
+          uppercase: false,
+          number: false,
+          specialChar: false,
+        });
+        setPasswordRequirementsVisible(false);
+        setPasswordErrors({}); // Ensure errors are cleared on successful API update
       } else {
         setError(data.message || t('passwordUpdateFailed'));
       }
@@ -219,8 +299,8 @@ const CustomerProfile = () => {
         setPaymentError(response.data.message || t("cardUpdateFailed") || "Failed to update card details");
       }
     } catch (err) {
-      console.error(err);
-      setPaymentError(t("genericError") || "An error occurred");
+      console.error("Card update failed:", err.response?.data?.message || err.message || err);
+      setPaymentError(err.response?.data?.message || t("genericError") || "An error occurred");
     }
   };
 
@@ -234,11 +314,12 @@ const CustomerProfile = () => {
         method: 'DELETE'
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         localStorage.removeItem('user');
         navigate('/login');
       } else {
-        const data = await response.json();
         setError(data.message || t('accountDeletionFailed'));
       }
     } catch (err) {
@@ -300,7 +381,6 @@ const CustomerProfile = () => {
             <p><strong>{t('usernameLabel')}:</strong> {user.username}</p>
             <p><strong>{t('emailLabel')}:</strong> {user.email}</p>
             <p><strong>{t('phoneLabel')}:</strong> {user.phoneNumber}</p>
-            <p><strong>{t('roleLabel')}:</strong> {user.role}</p>
           </div>
 
           <hr />
@@ -312,12 +392,34 @@ const CustomerProfile = () => {
               <input
                 type="tel"
                 value={newPhoneNumber}
-                onChange={(e) => setNewPhoneNumber(e.target.value)}
+                onChange={(e) => {
+                  const sanitizedValue = e.target.value.replace(/\D/g, '').slice(0, 8); // Remove non-digits and limit to 8
+                  setNewPhoneNumber(sanitizedValue);
+                  const phoneRegex = /^[79][0-9]{7}$/;
+                  if (!phoneRegex.test(sanitizedValue)) {
+                    setPhoneNumberError(t("phoneInvalid") || "Phone number must be an 8-digit number starting with 7 or 9.");
+                  } else {
+                    setPhoneNumberError('');
+                  }
+                  setMessage(''); // Clear general messages on input change
+                  setError('');   // Clear general errors on input change
+                }}
+                onBlur={(e) => {
+                  const sanitizedValue = e.target.value.replace(/\D/g, '').slice(0, 8); // Remove non-digits and limit to 8
+                  const phoneRegex = /^[79][0-9]{7}$/;
+                  if (!phoneRegex.test(sanitizedValue)) {
+                    setPhoneNumberError(t("phoneInvalid") || "Phone number must be an 8-digit number starting with 7 or 9.");
+                  } else {
+                    setPhoneNumberError('');
+                  }
+                }}
+                maxLength="8"
                 required
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
+              {phoneNumberError && <div className="error-message">{phoneNumberError}</div>}
             </div>
-            <button type="submit" className="action-btn">{t('updatePhoneNumber')}</button>
+            <button type="submit" className="action-btn" disabled={!!phoneNumberError || !newPhoneNumber}>{t('updatePhoneNumber')}</button>
           </form>
 
           <hr />
@@ -486,22 +588,61 @@ const CustomerProfile = () => {
               <input
                 type="password"
                 value={passwordData.newPassword}
-                onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                onChange={handlePasswordDataChange}
+                onFocus={() => setPasswordRequirementsVisible(true)}
+                onBlur={() => setPasswordRequirementsVisible(false)}
+                name="newPassword"
                 required
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
+              {passwordRequirementsVisible && (
+                <div className="password-requirements">
+                  <ul>
+                    <li className={passwordValidity.length ? "valid" : "invalid"}>
+                      {t("atLeast8Characters")}
+                    </li>
+                    <li className={passwordValidity.uppercase ? "valid" : "invalid"}>
+                      {t("atLeastOneUppercaseLetter")}
+                    </li>
+                    <li className={passwordValidity.lowercase ? "valid" : "invalid"}>
+                      {t("atLeastOneLowercaseLetter")}
+                    </li>
+                    <li className={passwordValidity.number ? "valid" : "invalid"}>
+                      {t("atLeastOneNumber")}
+                    </li>
+                    <li className={passwordValidity.specialChar ? "valid" : "invalid"}>
+                      {t("atLeastOneSpecialCharacter")}
+                    </li>
+                  </ul>
+                </div>
+              )}
+              {passwordErrors.newPassword && <div className="error-message">{passwordErrors.newPassword}</div>}
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('confirmNewPassword')}</label>
               <input
                 type="password"
                 value={passwordData.confirmPassword}
-                onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                onChange={handlePasswordDataChange}
+                name="confirmPassword"
                 required
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
+              {passwordErrors.confirmPassword && <div className="error-message">{passwordErrors.confirmPassword}</div>}
             </div>
-            <button type="submit" className="action-btn">{t('updatePassword')}</button>
+            <button 
+              type="submit" 
+              className="action-btn" 
+              disabled={ 
+                !passwordData.currentPassword || 
+                !passwordData.newPassword || 
+                !passwordData.confirmPassword || 
+                !Object.values(passwordValidity).every(v => v) || 
+                passwordData.newPassword !== passwordData.confirmPassword
+              }
+            >
+              {t("updatePassword")}
+            </button>
           </form>
 
           <hr style={{ margin: '2rem 0' }} />

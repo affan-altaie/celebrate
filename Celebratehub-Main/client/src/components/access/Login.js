@@ -11,6 +11,7 @@ const Login = () => {
     password: "",
     keepMeSignedIn: false,
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
@@ -109,15 +110,28 @@ const Login = () => {
 
           <div className="form-group">
             <label htmlFor="password">{t("password")}</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder={t("enterYourPassword")}
-              required
-            />
+            <div className="password-input-wrapper">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder={t("enterYourPassword")}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="password-toggle-btn"
+              >
+                {showPassword ? (
+                  <i className="fa-solid fa-eye"></i>
+                ) : (
+                  <i className="fa-solid fa-eye-slash"></i>
+                )}
+              </button>
+            </div>
           </div>
 
           <div className="form-options">

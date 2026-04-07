@@ -56,7 +56,7 @@ router.post("/process", paymentCardValidation, validate, async (req, res) => {
         cardNumber: cardNumber,
         expiryDate: expiryDate,
         cardHolderName: cardHolderName,
-        cvc: cvc,
+        // cvc: cvc, // CVC should not be stored
       };
     }
 
@@ -85,7 +85,8 @@ router.post("/process", paymentCardValidation, validate, async (req, res) => {
     });
   } catch (error) {
     console.error("Payment error:", error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error("Update card error:", error);
+    res.status(500).json({ success: false, message: error.message || "An unknown error occurred" });
   }
 });
 
@@ -118,9 +119,9 @@ router.get("/user-bookings/:userId", async (req, res) => {
 });
 
 // Update saved card details
-router.put("/update-card/:userId", paymentCardValidation, validate, async (req, res) => {
+router.put("/update-card/:userId", validate, async (req, res) => {
   try {
-    const { cardHolderName, cardNumber, expiryDate, cvc } = req.body;
+    const { cardHolderName, cardNumber, expiryDate } = req.body;
     const user = await User.findById(req.params.userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -130,7 +131,6 @@ router.put("/update-card/:userId", paymentCardValidation, validate, async (req, 
       cardHolderName,
       cardNumber,
       expiryDate,
-      cvc,
     };
 
     await user.save();

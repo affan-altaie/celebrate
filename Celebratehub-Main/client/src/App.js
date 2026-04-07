@@ -107,7 +107,7 @@ const AppContent = () => {
         <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/manage-services" element={<ProtectedRoute allowedRoles={['admin']}><ManageServices /></ProtectedRoute>} />
         <Route path="/admin/user-management" element={<ProtectedRoute allowedRoles={['admin']}><UserManagement /></ProtectedRoute>} />
-        <Route path="/admin/provider-approvals" element={<ProtectedRoute allowed_roles={['admin']}><ProviderApprovals /></ProtectedRoute>} />
+        <Route path="/admin/provider-approvals" element={<ProtectedRoute allowedRoles={['admin']}><ProviderApprovals /></ProtectedRoute>} />
         <Route path="/admin/reports-and-feedback" element={<ProtectedRoute allowedRoles={['admin']}><ReportsAndFeedback /></ProtectedRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

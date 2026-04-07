@@ -32,7 +32,7 @@ const ForgotPassword = () => {
       console.log("Response from server:", data);
       if (response.ok) {
         setOtpSent(true);
-        setMessage(data.message);
+        setMessage(t("otpSentTo", { email }));
       } else {
         setError(data.message || t("errorSendingOtp"));
       }

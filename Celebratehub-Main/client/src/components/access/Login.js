@@ -59,7 +59,7 @@ const Login = () => {
         ) {
           toast.error(
             <div>
-              {t("login Pending Verification")}{" "}
+              {t("loginPendingVerification")}{" "}
               <Link
                 to="/otp-verification"
                 state={{ email: formData.email }}
@@ -76,7 +76,7 @@ const Login = () => {
         ) {
           toast.error(t("accountRejected"));
         } else {
-          toast.error(data.message || t("login Failed"));
+          toast.error(data.message || t("loginFailed"));
         }
       }
     } catch (err) {
@@ -88,18 +88,18 @@ const Login = () => {
   return (
     <div className="access-container">
       <div className="access-card">
-        <h3 className="access-subtitle">{t("signIn To Your Account")}</h3>
+        <h3 className="access-subtitle">{t("signInToYourAccount")}</h3>
 
         <form className="access-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">{t("email Address")}</label>
+            <label htmlFor="email">{t("emailAddress")}</label>
             <input
               type="email"
               id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder={t("enter Your Email")}
+              placeholder={t("enterYourEmail")}
               required
             />
           </div>
@@ -113,7 +113,7 @@ const Login = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder={t("enter Your Password")}
+                placeholder={t("enterYourPassword")}
                 required
               />
               <button
@@ -132,7 +132,7 @@ const Login = () => {
 
           <div className="form-options">
             <Link to="/forgot-password" className="forgot-password-link">
-              {t("forgot Password")}
+              {t("forgotPassword")}
             </Link>
             <div className="form-check">
               <input
@@ -144,7 +144,7 @@ const Login = () => {
                 className="form-check-input"
               />
               <label htmlFor="keepMeSignedIn" className="form-check-label">
-                {t("keep Me SignedIn")}
+                {t("keepMeSignedIn")}
               </label>
             </div>
           </div>
@@ -155,7 +155,7 @@ const Login = () => {
         </form>
 
         <div className="access-footer">
-          {t("dont Have An Account")}{" "}
+          {t("dontHaveAnAccount")}{" "}
           <Link to="/register" className="access-link">
             {t("signUp")}
           </Link>

@@ -304,6 +304,7 @@ const BookingPage = () => {
             ...formData,
             date: selectedDate,
             time: selectedTime,
+            price: totalPrice,
             transactionId: response.data.transactionId,
             newBalance: response.data.newBalance,
           },
@@ -472,7 +473,6 @@ const BookingPage = () => {
               <div className="time-slots-container">
                 {service.availability[selectedDate].map((time, index) => (
                   <button
-                    key={index}
                     type="button"
                     className={`time-slot-button ${selectedTime === time ? 'selected' : ''}`}
                     onClick={() => setSelectedTime(time)}

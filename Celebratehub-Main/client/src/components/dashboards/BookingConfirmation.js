@@ -36,7 +36,7 @@ const BookingConfirmation = () => {
         <div className="receipt-details">
           <h2>{t('receipt')}</h2>
           <div className="receipt-item"><span>{t('serviceLabel')}:</span><span>{service.name}</span></div>
-          <div className="receipt-item"><span>{t('priceLabel')}:</span><span>{service.price}</span></div>
+          <div className="receipt-item"><span>{t('priceLabel')}:</span><span>OMR {booking.price.toFixed(2)}</span></div>
           <div className="receipt-item"><span>{t('dateLabel')}:</span><span>{booking.date}</span></div>
           <div className="receipt-item"><span>{t('timeLabel')}:</span><span>{booking.time}</span></div>
           <div className="receipt-item"><span>{t('locationLabel')}:</span><span>{booking.location}</span></div>

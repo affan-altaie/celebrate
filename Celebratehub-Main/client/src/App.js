@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './components/Navbar';
 import AuthHeader from './components/AuthHeader';
 import Footer from './components/Footer';
@@ -33,8 +35,9 @@ import LeaveReview from './components/dashboards/LeaveReview';
 import ReportService from './components/dashboards/ReportService';
 import BookingPage from './components/dashboards/BookingPage';
 import BookingConfirmation from './components/dashboards/BookingConfirmation';
+import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
-//AFFAN
+
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
   const user = localStorage.getItem('user');
@@ -78,6 +81,7 @@ const AppContent = () => {
 
   return (
     <div className="app-container">
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
       {showNavbar && <Navbar />}
       {showAuthHeader && <AuthHeader />}
       <main className="main-content">
@@ -120,11 +124,12 @@ const AppContent = () => {
 
 function App() {
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </ThemeProvider>
   );
 }
-//affan2
+
 export default App;
-// TestAFFAN

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 import "./Access.css";
 
 const Login = () => {
@@ -12,7 +13,6 @@ const Login = () => {
     keepMeSignedIn: false,
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -20,7 +20,6 @@ const Login = () => {
       ...prevState,
       [name]: type === "checkbox" ? checked : value,
     }));
-    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
@@ -38,8 +37,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log("Login successful", data);
-        // Store token or user info if needed
+        toast.success(t("loginSuccess"));
         localStorage.setItem("user", JSON.stringify(data.user));
 
         // Redirect based on role
@@ -59,9 +57,9 @@ const Login = () => {
           data.message ===
           "Your account is pending email verification. Please check your email for an OTP."
         ) {
-          setError(
-            <div className="error-message">
-              {t("loginPendingVerification")}{" "}
+          toast.error(
+            <div>
+              {t("login Pending Verification")}{" "}
               <Link
                 to="/otp-verification"
                 state={{ email: formData.email }}
@@ -76,34 +74,32 @@ const Login = () => {
           data.message ===
           "Your account has been rejected. Please register again."
         ) {
-          setError(t("accountRejected"));
+          toast.error(t("accountRejected"));
         } else {
-          setError(data.message || t("loginFailed"));
+          toast.error(data.message || t("login Failed"));
         }
       }
     } catch (err) {
       console.error("Login error:", err);
-      setError(t("genericError"));
+      toast.error(t("genericError"));
     }
   };
 
   return (
     <div className="access-container">
       <div className="access-card">
-        <h3 className="access-subtitle">{t("signInToYourAccount")}</h3>
-
-        {error && <div className="error-message">{error}</div>}
+        <h3 className="access-subtitle">{t("signIn To Your Account")}</h3>
 
         <form className="access-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">{t("emailAddress")}</label>
+            <label htmlFor="email">{t("email Address")}</label>
             <input
               type="email"
               id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder={t("enterYourEmail")}
+              placeholder={t("enter Your Email")}
               required
             />
           </div>
@@ -117,7 +113,7 @@ const Login = () => {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder={t("enterYourPassword")}
+                placeholder={t("enter Your Password")}
                 required
               />
               <button
@@ -136,7 +132,7 @@ const Login = () => {
 
           <div className="form-options">
             <Link to="/forgot-password" className="forgot-password-link">
-              {t("forgotPassword")}
+              {t("forgot Password")}
             </Link>
             <div className="form-check">
               <input
@@ -148,7 +144,7 @@ const Login = () => {
                 className="form-check-input"
               />
               <label htmlFor="keepMeSignedIn" className="form-check-label">
-                {t("keepMeSignedIn")}
+                {t("keep Me SignedIn")}
               </label>
             </div>
           </div>
@@ -159,7 +155,7 @@ const Login = () => {
         </form>
 
         <div className="access-footer">
-          {t("dontHaveAnAccount")}{" "}
+          {t("dont Have An Account")}{" "}
           <Link to="/register" className="access-link">
             {t("signUp")}
           </Link>

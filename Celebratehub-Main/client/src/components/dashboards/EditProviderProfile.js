@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 import './Dashboard.css';
 import logo1 from '../../assets/logo1.png'; // Fallback image
 
@@ -8,8 +9,6 @@ const EditProviderProfile = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
   
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -62,14 +61,13 @@ const EditProviderProfile = () => {
       if (response.ok) {
         localStorage.setItem('user', JSON.stringify(data.user));
         setUser(data.user);
-        setMessage(t('profileUpdated'));
-        setError('');
+        toast.success(t('profileUpdated'));
       } else {
-        setError(data.message || t('profileUpdateFailed'));
+        toast.error(data.message || t('profileUpdateFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError(t('genericError'));
+      toast.error(t('genericError'));
     }
   };
 
@@ -93,14 +91,13 @@ const EditProviderProfile = () => {
         const updatedUser = { ...user, profilePicture: data.profilePicture };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
-        setMessage(t('profilePictureUpdated'));
-        setError('');
+        toast.success(t('profilePictureUpdated'));
       } else {
-        setError(data.message || t('imageUploadFailed'));
+        toast.error(data.message || t('imageUploadFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError(t('genericError'));
+      toast.error(t('genericError'));
     }
   };
 
@@ -109,7 +106,7 @@ const EditProviderProfile = () => {
     e.preventDefault();
     
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError(t('passwordsDoNotMatchError'));
+      toast.error(t('passwordsDoNotMatchError'));
       return;
     }
 
@@ -128,15 +125,14 @@ const EditProviderProfile = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(t('passwordUpdated'));
-        setError('');
+        toast.success(t('passwordUpdated'));
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       } else {
-        setError(data.message || t('passwordUpdateFailed'));
+        toast.error(data.message || t('passwordUpdateFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError(t('genericError'));
+      toast.error(t('genericError'));
     }
   };
 
@@ -156,11 +152,11 @@ const EditProviderProfile = () => {
         navigate('/login');
       } else {
         const data = await response.json();
-        setError(data.message || t('accountDeletionFailed'));
+        toast.error(data.message || t('accountDeletionFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError(t('genericError'));
+      toast.error(t('genericError'));
     }
   };
   
@@ -180,8 +176,6 @@ const EditProviderProfile = () => {
       </header>
 
       <main className="dashboard-content" style={{ display: 'block' }}>
-        {message && <div className="success-message" style={{ color: 'green', marginBottom: '1rem', textAlign: 'center' }}>{message}</div>}
-        {error && <div className="error-message" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>{error}</div>}
 
         <div className="dashboard-card" style={{ maxWidth: '600px', margin: '0 auto', marginBottom: '2rem' }}>
           <h3>{t('profileInformation')}</h3>

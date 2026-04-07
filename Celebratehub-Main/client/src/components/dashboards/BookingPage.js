@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaCalendarAlt, FaCreditCard, FaStar, FaUserFriends, FaCheckCircle, FaClock } from 'react-icons/fa';
 import './BookingPage.css';
 
@@ -10,7 +11,7 @@ const services = [
       id: 1,
       name: 'Elite Photography Studios',
       type: 'Photography',
-      price: 'OMR 40 / hour',
+      pricePerHour: 'OMR 40 / hour',
       image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60',
       location: 'Muscat, Oman',
       availability: {
@@ -28,7 +29,7 @@ const services = [
       id: 2,
       name: 'Gourmet Catering Co.',
       type: 'Catering',
-      price: 'OMR 20 / hour',
+      pricePerHour: 'OMR 20 / hour',
       pricePerPerson: 'OMR 2',
       image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60',
       location: 'Salalah, Oman',
@@ -47,7 +48,7 @@ const services = [
       id: 3,
       name: 'Elegant Wedding Halls',
       type: 'Wedding Halls',
-      price: 'OMR 120 / hour',
+      pricePerHour: 'OMR 120 / hour',
       pricePerPerson: 'OMR 2',
       image: 'https://www.shangri-la.com/-/media/Shangri-La/muscat_barraljissahresort/settings/weddings-celebrations/SLMU_Events_Spaces_1920x940.jpg',
       location: 'Sohar, Oman',
@@ -66,7 +67,7 @@ const services = [
       id: 4,
       name: 'Joyful Birthday Parties',
       type: 'Birthdays',
-      price: 'OMR 30 / hour',
+      pricePerHour: 'OMR 30 / hour',
       pricePerPerson: 'OMR 2',
       image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60',
       location: 'Nizwa, Oman',
@@ -85,7 +86,7 @@ const services = [
   
 
 const BookingPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const [service, setService] = useState(null);
@@ -138,7 +139,7 @@ const BookingPage = () => {
     if (service) {
       let total = 0;
       if (hours > 0) {
-        const priceRange = service.price.match(/\d+/g);
+        const priceRange = service.pricePerHour.match(/\d+/g);
         if (priceRange && priceRange.length > 0) {
           const minPrice = parseInt(priceRange[0], 10);
           total += minPrice * hours;
@@ -258,12 +259,12 @@ const BookingPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!selectedDate || !selectedTime) {
-      alert(t("selectDateTimeAlert"));
+      toast.error(t("selectDateTimeAlert"));
       return;
     }
 
     if (!validateForm()) {
-      alert(t("paymentValidationErrors"));
+      toast.error(t("paymentValidationErrors"));
       return;
     }
 
@@ -271,7 +272,7 @@ const BookingPage = () => {
     const userId = storedUser?.id || storedUser?._id;
 
     if (!storedUser || !userId) {
-      alert("Please login to book a service");
+      toast.error(t("loginToBook"));
       navigate("/login");
       return;
     }
@@ -283,10 +284,11 @@ const BookingPage = () => {
         serviceName: service.name,
         amount: totalPrice,
         cardHolderName: formData.cardHolderName,
-        cardNumber: formData.cardNumber,
+        cardNumber: formData.cardNumber.replace(/\s/g, ""),
         expiryDate: formData.expiryDate,
         cvc: formData.cvc,
         saveCard: saveCard,
+        language: i18n.language,
         bookingDetails: {
           ...formData,
           date: selectedDate,
@@ -306,11 +308,12 @@ const BookingPage = () => {
             newBalance: response.data.newBalance,
           },
         };
+        toast.success(t("bookingSuccessful"))
         navigate("/booking-confirmation", { state: { bookingDetails } });
       }
     } catch (error) {
       console.error("Booking/Payment error:", error);
-      alert(error.response?.data?.message || "Booking failed. Please try again.");
+      toast.error(error.response?.data?.message || t("bookingFailed"));
     }
   };
 
@@ -377,7 +380,7 @@ const BookingPage = () => {
           <span><FaUserFriends /> {t('reviewsCount', { count: service.reviews })}</span>
         </div>
         <p className="service-info"><FaMapMarkerAlt /> {service.location}</p>
-        <p className="service-info">{service.price}</p>
+        <p className="service-info">{service.pricePerHour}</p>
         {service.pricePerPerson && <p className="service-info">{service.pricePerPerson} / {t('personLabel')}</p>}
         <p className="service-description">{service.description}</p>
         <div className="service-features">

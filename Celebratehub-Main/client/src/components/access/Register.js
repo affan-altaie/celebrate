@@ -17,8 +17,6 @@ const Register = () => {
     location: "",
     document: null,
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
   const [formErrors, setFormErrors] = useState({});
   const [touched, setTouched] = useState({});
@@ -205,7 +203,7 @@ const Register = () => {
           navigate("/otp-verification", { state: { email: formData.email } });
         } else if (formData.role === "provider") {
           // Display the message from the server for providers awaiting admin approval
-          setError(data.message || t("registrationSuccessProviderPending"));
+          setError(data.message || t("registration Success Provider Pending"));
           // Optionally navigate to login or a dedicated info page after a delay
           setTimeout(() => {
             navigate("/login");
@@ -215,7 +213,7 @@ const Register = () => {
         if (data.message === "User already registered") {
           navigate("/login");
         } else {
-          setError(data.message || t("registrationFailed"));
+          setError(data.message || t("registration Failed"));
         }
       }
     }
@@ -333,33 +331,20 @@ const Register = () => {
 
           <div className="form-group">
             <label htmlFor="password">{t("password")}</label>
-            <div className="password-input-wrapper">
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                onFocus={() => setPasswordRequirements(true)}
-                onBlur={(e) => {
-                  setPasswordRequirements(false);
-                  handleBlur(e);
-                }}
-                placeholder={t("createAPassword")}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="password-toggle-btn"
-              >
-                {showPassword ? (
-                  <i className="fa-solid fa-eye"></i>
-                ) : (
-                  <i className="fa-solid fa-eye-slash"></i>
-                )}
-              </button>
-            </div>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              onFocus={() => setPasswordRequirements(true)}
+              onBlur={(e) => {
+                setPasswordRequirements(false);
+                handleBlur(e);
+              }}
+              placeholder={t("createAPassword")}
+              required
+            />
             {passwordRequirements && (
               <div className="password-requirements">
                 <ul>
@@ -388,29 +373,16 @@ const Register = () => {
 
           <div className="form-group">
             <label htmlFor="confirmPassword">{t("confirmPassword")}</label>
-            <div className="password-input-wrapper">
-              <input
-                type={showConfirmPassword ? "text" : "password"}
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder={t("confirmYourPassword")}
-                required
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword((prev) => !prev)}
-                className="password-toggle-btn"
-              >
-                {showConfirmPassword ? (
-                  <i className="fa-solid fa-eye"></i>
-                ) : (
-                  <i className="fa-solid fa-eye-slash"></i>
-                )}
-              </button>
-            </div>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder={t("confirmYourPassword")}
+              required
+            />
             {touched.confirmPassword && formErrors.confirmPassword && (
               <div className="error-message">{formErrors.confirmPassword}</div>
             )}

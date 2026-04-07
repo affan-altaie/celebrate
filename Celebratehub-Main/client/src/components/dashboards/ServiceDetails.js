@@ -14,7 +14,7 @@ const services = [
     rating: 4.9,
     description: 'Professional event photography with years of experience capturing precious moments.',
     features: ['Wedding Photography', 'Corporate Events', 'Portrait Sessions'],
-    price: 'OMR 40 / hour',
+    pricePerHour: 'OMR 40 / hour',
     image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60',
     location: 'Muscat, Oman',
     distance: '5 miles',
@@ -34,7 +34,7 @@ const services = [
     rating: 4.8,
     description: 'Exceptional culinary experiences tailored to your event needs and preferences.',
     features: ['Menu Planning', 'Food Service', 'Beverage Service'],
-    price: 'OMR 20 / hour',
+    pricePerHour: 'OMR 20 / hour',
     pricePerPerson: 'OMR 2',
     image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60',
     location: 'Salalah, Oman',
@@ -55,7 +55,7 @@ const services = [
     rating: 5,
     description: 'Stunning wedding halls with state-of-the-art facilities and flexible spaces.',
     features: ['Indoor Spaces', 'Outdoor Gardens', 'Audio/Visual Equipment'],
-    price: 'OMR 120 / hour',
+    pricePerHour: 'OMR 120 / hour',
     pricePerPerson: 'OMR 2',
     image: 'https://www.shangri-la.com/-/media/Shangri-La/muscat_barraljissahresort/settings/weddings-celebrations/SLMU_Events_Spaces_1920x940.jpg',
     location: 'Sohar, Oman',
@@ -76,7 +76,7 @@ const services = [
     rating: 4.7,
     description: 'Unforgettable birthday parties for all ages, with entertainment and activities.',
     features: ['Themed Decorations', 'Games and Activities', 'Cake and Catering'],
-    price: 'OMR 30 / hour',
+    pricePerHour: 'OMR 30 / hour',
     pricePerPerson: 'OMR 2',
     image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60',
     location: 'Nizwa, Oman',
@@ -149,7 +149,7 @@ const ServiceDetails = () => {
             <p className="service-description">{service.description}</p>
             <div className="service-price-book">
               <div className="price-info">
-                <span className="price-display">{service.price}</span>
+                <span className="price-display">{service.pricePerHour}</span>
                 {service.pricePerPerson && <span className="price-per-person">{service.pricePerPerson} / {t('personLabel')}</span>}
               </div>
               <button className="book-now-button" onClick={() => navigate(`/booking/${service.id}`)}>{t('bookNow')}</button>

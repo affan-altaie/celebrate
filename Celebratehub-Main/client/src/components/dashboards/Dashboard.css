@@ -262,7 +262,6 @@
 
 .card-visualization .card-number {
   font-size: 1.4rem;
-  letter-spacing: 2px;
   margin-bottom: 1.5rem;
   font-family: 'Courier New', Courier, monospace;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
@@ -280,7 +279,6 @@
   text-transform: uppercase;
   opacity: 0.8;
   margin-bottom: 0.2rem;
-  letter-spacing: 1px;
 }
 
 .card-visualization .card-holder-name,
@@ -288,7 +286,6 @@
   font-size: 0.9rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .message-placeholder {

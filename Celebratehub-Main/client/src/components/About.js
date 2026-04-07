@@ -16,6 +16,9 @@ const About = () => {
         <li>{t('offer2')}</li>
         <li>{t('offer3')}</li>
         <li>{t('offer4')}</li>
+        <li>{t('offer5')}</li>
+        <li>{t('offer6')}</li>
+        <li>{t('offer7')}</li>
       </ul>
     </div>
   );

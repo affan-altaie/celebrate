@@ -57,6 +57,11 @@ const userSchema = new mongoose.Schema({
     cardNumber: { type: String, default: "" },
     expiryDate: { type: String, default: "" },
     cardHolderName: { type: String, default: "" }
+  },
+  language: {
+    type: String,
+    enum: ["en", "ar"],
+    default: "en"
   }
 });
 

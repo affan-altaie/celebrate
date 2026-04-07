@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import "./Access.css";
 
 const OtpVerification = () => {
@@ -8,7 +9,6 @@ const OtpVerification = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [otp, setOtp] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
@@ -35,19 +35,19 @@ const OtpVerification = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || t("resendOtpFailed"));
+        toast.error(data.message || t("resendOtpFailed"));
       } else {
+        toast.success(t("otpResent"));
         setResendCooldown(60); // 60-second cooldown
       }
     } catch (err) {
-      setError(t("genericError"));
+      toast.error(t("genericError"));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
       const response = await fetch("/api/verify-otp", {
@@ -61,12 +61,13 @@ const OtpVerification = () => {
       const data = await response.json();
 
       if (response.ok) {
+        toast.success(t("otpVerificationSuccess"));
         navigate("/login");
       } else {
-        setError(data.message || t("otpVerificationFailed"));
+        toast.error(data.message || t("otpVerificationFailed"));
       }
     } catch (err) {
-      setError(t("genericError"));
+      toast.error(t("genericError"));
     } finally {
       setLoading(false);
     }
@@ -78,8 +79,6 @@ const OtpVerification = () => {
         <h3 className="access-subtitle">{t("verifyYourEmail")}</h3>
         <p style={{ marginBottom: "1rem" }}>{t("otpSentTo", { email: location.state?.email })}</p>
 
-        {error && <div className="error-message">{error}</div>}
-
         <form className="access-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="otp">{t("enterOtp")}</label>
@@ -90,7 +89,6 @@ const OtpVerification = () => {
               value={otp}
               onChange={(e) => {
                 setOtp(e.target.value);
-                setError("");
               }}
               placeholder={t("enterOtp")}
               required

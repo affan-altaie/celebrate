@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { FaCreditCard } from 'react-icons/fa';
 import './Dashboard.css';
 import logo1 from '../../assets/logo1.png'; // Fallback image
@@ -11,9 +12,6 @@ const CustomerProfile = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [user, setUser] = useState(location.state?.user || null);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-  const [paymentError, setPaymentError] = useState('');
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
   const [phoneNumberError, setPhoneNumberError] = useState('');
   const [isEditingCard, setIsEditingCard] = useState(false);
@@ -58,16 +56,14 @@ const CustomerProfile = () => {
     try {
       const response = await axios.delete(`/api/payments/delete-card/${userId}`);
       if (response.data.success) {
-        setMessage(t("cardDeleted") || "Card details deleted successfully.");
+        toast.success(t("cardDeleted") || "Card details deleted successfully.");
         setCardData({ cardHolderName: "", cardNumber: "", expiryDate: "" });
-        setError("");
-        setPaymentError('');
       } else {
-        setError(response.data.message || t("cardDeletionFailed") || "Failed to delete card details.");
+        toast.error(response.data.message || t("cardDeletionFailed") || "Failed to delete card details.");
       }
     } catch (err) {
       console.error(err);
-      setError(t("genericError"));
+      toast.error(t("genericError"));
     }
   };
   
@@ -85,6 +81,10 @@ const CustomerProfile = () => {
     number: false,
     specialChar: false,
   });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   const validatePassword = (password) => {
     const newValidity = {
@@ -104,9 +104,6 @@ const CustomerProfile = () => {
       ...prev,
       [name]: value
     }));
-
-    setMessage(''); // Clear general messages on input change
-    setError('');   // Clear general errors on input change
 
     if (name === "newPassword") {
       const isValid = validatePassword(value);
@@ -132,10 +129,6 @@ const CustomerProfile = () => {
 
     const formData = new FormData();
     formData.append('profilePicture', file);
-    
-    setMessage('');
-    setError('');
-    setPaymentError('');
 
     try {
       const response = await fetch(`/api/users/${user.id}/profile-picture`, {
@@ -149,21 +142,18 @@ const CustomerProfile = () => {
         const updatedUser = { ...user, profilePicture: data.profilePicture };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
-        setMessage(t('profilePictureUpdated'));
+        toast.success(t('profilePictureUpdated'));
       } else {
-        setError(data.message || t('imageUploadFailed'));
+        toast.error(data.message || t('imageUploadFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError(t('genericError'));
+      toast.error(t('genericError'));
     }
   };
 
   const handlePhoneUpdate = async (e) => {
     e.preventDefault();
-    setMessage('');
-    setError('');
-    setPaymentError('');
     setPhoneNumberError(''); // Clear previous phone number errors
 
     const phoneRegex = /^[79][0-9]{7}$/;
@@ -187,23 +177,20 @@ const CustomerProfile = () => {
         const updatedUser = { ...user, phoneNumber: newPhoneNumber };
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
-        setMessage(t('phoneNumberUpdated'));
+        toast.success(t('phoneNumberUpdated'));
         setNewPhoneNumber('');
         setPhoneNumberError(''); // Ensure error is cleared on successful API update
       } else {
-        setError(data.message || t('phoneNumberUpdateFailed'));
+        toast.error(data.message || t('phoneNumberUpdateFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError(t('genericError'));
+      toast.error(t('genericError'));
     }
   };
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
-    setMessage('');
-    setError('');
-    setPaymentError('');
     setPasswordErrors({}); // Clear all password errors at the start of submission
 
     const newErrors = {};
@@ -237,7 +224,7 @@ const CustomerProfile = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(t('passwordUpdated'));
+        toast.success(t('passwordUpdated'));
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
         setPasswordValidity({
           length: false,
@@ -249,11 +236,11 @@ const CustomerProfile = () => {
         setPasswordRequirementsVisible(false);
         setPasswordErrors({}); // Ensure errors are cleared on successful API update
       } else {
-        setError(data.message || t('passwordUpdateFailed'));
+        toast.error(data.message || t('passwordUpdateFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError(t('genericError'));
+      toast.error(t('genericError'));
     }
   };
 
@@ -261,13 +248,9 @@ const CustomerProfile = () => {
     e.preventDefault();
     const userId = user?.id || user?._id;
   
-    setMessage('');
-    setError('');
-    setPaymentError('');
-  
     const cardNumberDigits = cardData.cardNumber.replace(/\D/g, '');
     if (cardNumberDigits.length !== 16) {
-      setPaymentError(t('invalidCardNumber') || 'Card number must be 16 digits.');
+      toast.error(t('invalidCardNumber') || 'Card number must be 16 digits.');
       return;
     }
   
@@ -276,12 +259,12 @@ const CustomerProfile = () => {
     const currentMonth = new Date().getMonth() + 1;
   
     if (!month || !year || parseInt(month, 10) < 1 || parseInt(month, 10) > 12) {
-      setPaymentError(t("invalidExpiryDate") || "Invalid expiry date format. Please use MM/YY.");
+      toast.error(t("invalidExpiryDate") || "Invalid expiry date format. Please use MM/YY.");
       return;
     }
   
     if (parseInt(year, 10) < currentYear || (parseInt(year, 10) === currentYear && parseInt(month, 10) < currentMonth)) {
-      setPaymentError(t("expiredCardError") || "Card has expired. Please enter a valid expiry date.");
+      toast.error(t("expiredCardError") || "Card has expired. Please enter a valid expiry date.");
       return;
     }
   
@@ -292,15 +275,15 @@ const CustomerProfile = () => {
       });
   
       if (response.data.success) {
-        setMessage(t("cardUpdated") || "Card details updated successfully");
+        toast.success(t("cardUpdated") || "Card details updated successfully");
         setIsEditingCard(false);
         setCardData(prev => ({ ...prev, cardNumber: cardData.cardNumber }));
       } else {
-        setPaymentError(response.data.message || t("cardUpdateFailed") || "Failed to update card details");
+        toast.error(response.data.message || t("cardUpdateFailed") || "Failed to update card details");
       }
     } catch (err) {
       console.error("Card update failed:", err.response?.data?.message || err.message || err);
-      setPaymentError(err.response?.data?.message || t("genericError") || "An error occurred");
+      toast.error(err.response?.data?.message || t("genericError") || "An error occurred");
     }
   };
 
@@ -320,11 +303,11 @@ const CustomerProfile = () => {
         localStorage.removeItem('user');
         navigate('/login');
       } else {
-        setError(data.message || t('accountDeletionFailed'));
+        toast.error(data.message || t('accountDeletionFailed'));
       }
     } catch (err) {
       console.error(err);
-      setError(t('genericError'));
+      toast.error(t('genericError'));
     }
   };
 
@@ -348,11 +331,6 @@ const CustomerProfile = () => {
       </header>
 
       <main className="dashboard-content" style={{ display: 'block' }}>
-        <div className="message-placeholder">
-          {message && <div className="success-message">{message}</div>}
-          {error && <div className="error-message">{error}</div>}
-        </div>
-
         <div className="dashboard-card" style={{ maxWidth: '600px', margin: '0 auto', marginBottom: '2rem' }}>
           <h3>{t('profileInformation')}</h3>
           
@@ -401,8 +379,6 @@ const CustomerProfile = () => {
                   } else {
                     setPhoneNumberError('');
                   }
-                  setMessage(''); // Clear general messages on input change
-                  setError('');   // Clear general errors on input change
                 }}
                 onBlur={(e) => {
                   const sanitizedValue = e.target.value.replace(/\D/g, '').slice(0, 8); // Remove non-digits and limit to 8
@@ -544,7 +520,7 @@ const CustomerProfile = () => {
                   </div>
                 </div>
 
-                {paymentError && <div className="error-message" style={{ textAlign: 'center', marginBottom: '1rem' }}>{paymentError}</div>}
+                {<div className="error-message" style={{ textAlign: 'center', marginBottom: '1rem' }}></div>}
                 
                 <div style={{ display: 'flex', gap: '1rem' }}>
                   <button type="submit" className="action-btn" style={{ flex: 2, borderRadius: '10px', padding: '12px' }}>
@@ -557,7 +533,6 @@ const CustomerProfile = () => {
                         setCardData(originalCardData);
                       }
                       setIsEditingCard(false); 
-                      setPaymentError(''); 
                     }} 
                     className="logout-btn" 
                     style={{ flex: 1, borderRadius: '10px', padding: '12px', background: '#ccc', color: '#333' }}
@@ -573,20 +548,34 @@ const CustomerProfile = () => {
 
           <h3 style={{ textAlign: 'center' }}>{t('changePassword')}</h3>
           <form onSubmit={handlePasswordChange} style={{ textAlign: 'left' }}>
-            <div className="form-group" style={{ marginBottom: '1rem' }}>
+          <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('currentPassword')}</label>
-              <input
-                type="password"
-                value={passwordData.currentPassword}
-                onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                required
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-              />
+              <div className="password-input-wrapper">
+                <input
+                  type={showCurrentPassword ? "text" : "password"}
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                  required
+                  style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+                />
+                <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword((prev) => !prev)}
+                    className="password-toggle-btn"
+                >
+                    {showCurrentPassword ? (
+                        <i className="fa-solid fa-eye"></i>
+                    ) : (
+                        <i className="fa-solid fa-eye-slash"></i>
+                    )}
+                </button>
+              </div>
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('newPassword')}</label>
+              <div className="password-input-wrapper">
               <input
-                type="password"
+                type={showNewPassword ? "text" : "password"}
                 value={passwordData.newPassword}
                 onChange={handlePasswordDataChange}
                 onFocus={() => setPasswordRequirementsVisible(true)}
@@ -595,6 +584,18 @@ const CustomerProfile = () => {
                 required
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
+              <button
+                    type="button"
+                    onClick={() => setShowNewPassword((prev) => !prev)}
+                    className="password-toggle-btn"
+                >
+                    {showNewPassword ? (
+                        <i className="fa-solid fa-eye"></i>
+                    ) : (
+                        <i className="fa-solid fa-eye-slash"></i>
+                    )}
+                </button>
+                </div>
               {passwordRequirementsVisible && (
                 <div className="password-requirements">
                   <ul>
@@ -620,14 +621,27 @@ const CustomerProfile = () => {
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('confirmNewPassword')}</label>
+              <div className="password-input-wrapper">
               <input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 value={passwordData.confirmPassword}
                 onChange={handlePasswordDataChange}
                 name="confirmPassword"
                 required
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className="password-toggle-btn"
+              >
+                {showConfirmPassword ? (
+                  <i className="fa-solid fa-eye"></i>
+                ) : (
+                  <i className="fa-solid fa-eye-slash"></i>
+                )}
+              </button>
+              </div>
               {passwordErrors.confirmPassword && <div className="error-message">{passwordErrors.confirmPassword}</div>}
             </div>
             <button 

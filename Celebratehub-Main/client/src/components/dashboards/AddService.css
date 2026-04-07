@@ -1,40 +1,180 @@
 .add-service-container {
-  background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
-
-.add-service-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.add-service-form .form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.add-service-form label {
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  text-align: center;
-}
-
-.add-service-form input[type="text"],
-.add-service-form textarea {
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-.add-service-form textarea {
-  resize: vertical;
-  min-height: 100px;
-}
-
-.add-service-form .action-btn {
-  align-self: flex-start;
-}
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .add-service-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .add-service-form .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .add-service-form label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    text-align: left;
+  }
+  
+  .add-service-form input[type="text"],
+  .add-service-form textarea {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  
+  .add-service-form textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .add-service-form .action-btn {
+    align-self: flex-start;
+  }
+  
+  .availability-manager {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    border-radius: 8px;
+  }
+  
+  .availability-calendar .calendar-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .availability-calendar .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .calendar-day {
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .calendar-day.empty {
+    cursor: default;
+  }
+  
+  .calendar-day.available {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .calendar-day.selected {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .time-slots-manager {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ddd;
+  }
+  
+  .time-slots-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .time-slot-chip {
+    background-color: #f0f0f0;
+    padding: 0.5rem 1rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .time-slot-chip button {
+    background: none;
+    border: none;
+    color: #ff0000;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+  
+  .add-time-slot {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .add-time-slot input[type="time"] {
+    padding: 0.5rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  .image-upload-container {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  
+  .image-upload-container.drag-over {
+    background-color: #f0f8ff;
+    border-color: #007bff;
+  }
+  
+  .image-upload-input {
+    display: none;
+  }
+  
+  .image-previews {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  
+  .image-preview-container {
+    position: relative;
+  }
+  
+  .image-preview {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .remove-image-btn {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff0000;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    font-size: 1rem;
+  }
+  
+  .error-message {
+    color: #ff0000;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+  }
+  

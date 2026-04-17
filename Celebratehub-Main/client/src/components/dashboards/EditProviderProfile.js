@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import './Dashboard.css';
+import './dark-dropdown.css';
 import logo1 from '../../assets/logo1.png'; // Fallback image
 
 const EditProviderProfile = () => {
@@ -17,18 +18,43 @@ const EditProviderProfile = () => {
   });
 
   const [formData, setFormData] = useState({
+    username: '',
     location: '',
-    contact: '',
     phoneNumber: ''
   });
+
+  const [phoneNumberError, setPhoneNumberError] = useState('');
+  const [passwordErrors, setPasswordErrors] = useState({});
+  const [passwordRequirementsVisible, setPasswordRequirementsVisible] = useState(false);
+  const [passwordValidity, setPasswordValidity] = useState({
+    length: false,
+    lowercase: false,
+    uppercase: false,
+    number: false,
+    specialChar: false,
+  });
+
+  const locations = [
+    "Muscat", "Seeb", "Bawshar", "Muttrah", "Al Amerat", "Qurayyat",
+    "Sohar", "Shinas", "Liwa", "Saham", "Al Khaburah", "As Suwayq",
+    "Rustaq", "Al Awabi", "Nakhal", "Wadi Al Maawil", "Barka", "Al Musannah",
+    "Nizwa", "Bahla", "Manah", "Al Hamra", "Adam", "Izki", "Samail", "Bidbid",
+    "Ibra", "Al Mudaybi", "Bidiyah", "Al Qabil", "Wadi Bani Khalid", "Dima Wa At Taiyyin",
+    "Sur", "Al Kamil Wal Wafi", "Jalan Bani Bu Hassan", "Jalan Bani Bu Ali", "Masirah",
+    "Ibri", "Yanqul", "Dhank",
+    "Haima", "Duqm", "Mahout", "Al Jazir",
+    "Salalah", "Taqah", "Mirbat", "Sadah", "Rakhyut", "Dhalkut", "Muqshin", "Shalim and the Hallaniyat Islands", "Thumrait",
+    "Khasab", "Bukha", "Dibba Al-Baya", "Madha",
+    "Al Buraimi", "Mahdah", "As Sunaynah"
+  ];
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
     if (storedUser) {
       setUser(storedUser);
       setFormData({
+        username: storedUser.username || '',
         location: storedUser.location || '',
-        contact: storedUser.contact || '',
         phoneNumber: storedUser.phoneNumber || ''
       });
     }
@@ -42,8 +68,27 @@ const EditProviderProfile = () => {
     }));
   };
 
+  const handlePhoneChange = (e) => {
+    const { name, value } = e.target;
+    const sanitizedValue = value.replace(/\D/g, '').slice(0, 8);
+    setFormData(prevState => ({
+      ...prevState,
+      [name]: sanitizedValue
+    }));
+    const phoneRegex = /^[79][0-9]{7}$/;
+    if (!phoneRegex.test(sanitizedValue)) {
+      setPhoneNumberError(t("phoneInvalid") || "Phone number must be an 8-digit number starting with 7 or 9.");
+    } else {
+      setPhoneNumberError('');
+    }
+  }
+
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
+    if(phoneNumberError){
+      toast.error(phoneNumberError);
+      return;
+    }
     try {
       const response = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
@@ -51,8 +96,8 @@ const EditProviderProfile = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          username: formData.username,
           location: formData.location,
-          contact: formData.contact,
           phoneNumber: formData.phoneNumber
         }),
       });
@@ -101,12 +146,61 @@ const EditProviderProfile = () => {
     }
   };
 
+  const validatePassword = (password) => {
+    const newValidity = {
+      length: password.length >= 8,
+      lowercase: /[a-z]/.test(password),
+      uppercase: /[A-Z]/.test(password),
+      number: /[0-9]/.test(password),
+      specialChar: /[!@#$%^&*]/.test(password),
+    };
+    setPasswordValidity(newValidity);
+    return Object.values(newValidity).every((v) => v);
+  };
+
+  const handlePasswordDataChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    if (name === "newPassword") {
+      const isValid = validatePassword(value);
+      setPasswordErrors(prev => ({ ...prev, newPassword: isValid ? '' : t("passwordRequirementsError") }));
+      
+      if (passwordData.confirmPassword && value !== passwordData.confirmPassword) {
+        setPasswordErrors(prev => ({ ...prev, confirmPassword: t("passwordsDoNotMatchError") }));
+      } else if (passwordData.confirmPassword && value === passwordData.confirmPassword) {
+        setPasswordErrors(prev => { const { confirmPassword, ...rest } = prev; return rest; });
+      }
+    } else if (name === "confirmPassword") {
+      if (passwordData.newPassword && value !== passwordData.newPassword) {
+        setPasswordErrors(prev => ({ ...prev, confirmPassword: t("passwordsDoNotMatchError") }));
+      } else {
+        setPasswordErrors(prev => { const { confirmPassword, ...rest } = prev; return rest; });
+      }
+    }
+  };
+
   // Handle Password Change
   const handlePasswordChange = async (e) => {
     e.preventDefault();
-    
+    setPasswordErrors({}); // Clear all password errors at the start of submission
+
+    const newErrors = {};
+    const isNewPasswordValid = validatePassword(passwordData.newPassword);
+
+    if (!isNewPasswordValid) {
+      newErrors.newPassword = t("passwordRequirementsError");
+    }
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error(t('passwordsDoNotMatchError'));
+      newErrors.confirmPassword = t("passwordsDoNotMatchError");
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setPasswordErrors(newErrors);
       return;
     }
 
@@ -127,6 +221,15 @@ const EditProviderProfile = () => {
       if (response.ok) {
         toast.success(t('passwordUpdated'));
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        setPasswordValidity({
+          length: false,
+          lowercase: false,
+          uppercase: false,
+          number: false,
+          specialChar: false,
+        });
+        setPasswordRequirementsVisible(false);
+        setPasswordErrors({}); // Ensure errors are cleared on successful API update
       } else {
         toast.error(data.message || t('passwordUpdateFailed'));
       }
@@ -201,11 +304,9 @@ const EditProviderProfile = () => {
           </div>
 
           <div style={{ textAlign: 'left', marginBottom: '2rem' }}>
-            <p><strong>{t('usernameLabel')}:</strong> {user.username}</p>
+            <p><strong>Business Name:</strong> {user.username}</p>
             <p><strong>{t('emailLabel')}:</strong> {user.email}</p>
-            <p><strong>{t('roleLabel')}:</strong> {user.role}</p>
             <p><strong>{t('location')}:</strong> {user.location}</p>
-            <p><strong>{t('contact')}:</strong> {user.contact}</p>
             <p><strong>{t('phoneNumber')}:</strong> {user.phoneNumber}</p>
           </div>
 
@@ -214,24 +315,30 @@ const EditProviderProfile = () => {
           <h3>{t('editInformation')}</h3>
           <form onSubmit={handleProfileUpdate} style={{ textAlign: 'left' }}>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label>{t('location')}</label>
+              <label>Business Name</label>
               <input
                 type="text"
-                name="location"
-                value={formData.location}
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
+                required
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <label>{t('contact')}</label>
-              <input
-                type="text"
-                name="contact"
-                value={formData.contact}
+              <label>{t('location')}</label>
+              <select
+                name="location"
+                value={formData.location}
                 onChange={handleChange}
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-              />
+                required
+                className="themed-dropdown"
+              >
+                <option value="" disabled>{t('selectLocation')}</option>
+                {locations.map(loc => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
+              </select>
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('phoneNumber')}</label>
@@ -239,11 +346,14 @@ const EditProviderProfile = () => {
                 type="tel"
                 name="phoneNumber"
                 value={formData.phoneNumber}
-                onChange={handleChange}
+                onChange={handlePhoneChange}
+                maxLength="8"
+                required
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
+              {phoneNumberError && <div className="error-message">{phoneNumberError}</div>}
             </div>
-            <button type="submit" className="action-btn">{t('updateInformation')}</button>
+            <button type="submit" className="action-btn" disabled={!!phoneNumberError}>{t('updateInformation')}</button>
           </form>
 
           <hr />
@@ -264,23 +374,62 @@ const EditProviderProfile = () => {
               <label>{t('newPassword')}</label>
               <input
                 type="password"
+                name="newPassword"
                 value={passwordData.newPassword}
-                onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+                onChange={handlePasswordDataChange}
+                onFocus={() => setPasswordRequirementsVisible(true)}
+                onBlur={() => setPasswordRequirementsVisible(false)}
                 required
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
+              {passwordRequirementsVisible && (
+                <div className="password-requirements">
+                  <ul>
+                    <li className={passwordValidity.length ? "valid" : "invalid"}>
+                      {t("atLeast8Characters")}
+                    </li>
+                    <li className={passwordValidity.uppercase ? "valid" : "invalid"}>
+                      {t("atLeastOneUppercaseLetter")}
+                    </li>
+                    <li className={passwordValidity.lowercase ? "valid" : "invalid"}>
+                      {t("atLeastOneLowercaseLetter")}
+                    </li>
+                    <li className={passwordValidity.number ? "valid" : "invalid"}>
+                      {t("atLeastOneNumber")}
+                    </li>
+                    <li className={passwordValidity.specialChar ? "valid" : "invalid"}>
+                      {t("atLeastOneSpecialCharacter")}
+                    </li>
+                  </ul>
+                </div>
+              )}
+              {passwordErrors.newPassword && <div className="error-message">{passwordErrors.newPassword}</div>}
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('confirmNewPassword')}</label>
               <input
                 type="password"
+                name="confirmPassword"
                 value={passwordData.confirmPassword}
-                onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+                onChange={handlePasswordDataChange}
                 required
                 style={{ width: '100%', padding: '8px', marginTop: '5px' }}
               />
+              {passwordErrors.confirmPassword && <div className="error-message">{passwordErrors.confirmPassword}</div>}
             </div>
-            <button type="submit" className="action-btn">{t('updatePassword')}</button>
+            <button 
+              type="submit" 
+              className="action-btn" 
+              disabled={ 
+                !passwordData.currentPassword || 
+                !passwordData.newPassword || 
+                !passwordData.confirmPassword || 
+                !Object.values(passwordValidity).every(v => v) || 
+                passwordData.newPassword !== passwordData.confirmPassword
+              }
+            >
+              {t("updatePassword")}
+            </button>
           </form>
 
           <hr style={{ margin: '2rem 0' }} />

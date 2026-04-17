@@ -31,6 +31,14 @@ const Register = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
 
+  const locations = [
+    "Muscat", "Muttrah", "Ruwi", "Seeb", "Azaiba", "Ghubra", "Bausher",
+    "Salalah", "Taqah", "Mirbat", "Thumrait", "Khasab", "Dibba Al-Baya",
+    "Sohar", "Shinas", "Liwa", "Barka", "Rustaq", "Musannah",
+    "Nizwa", "Bahla", "Sumail", "Izki", "Ibri", "Yanqul", "Ibra", "Bidiyah",
+    "Sur", "Jalan Bani Bu Ali", "Haima", "Duqm", "Al Buraimi", "Mahdah"
+  ];
+
   const validate = useCallback(() => {
     const errors = {};
     if (!formData.username) {
@@ -38,14 +46,12 @@ const Register = () => {
     }
     if (!formData.email) {
       errors.email = t("emailRequired");
-    }
-    else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(formData.email)) {
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(formData.email)) {
       errors.email = t("emailInvalid");
     }
     if (!formData.phoneNumber) {
       errors.phoneNumber = t("phoneRequired");
-    }
-    else if (!/^[79][0-9]{7}$/.test(formData.phoneNumber)) {
+    } else if (!/^[79][0-9]{7}$/.test(formData.phoneNumber)) {
       errors.phoneNumber = t("phoneInvalid");
     }
     if (!formData.password) {
@@ -58,7 +64,7 @@ const Register = () => {
       if (!formData.location) {
         errors.location = t("locationRequired");
       }
-      if (!selectedFile) { 
+      if (!selectedFile) {
         errors.document = t("documentRequired");
       }
     }
@@ -104,8 +110,7 @@ const Register = () => {
           document: file,
         }));
       }
-    }
-    else {
+    } else {
       setFormData((prevState) => ({
         ...prevState,
         [name]: value,
@@ -216,12 +221,10 @@ const Register = () => {
           setError(data.message || t("registration Failed"));
         }
       }
-    }
-    catch (err) {
+    } catch (err) {
       console.error("Registration error:", err);
       setError(t("genericError"));
-    }
-    finally {
+    } finally {
       setUploading(false);
       console.log("Uploading state set to false");
     }
@@ -276,16 +279,28 @@ const Register = () => {
           {formData.role === "provider" && (
             <div className="form-group">
               <label htmlFor="location">{t("locationOfBusiness")}</label>
-              <input
-                type="text"
+              <select
                 id="location"
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder={t("enterYourBusinessLocation")}
                 required
-              />
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "4px",
+                  border: "1px solid #ddd",
+                  marginBottom: "1rem",
+                }}
+              >
+                <option value="">{t("selectLocation")}</option>
+                {locations.map((loc) => (
+                  <option key={loc} value={loc}>
+                    {t(loc)}
+                  </option>
+                ))}
+              </select>
               {touched.location && formErrors.location && (
                 <div className="error-message">{formErrors.location}</div>
               )}

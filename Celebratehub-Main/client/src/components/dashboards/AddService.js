@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
@@ -8,8 +8,47 @@ import 'react-toastify/dist/ReactToastify.css';
 import './Dashboard.css';
 import './AddService.css';
 
+const ImagePreviewer = ({ file, alt, className }) => {
+    const [imageUrl, setImageUrl] = useState(null);
+
+    useEffect(() => {
+        if (file) {
+            const url = URL.createObjectURL(file);
+            setImageUrl(url);
+
+            return () => {
+                URL.revokeObjectURL(url);
+            };
+        }
+    }, [file]);
+
+    if (!imageUrl) {
+        return null;
+    }
+
+    return <img src={imageUrl} alt={alt} className={className} />;
+};
+
 const ServicePreview = ({ service, mainImageIndex }) => {
   const { t } = useTranslation();
+  const [imageURL, setImageURL] = useState(null);
+
+  useEffect(() => {
+    let url;
+    if (service.images && service.images.length > mainImageIndex) {
+      url = URL.createObjectURL(service.images[mainImageIndex]);
+      setImageURL(url);
+    } else {
+      setImageURL(null);
+    }
+    
+    return () => {
+      if (url) {
+        URL.revokeObjectURL(url);
+      }
+    };
+  }, [service.images, mainImageIndex]);
+
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
     const halfStar = rating % 1 !== 0;
@@ -26,8 +65,8 @@ const ServicePreview = ({ service, mainImageIndex }) => {
   return (
     <div className="service-preview-card">
       <div className="service-image-container">
-        {service.images.length > 0 ? (
-          <img src={URL.createObjectURL(service.images[mainImageIndex])} alt="Service Preview" />
+        {imageURL ? (
+          <img src={imageURL} alt="Service Preview" />
         ) : (
           <div className="image-placeholder">
             <FaCamera />
@@ -56,7 +95,7 @@ const ServicePreview = ({ service, mainImageIndex }) => {
           <h4>{t('features')}</h4>
           <ul>
             {(service.features || 'Menu Planning, Food Service, Beverage Service').split(',').map((feature, index) => (
-              <li key={index}>? {feature.trim()}</li>
+              <li key={index}>✓ {feature.trim()}</li>
             ))}
           </ul>
         </div>
@@ -79,6 +118,7 @@ const AddService = () => {
     images: [],
     availability: {},
   });
+  const [pricingOption, setPricingOption] = useState('perHour');
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [imageError, setImageError] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -86,9 +126,28 @@ const AddService = () => {
   const [timeInput, setTimeInput] = useState('');
   const [isDragging, setIsDragging] = useState(false);
 
+  useEffect(() => {
+    const userString = localStorage.getItem('user');
+    if (userString) {
+      const user = JSON.parse(userString);
+      if (user && user.username) {
+        setFormData(prev => ({ ...prev, name: user.username }));
+      }
+    }
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePricingOptionChange = (option) => {
+    setPricingOption(option);
+    if (option === 'perHour') {
+        setFormData(prev => ({ ...prev, pricePerPerson: '' }));
+    } else {
+        setFormData(prev => ({ ...prev, pricePerHour: '' }));
+    }
   };
 
   const handleFiles = (files) => {
@@ -350,20 +409,75 @@ const AddService = () => {
 </div>
 <div className="form-group">
     <label htmlFor="category">{t('categoryLabel')}</label>
-    <input id="category" type="text" name="category" value={formData.category} onChange={handleChange} required />
+    <select id="category" name="category" value={formData.category} onChange={handleChange} required>
+        <option value="">{t('selectCategory')}</option>
+        <option value="wedding-halls">{t('weddingHalls')}</option>
+        <option value="catering">{t('catering')}</option>
+        <option value="photography">{t('photography')}</option>
+        <option value="birthdays">{t('birthdays')}</option>
+    </select>
 </div>
 <div className="form-group">
     <label htmlFor="location">{t('locationLabel')}</label>
-    <input id="location" type="text" name="location" value={formData.location} onChange={handleChange} placeholder="e.g. Salalah, Oman" required />
+    <select id="location" name="location" value={formData.location} onChange={handleChange} required>
+        <option value="">{t('selectLocation')}</option>
+        <option value="Muscat">Muscat</option>
+        <option value="Muttrah">Muttrah</option>
+        <option value="Ruwi">Ruwi</option>
+        <option value="Seeb">Seeb</option>
+        <option value="Azaiba">Azaiba</option>
+        <option value="Ghubra">Ghubra</option>
+        <option value="Bausher">Bausher</option>
+        <option value="Salalah">Salalah</option>
+        <option value="Taqah">Taqah</option>
+        <option value="Mirbat">Mirbat</option>
+        <option value="Thumrait">Thumrait</option>
+        <option value="Khasab">Khasab</option>
+        <option value="Dibba Al-Baya">Dibba Al-Baya</option>
+        <option value="Sohar">Sohar</option>
+        <option value="Shinas">Shinas</option>
+        <option value="Liwa">Liwa</option>
+        <option value="Barka">Barka</option>
+        <option value="Rustaq">Rustaq</option>
+        <option value="Musannah">Musannah</option>
+        <option value="Nizwa">Nizwa</option>
+        <option value="Bahla">Bahla</option>
+        <option value="Sumail">Sumail</option>
+        <option value="Izki">Izki</option>
+        <option value="Ibri">Ibri</option>
+        <option value="Yanqul">Yanqul</option>
+        <option value="Ibra">Ibra</option>
+        <option value="Bidiyah">Bidiyah</option>
+        <option value="Sur">Sur</option>
+        <option value="Jalan Bani Bu Ali">Jalan Bani Bu Ali</option>
+        <option value="Haima">Haima</option>
+        <option value="Duqm">Duqm</option>
+        <option value="Al Buraimi">Al Buraimi</option>
+        <option value="Mahdah">Mahdah</option>
+    </select>
 </div>
 <div className="form-group">
-    <label htmlFor="pricePerHour">{t('pricePerHour')}</label>
-    <input id="pricePerHour" type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} placeholder="OMR 20 / hour" required />
+    <label>{t('priceOption', 'Pricing Option')}</label>
+    <div className="toggle-switch">
+        <button type="button" className={`toggle-btn ${pricingOption === 'perHour' ? 'active' : ''}`} onClick={() => handlePricingOptionChange('perHour')}>
+            {t('perHour', 'Per Hour')}
+        </button>
+        <button type="button" className={`toggle-btn ${pricingOption === 'perPerson' ? 'active' : ''}`} onClick={() => handlePricingOptionChange('perPerson')}>
+            {t('perPerson', 'Per Person')}
+        </button>
+    </div>
 </div>
-<div className="form-group">
-    <label htmlFor="pricePerPerson">{t('pricePerPerson')}</label>
-    <input id="pricePerPerson" type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} placeholder="OMR 2 / person" />
-</div>
+{pricingOption === 'perHour' ? (
+    <div className="form-group">
+        <label htmlFor="pricePerHour">{t('pricePerHour')}</label>
+        <input id="pricePerHour" type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} placeholder="OMR 20 / hour" required />
+    </div>
+) : (
+    <div className="form-group">
+        <label htmlFor="pricePerPerson">{t('pricePerPerson')}</label>
+        <input id="pricePerPerson" type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} placeholder="OMR 2 / person" required />
+    </div>
+)}
 <div className="form-group">
     <label htmlFor="description">{t('descriptionLabel')}</label>
     <textarea id="description" name="description" value={formData.description} onChange={handleChange} required />
@@ -401,7 +515,7 @@ const AddService = () => {
                         className={`image-preview-container ${index === mainImageIndex ? 'main' : ''}`}
                         onClick={() => setMainImage(index)}
                     >
-                      <img src={URL.createObjectURL(image)} alt={`preview ${index}`} className="image-preview" />
+                      <ImagePreviewer file={image} alt={`preview ${index}`} className="image-preview" />
                       <button 
                         type="button" 
                         onClick={(e) => { e.stopPropagation(); removeImage(index); }} 

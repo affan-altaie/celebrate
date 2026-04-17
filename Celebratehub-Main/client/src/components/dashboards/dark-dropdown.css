@@ -1,0 +1,15 @@
+
+select.themed-dropdown {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+select.themed-dropdown option {
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+}

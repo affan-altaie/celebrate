@@ -1,11 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  FaSearch, FaMapMarkerAlt, FaMoneyBillAlt, FaStar, FaCalendarCheck, FaUserFriends, 
+  FaSearch, FaMapMarkerAlt, FaMoneyBillAlt, FaStar, FaCalendarCheck, FaUserFriends,
   FaSearchLocation, FaMapMarkedAlt, FaUtensils, FaCameraRetro, FaMusic, FaCheckCircle,
   FaTimes, FaHistory, FaTag
 } from 'react-icons/fa';
+import axios from 'axios';
 import './NewBooking.css';
 
 const NewBooking = () => {
@@ -18,64 +19,24 @@ const NewBooking = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [services, setServices] = useState([]);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/services');
+        setServices(response.data);
+      } catch (error) {
+        console.error('Error fetching services:', error);
+      }
+    };
+
+    fetchServices();
+  }, []);
   const [searchHistory, setSearchHistory] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const resultsRef = useRef(null);
   const searchInputRef = useRef(null);
-
-  const services = [
-    {
-      id: 1,
-      name: 'Elite Photography Studios',
-      type: 'Photography',
-      location: 'Muscat, Oman',
-      reviews: 127,
-      rating: 4.9,
-      description: 'Professional event photography with years of experience capturing precious moments.',
-      features: ['Wedding Photography', 'Corporate Events', 'Portrait Sessions'],
-      price: 'OMR 40 / hour',
-      image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60'
-    },
-    {
-      id: 2,
-      name: 'Gourmet Catering Co.',
-      type: 'Catering',
-      location: 'Salalah, Oman',
-      reviews: 89,
-      rating: 4.8,
-      description: 'Exceptional culinary experiences tailored to your event needs and preferences.',
-      features: ['Menu Planning', 'Food Service', 'Beverage Service'],
-      price: 'OMR 20 / hour',
-      pricePerPerson: 'OMR 2',
-      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60'
-    },
-    {
-      id: 3,
-      name: 'Elegant Wedding Halls',
-      type: 'Wedding Halls',
-      location: 'Sohar, Oman',
-      reviews: 156,
-      rating: 5,
-      description: 'Stunning wedding halls with state-of-the-art facilities and flexible spaces.',
-      features: ['Indoor Spaces', 'Outdoor Gardens', 'Audio/Visual Equipment'],
-      price: 'OMR 120 / hour',
-      pricePerPerson: 'OMR 2',
-      image: 'https://www.shangri-la.com/-/media/Shangri-La/muscat_barraljissahresort/settings/weddings-celebrations/SLMU_Events_Spaces_1920x940.jpg'
-    },
-    {
-      id: 4,
-      name: 'Joyful Birthday Parties',
-      type: 'Birthdays',
-      location: 'Nizwa, Oman',
-      reviews: 94,
-      rating: 4.7,
-      description: 'Unforgettable birthday parties for all ages, with entertainment and activities.',
-      features: ['Themed Decorations', 'Games and Activities', 'Cake and Catering'],
-      price: 'OMR 30 / hour',
-      pricePerPerson: 'OMR 2',
-      image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60'
-    }
-  ];
 
   // Enhanced search functionality
   const generateSearchSuggestions = (term) => {
@@ -185,10 +146,7 @@ const NewBooking = () => {
       }
 
       if (priceToSearch) {
-        results = results.filter(service => {
-          const servicePrice = parseInt(service.price.replace(/\D/g, ''));
-          return servicePrice <= parseInt(priceToSearch);
-        });
+        results = results.filter(service => service.pricePerHour <= parseInt(priceToSearch));
       }
 
       if (ratingToSearch) {
@@ -357,9 +315,9 @@ const NewBooking = () => {
         <h2>{t('topProvidersTitle')}</h2>
         <div className="results-grid">
           {topProviders.map((provider, index) => (
-            <div key={index} className="result-card" onClick={() => navigate(`/service/${provider.id}`)}>
+            <div key={index} className="result-card" onClick={() => navigate(`/service/${provider._id}`)}>
               <div className="card-image-container">
-                <img src={provider.image} alt={provider.name} className="result-image" />
+                <img src={`http://localhost:5000${provider.images[provider.mainImageIndex]}`} alt={provider.name} className="result-image" />
                 <div className="rating-badge">
                   <FaStar /> {provider.rating}
                 </div>
@@ -367,7 +325,7 @@ const NewBooking = () => {
               <div className="result-details">
                 <div className="service-tag">{provider.type}</div>
                 <h3>{provider.name}</h3>
-                <p className="reviews">{t('reviewsCount', { count: provider.reviews })}</p>
+                <p className="reviews">{t('reviewsCount', { count: provider.reviews || 0 })}</p>
               </div>
             </div>
           ))}
@@ -391,18 +349,18 @@ const NewBooking = () => {
         <div className="search-results-container" ref={resultsRef}>
           <h2>{t('searchResultsTitle')}</h2>
           <div className="results-grid">
-            {searchResults.map((result, index) => (
-              <div key={index} className="result-card">
-                <div className="card-image-container">
-                  <img src={result.image} alt={result.name} className="result-image" />
-                  <div className="rating-badge">
+          {searchResults.map((result, index) => (
+            <div key={index} className="result-card">
+              <div className="card-image-container">
+                <img src={`http://localhost:5000${result.images[result.mainImageIndex]}`} alt={result.name} className="result-image" />
+                <div className="rating-badge">
                     <FaStar /> {result.rating}
                   </div>
                 </div>
                 <div className="result-details">
                   <div className="service-tag">{result.type}</div>
                   <h3>{result.name}</h3>
-                  <p className="reviews">{t('reviewsCount', { count: result.reviews })}</p>
+                  <p className="reviews">{t('reviewsCount', { count: result.reviews || 0 })}</p>
                   <p className="description">{result.description}</p>
                   <ul className="features-list">
                     {result.features.map((feature, i) => (
@@ -410,8 +368,8 @@ const NewBooking = () => {
                     ))}
                   </ul>
                   <div className="card-footer">
-                    <p className="price">{result.price}</p>
-                    <button className="book-button" onClick={() => navigate(`/service/${result.id}`)}>{t('bookButton')}</button>
+                    <p className="price">OMR {result.pricePerHour} / hour</p>
+                    <button className="book-button" onClick={() => navigate(`/service/${result._id}`)}>{t('bookButton')}</button>
                   </div>
                 </div>
               </div>

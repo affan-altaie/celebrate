@@ -1,15 +1,114 @@
 const express = require("express");
 const router = express.Router();
+const { upload } = require("../middleware/multer");
 const Service = require("../modals/Service");
+const supabase = require("../supabase");
+const User = require("../modals/User");
 
 // Service Routes
-router.post("/", async (req, res) => {
+router.post("/", upload.array("images", 8), async (req, res) => {
   try {
-    const service = new Service(req.body);
-    await service.save();
-    res.status(201).json(service);
+    const {
+      name,
+      type,
+      location,
+      pricePerHour,
+      pricePerPerson,
+      description,
+      features,
+      availability,
+      mainImageIndex,
+      email
+    } = req.body;
+
+    const provider = await User.findOne({ email });
+    if (!provider || provider.status !== "approved") {
+      return res.status(403).json({ message: "Provider not approved to add services." });
+    }
+
+    const images = [];
+    if (req.files && req.files.length > 0) {
+      console.log(`Processing ${req.files.length} images...`);
+      for (const file of req.files) {
+        const filePath = `${Date.now()}-${file.originalname}`;
+        console.log(`Uploading image ${file.originalname} to Supabase path ${filePath}...`);
+        try {
+          const { data, error } = await supabase.storage
+            .from('celebrate-services-files')
+            .upload(filePath, file.buffer, {
+              contentType: file.mimetype,
+              upsert: true
+            });
+
+          if (error) {
+            console.error('Error uploading image to Supabase:', error);
+            return res.status(500).json({ message: "Failed to upload image to storage", error: error.message });
+          }
+
+          console.log(`Image ${file.originalname} uploaded successfully. Getting public URL...`);
+          const { data: publicUrlData } = supabase.storage
+            .from('celebrate-services-files')
+            .getPublicUrl(filePath);
+
+          if (!publicUrlData || !publicUrlData.publicUrl) {
+            console.error('Error getting public URL from Supabase');
+            return res.status(500).json({ message: "Failed to get public URL for image" });
+          }
+
+          console.log(`Public URL for ${file.originalname}: ${publicUrlData.publicUrl}`);
+          images.push(publicUrlData.publicUrl);
+        } catch (uploadCatchError) {
+          console.error('Catch error during Supabase upload:', uploadCatchError);
+          return res.status(500).json({ message: "Exception during image upload", error: uploadCatchError.message });
+        }
+      }
+    }
+
+    let parsedFeatures = [];
+    if (features) {
+      parsedFeatures = typeof features === 'string' 
+        ? features.split(',').map(f => f.trim()).filter(f => f) 
+        : features;
+    }
+
+    let parsedAvailability = {};
+    if (availability) {
+      parsedAvailability = typeof availability === 'string' 
+        ? JSON.parse(availability) 
+        : availability;
+    }
+
+    const newService = new Service({
+      name,
+      type,
+      location,
+      pricePerHour,
+      pricePerPerson,
+      description,
+      features: parsedFeatures,
+      images,
+      mainImageIndex: parseInt(mainImageIndex) || 0,
+      availability: parsedAvailability,
+      providerId: provider._id
+    });
+
+    console.log('Saving service to MongoDB:', newService);
+    await newService.save();
+    console.log('Service saved successfully to MongoDB.');
+
+     res.status(201).json({ message: "Service added successfully", service: newService });
+   } catch (error) {
+    console.error("Error adding service:", error);
+    res.status(400).json({ message: "Failed to add service", error: error.message });
+   }
+});
+
+router.get("/", async (req, res) => {
+  try {
+    const services = await Service.find();
+    res.json(services);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -22,21 +121,128 @@ router.get("/provider/:providerId", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
-    const service = await Service.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const service = await Service.findById(req.params.id);
     res.json(service);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.put("/:id", upload.array("images", 8), async (req, res) => {
+  try {
+    const {
+      name,
+      type,
+      location,
+      pricePerHour,
+      pricePerPerson,
+      description,
+      features,
+      availability,
+      mainImageIndex,
+      existingImages
+    } = req.body;
+
+    const currentService = await Service.findById(req.params.id);
+    if (!currentService) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    let images = [];
+    if (existingImages) {
+      images = typeof existingImages === 'string' ? JSON.parse(existingImages) : existingImages;
+    }
+
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const filePath = `${Date.now()}-${file.originalname}`;
+        const { data, error } = await supabase.storage
+          .from('celebrate-services-files')
+          .upload(filePath, file.buffer, {
+            contentType: file.mimetype,
+            upsert: true
+          });
+
+        if (error) {
+          console.error('Error uploading image to Supabase:', error);
+          continue;
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from('celebrate-services-files')
+          .getPublicUrl(filePath);
+
+        if (publicUrlData && publicUrlData.publicUrl) {
+          images.push(publicUrlData.publicUrl);
+        }
+      }
+    }
+
+    let parsedFeatures = [];
+    if (features) {
+      parsedFeatures = typeof features === 'string' 
+        ? features.split(',').map(f => f.trim()).filter(f => f) 
+        : features;
+    }
+
+    let parsedAvailability = {};
+    if (availability) {
+      parsedAvailability = typeof availability === 'string' 
+        ? JSON.parse(availability) 
+        : availability;
+    }
+
+    const updatedData = {
+      name,
+      type,
+      location,
+      pricePerHour,
+      pricePerPerson,
+      description,
+      features: parsedFeatures,
+      images,
+      mainImageIndex: parseInt(mainImageIndex) || 0,
+      availability: parsedAvailability,
+    };
+
+    const updatedService = await Service.findByIdAndUpdate(req.params.id, updatedData, { new: true });
+    res.json({ message: "Service updated successfully", service: updatedService });
+  } catch (error) {
+    console.error("Error updating service:", error);
+    res.status(400).json({ message: "Failed to update service", error: error.message });
   }
 });
 
 router.delete("/:id", async (req, res) => {
   try {
+    const service = await Service.findById(req.params.id);
+    if (!service) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
+    // Delete images from Supabase storage
+    for (const imageUrl of service.images) {
+      try {
+        const filePath = imageUrl.split("celebrate-services-files/")[1];
+        const { error } = await supabase.storage.from("celebrate-services-files").remove([filePath]);
+
+        if (error) {
+          console.error(`Error deleting image ${filePath} from Supabase:`, error);
+          // Continue to delete other images and service even if one image fails
+        }
+      } catch (e) {
+        console.error(`Exception while deleting image ${imageUrl}:`, e);
+        // Continue processing to attempt to delete other images and the service
+      }
+    }
+
     await Service.findByIdAndDelete(req.params.id);
-    res.json({ message: "Service deleted" });
+    res.json({ message: "Service deleted successfully, including associated images." });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error("Error deleting service:", error);
+    res.status(500).json({ message: "Failed to delete service", error: error.message });
   }
 });
 

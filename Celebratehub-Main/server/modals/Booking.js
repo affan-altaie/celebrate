@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const BookingSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  serviceId: { type: Number, required: true }, // Using Number because services seem to have numeric IDs in frontend
+  serviceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
   serviceName: { type: String, required: true },
   date: { type: String, required: true },
   time: { type: String, required: true },

@@ -76,9 +76,10 @@ router.put("/:id/approve", async (req, res) => {
 // Reject provider
 router.put("/:id/reject", async (req, res) => {
   try {
+    const { reason } = req.body;
     const user = await User.findByIdAndUpdate(
       req.params.id,
-      { status: "rejected" },
+      { status: "rejected", rejectionReason: reason },
       { new: true }
     );
     if (!user) {
@@ -90,8 +91,8 @@ router.put("/:id/reject", async (req, res) => {
       service: "gmail",
       auth: {
         user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
+        pass: process.env.EMAIL_PASS,
+      },
     });
 
     const mailOptions = {
@@ -102,11 +103,12 @@ router.put("/:id/reject", async (req, res) => {
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
           <h2>Account Rejection Notice</h2>
           <p>Dear ${user.username},</p>
-          <p>We regret to inform you that your service provider account on CelebrateHub has been rejected. This may be due to incomplete information or a failure to meet our platform's standards.</p>
+          <p>We regret to inform you that your service provider account on CelebrateHub has been rejected.</p>
+          <p><b>Reason for rejection:</b> ${reason}</p>
           <p>If you believe this is a mistake or would like more information, please contact our support team for further assistance.</p>
           <p>Best regards,<br>The CelebrateHub Team</p>
         </div>
-      `
+      `,
     };
 
     await transporter.sendMail(mailOptions);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 import { FaCamera, FaRegStar, FaStar, FaMapMarkerAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -201,10 +202,55 @@ const AddService = () => {
       toast.error(error);
       return;
     }
-    // Form submission logic
-    console.log('New service submitted:', { ...formData, mainImage: mainImageIndex });
-    toast.success('Service added successfully!');
-    navigate('/manage-listings');
+
+    const data = new FormData();
+    console.log('formData state:', formData);
+    data.append('name', formData.name);
+    data.append('type', formData.type);
+    data.append('pricePerHour', formData.pricePerHour);
+    data.append('pricePerPerson', formData.pricePerPerson);
+    data.append('location', formData.location);
+    data.append('description', formData.description);
+    data.append('features', formData.features);
+    data.append('availability', JSON.stringify(formData.availability));
+      data.append('mainImageIndex', mainImageIndex);
+      const userString = localStorage.getItem('user');
+      if (!userString) {
+        toast.error('You must be logged in to add a service.');
+        return;
+      }
+      const user = JSON.parse(userString);
+      if (!user || !user.email) {
+        toast.error('You must be logged in to add a service.');
+        return;
+      }
+      data.append('email', user.email);
+ 
+      formData.images.forEach(image => {
+      data.append('images', image);
+    });
+
+    try {
+      console.log('Form data entries:');
+      for (let pair of data.entries()) {
+        console.log(pair[0]+ ', ' + pair[1]); 
+      }
+      const response = await axios.post('/api/services', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log('Response:', response);
+      toast.success('Service added successfully!');
+      navigate('/manage-listings');
+    } catch (error) {
+      console.error('Error:', error);
+      if (error.response) {
+        console.error('Error response data:', error.response.data);
+        console.error('Error response status:', error.response.status);
+      }
+      toast.error('Failed to add service.');
+    }
   };
 
   const renderAvailabilityCalendar = () => {
@@ -298,36 +344,36 @@ const AddService = () => {
         </div>
         <div className="add-service-form-column">
             <form onSubmit={handleSubmit} className="add-service-form">
+<div className="form-group">
+    <label htmlFor="name">{t('serviceNameLabel')}</label>
+    <input id="name" type="text" name="name" value={formData.name} onChange={handleChange} required />
+</div>
+<div className="form-group">
+    <label htmlFor="type">{t('roleLabel')}</label>
+    <input id="type" type="text" name="type" value={formData.type} onChange={handleChange} required />
+</div>
+<div className="form-group">
+    <label htmlFor="location">{t('locationLabel')}</label>
+    <input id="location" type="text" name="location" value={formData.location} onChange={handleChange} placeholder="e.g. Salalah, Oman" required />
+</div>
+<div className="form-group">
+    <label htmlFor="pricePerHour">{t('pricePerHour')}</label>
+    <input id="pricePerHour" type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} placeholder="OMR 20 / hour" required />
+</div>
+<div className="form-group">
+    <label htmlFor="pricePerPerson">{t('pricePerPerson')}</label>
+    <input id="pricePerPerson" type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} placeholder="OMR 2 / person" />
+</div>
+<div className="form-group">
+    <label htmlFor="description">{t('descriptionLabel')}</label>
+    <textarea id="description" name="description" value={formData.description} onChange={handleChange} required />
+</div>
+<div className="form-group">
+    <label htmlFor="features">{t('featuresLabel')}</label>
+    <input id="features" type="text" name="features" value={formData.features} onChange={handleChange} placeholder={t('featuresPlaceholder')} />
+</div>
               <div className="form-group">
-                <label>{t('serviceNameLabel')}</label>
-                <input type="text" name="name" value={formData.name} onChange={handleChange} required />
-              </div>
-              <div className="form-group">
-                <label>{t('roleLabel')}</label>
-                <input type="text" name="type" value={formData.type} onChange={handleChange} required />
-              </div>
-              <div className="form-group">
-                <label>{t('locationLabel')}</label>
-                <input type="text" name="location" value={formData.location} onChange={handleChange} placeholder="e.g. Salalah, Oman" required />
-              </div>
-              <div className="form-group">
-                <label>{t('pricePerHour')}</label>
-                <input type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} placeholder="OMR 20 / hour" required />
-              </div>
-              <div className="form-group">
-                <label>{t('pricePerPerson')}</label>
-                <input type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} placeholder="OMR 2 / person" />
-              </div>
-              <div className="form-group">
-                <label>{t('descriptionLabel')}</label>
-                <textarea name="description" value={formData.description} onChange={handleChange} required />
-              </div>
-              <div className="form-group">
-                <label>{t('featuresLabel')}</label>
-                <input type="text" name="features" value={formData.features} onChange={handleChange} placeholder={t('featuresPlaceholder')} />
-              </div>
-              <div className="form-group">
-                <label>{t('serviceImage', 'Service Images')}</label>
+                <label htmlFor="image-upload-input">{t('serviceImage', 'Service Images')}</label>
                  <div 
                   className={`image-upload-container ${isDragging ? 'drag-over' : ''}`}
                   onDrop={handleDrop}

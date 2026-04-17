@@ -29,6 +29,11 @@ const ProviderDashboard = () => {
           <p>{t('editProviderProfileDesc')}</p>
           <button onClick={() => navigate('/edit-provider-profile')} className="action-btn">{t('editProfile')}</button>
         </div>
+        <div className="dashboard-card">
+          <h3>{t('allServices')}</h3>
+          <p>{t('allServicesDesc')}</p>
+          <button onClick={() => navigate('/services')} className="action-btn">{t('viewServices')}</button>
+        </div>
       </main>
     </div>
   );

@@ -5,7 +5,7 @@ const serviceSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  type: {
+  category: {
     type: String,
     required: true,
   },
@@ -13,9 +13,13 @@ const serviceSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  price: {
+  pricePerHour: {
     type: String,
-    required: true,
+    required: false,
+  },
+  pricePerPerson: {
+    type: String,
+    required: false,
   },
   description: {
     type: String,
@@ -25,9 +29,17 @@ const serviceSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
-  image: {
-    type: String,
+  images: {
+    type: [String],
     required: true,
+  },
+  mainImageIndex: {
+    type: Number,
+    default: 0,
+  },
+  availability: {
+    type: Object,
+    default: {},
   },
   providerId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -37,15 +49,18 @@ const serviceSchema = new mongoose.Schema({
   reviews: {
     type: Number,
     default: 0,
+    required: false,
   },
   rating: {
     type: Number,
     default: 0,
+    required: false,
   },
   status: {
     type: String,
     enum: ['Active', 'Inactive'],
     default: 'Active',
+    required: false,
   },
 });
 

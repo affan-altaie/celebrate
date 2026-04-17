@@ -35,6 +35,7 @@ import LeaveReview from './components/dashboards/LeaveReview';
 import ReportService from './components/dashboards/ReportService';
 import BookingPage from './components/dashboards/BookingPage';
 import BookingConfirmation from './components/dashboards/BookingConfirmation';
+import ServicesList from './components/dashboards/ServicesList';
 import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
 
@@ -94,7 +95,8 @@ const AppContent = () => {
         <Route path="/leave-review/:bookingId" element={<ProtectedRoute allowedRoles={['customer']}><LeaveReview /></ProtectedRoute>} />
         <Route path="/report-service/:serviceId" element={<ProtectedRoute allowedRoles={['customer']}><ReportService /></ProtectedRoute>} />
         <Route path="/new-booking" element={<ProtectedRoute allowedRoles={['customer']}><NewBooking /></ProtectedRoute>} />
-        <Route path="/service/:id" element={<ProtectedRoute allowedRoles={['customer']}><ServiceDetails /></ProtectedRoute>} />
+        <Route path="/services" element={<ServicesList />} />
+        <Route path="/service/:id" element={<ProtectedRoute allowedRoles={['customer', 'provider']}><ServiceDetails /></ProtectedRoute>} />
         <Route path="/booking/:id" element={<ProtectedRoute allowedRoles={['customer']}><BookingPage /></ProtectedRoute>} />
         <Route path="/booking-confirmation" element={<ProtectedRoute allowedRoles={['customer']}><BookingConfirmation /></ProtectedRoute>} />
         <Route path="/provider-dashboard" element={<ProtectedRoute allowedRoles={['provider']}><ProviderDashboard /></ProtectedRoute>} />

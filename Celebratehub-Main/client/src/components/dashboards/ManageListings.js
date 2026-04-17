@@ -1,38 +1,58 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
+import axios from 'axios';
 import './Dashboard.css';
 
 const ManageListings = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [services, setServices] = useState([]);
 
-  const services = [
-    {
-      id: 1,
-      name: 'Elegant Wedding Halls',
-      type: 'Wedding Halls',
-      image: 'https://www.shangri-la.com/-/media/Shangri-La/muscat_barraljissahresort/settings/weddings-celebrations/SLMU_Events_Spaces_1920x940.jpg',
-      status: 'Active',
-      bookings: 12,
-    },
-    {
-      id: 2,
-      name: 'Joyful Birthday Parties',
-      type: 'Birthdays',
-      image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60',
-      status: 'Active',
-      bookings: 8,
-    },
-    {
-      id: 3,
-      name: 'Corporate Event Catering',
-      type: 'Catering',
-      image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60',
-      status: 'Inactive',
-      bookings: 0,
-    },
-  ];
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const userString = localStorage.getItem('user');
+        if (!userString) return;
+        const user = JSON.parse(userString);
+        const providerId = user.id || user._id;
+        const response = await axios.get(`/api/services/provider/${providerId}`);
+        setServices(response.data);
+      } catch (error) {
+        console.error('Failed to fetch services', error);
+      }
+    };
+
+    fetchServices();
+  }, []);
+
+  const handleStatusToggle = async (id, currentStatus) => {
+    try {
+      const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
+      await axios.put(`/api/services/${id}`, { status: newStatus });
+      setServices(services.map(service => 
+        service._id === id ? { ...service, status: newStatus } : service
+      ));
+      toast.success(t('statusUpdatedSuccess', { status: newStatus }));
+    } catch (error) {
+      console.error('Failed to update status', error);
+      toast.error(t('statusUpdateError'));
+    }
+  };
+
+  const handleDeleteService = async (id) => {
+    if (window.confirm(t("confirmDeleteService"))) {
+      try {
+        await axios.delete(`/api/services/${id}`);
+        setServices(services.filter(service => service._id !== id));
+        toast.success(t("serviceDeletedSuccess"));
+      } catch (error) {
+        console.error("Failed to delete service", error);
+        toast.error(t("serviceDeleteError"));
+      }
+    }
+  };
 
   return (
     <div className="dashboard-container">
@@ -57,10 +77,14 @@ const ManageListings = () => {
             </thead>
             <tbody>
               {services.map(service => (
-                <tr key={service.id}>
+                <tr key={service._id}>
                   <td>
-                    <div className="service-info">
-                      <img src={service.image} alt={service.name} className="service-thumbnail" />
+                    <div 
+                      className="service-info clickable" 
+                      onClick={() => navigate(`/service/${service._id}`)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <img src={service.images[service.mainImageIndex || 0]} alt={service.name} className="service-thumbnail" />
                       <div>
                         <strong>{service.name}</strong>
                         <p>{service.type}</p>
@@ -68,12 +92,18 @@ const ManageListings = () => {
                     </div>
                   </td>
                   <td>
-                    <span className={`status ${service.status.toLowerCase()}`}>{t(service.status.toLowerCase())}</span>
+                    <span 
+                      className={`status ${service.status?.toLowerCase() || 'active'}`}
+                      onClick={(e) => { e.stopPropagation(); handleStatusToggle(service._id, service.status || 'Active'); }}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {service.status || 'Active'}
+                    </span>
                   </td>
-                  <td>{service.bookings}</td>
+                  <td>{service.bookings ? service.bookings.length : 0}</td>
                   <td>
                     <button onClick={() => navigate(`/edit-listing/${service._id}`)} className="action-btn">{t("edit")}</button>
-                    <button className="delete-btn">{t("delete")}</button>
+                    <button onClick={() => handleDeleteService(service._id)} className="delete-btn">{t("delete")}</button>
                   </td>
                 </tr>
               ))}

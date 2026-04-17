@@ -31,11 +31,36 @@ const ProviderApprovals = () => {
     }
   };
 
-  const handleReject = async (id) => {
+  const [rejectionModalVisible, setRejectionModalVisible] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [customRejectionReason, setCustomRejectionReason] = useState('');
+  const [selectedProviderId, setSelectedProviderId] = useState(null);
+
+  const openRejectionModal = (id) => {
+    setSelectedProviderId(id);
+    setRejectionModalVisible(true);
+  };
+
+  const closeRejectionModal = () => {
+    setSelectedProviderId(null);
+    setRejectionModalVisible(false);
+    setRejectionReason('');
+    setCustomRejectionReason('');
+  };
+
+  const handleReject = async () => {
+    const reason = rejectionReason === 'other' ? customRejectionReason : rejectionReason;
+
+    if (!reason) {
+      alert(t('selectRejectionReason'));
+      return;
+    }
+
     try {
-      await axios.put(`/api/providers/${id}/reject`);
-      setRequests(requests.filter(request => request._id !== id));
+      await axios.put(`/api/providers/${selectedProviderId}/reject`, { reason });
+      setRequests(requests.filter(request => request._id !== selectedProviderId));
       alert(t('providerRejectedAlert'));
+      closeRejectionModal();
     } catch (error) {
       console.error('Error rejecting provider:', error);
       alert(t('providerApprovalError'));
@@ -44,6 +69,30 @@ const ProviderApprovals = () => {
 
   return (
     <div className="admin-container">
+      {rejectionModalVisible && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>{t('selectRejectionReason')}</h2>
+            <select onChange={(e) => setRejectionReason(e.target.value)} value={rejectionReason}>
+              <option value="">{t('selectReason')}</option>
+              <option value="incomplete_documents">{t('incompleteDocuments')}</option>
+              <option value="invalid_information">{t('invalidInformation')}</option>
+              <option value="other">{t('other')}</option>
+            </select>
+            {rejectionReason === 'other' && (
+              <textarea
+                value={customRejectionReason}
+                onChange={(e) => setCustomRejectionReason(e.target.value)}
+                placeholder={t('rejectionReasonPlaceholder')}
+              ></textarea>
+            )}
+            <div className="modal-buttons">
+              <button className="reject-btn" onClick={handleReject}>{t('reject')}</button>
+              <button onClick={closeRejectionModal}>{t('cancel')}</button>
+            </div>
+          </div>
+        </div>
+      )}
       <h1>{t('providerApprovals')}</h1>
       <p>{t('providerApprovalsDescription')}</p>
       
@@ -81,7 +130,7 @@ const ProviderApprovals = () => {
                   {request.status === 'pending' && (
                     <>
                       <button className="action-btn" onClick={() => handleApprove(request._id)}>{t('approve')}</button>
-                      <button className="delete-btn" onClick={() => handleReject(request._id)}>{t('reject')}</button>
+                      <button className="delete-btn" onClick={() => openRejectionModal(request._id)}>{t('reject')}</button>
                     </>
                   )}
                 </td>

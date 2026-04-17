@@ -335,6 +335,13 @@
     "resendOtpCooldown": "Resend OTP in {{seconds}}s",
     "unsupportedFileType": "Unsupported file type. Only PDF, DOC, DOCX, and image files are allowed.",
     "showPassword": "Show Password",
-    "hidePassword": "Hide Password"
+    "hidePassword": "Hide Password",
+    "enterRejectionReason": "Enter Rejection Reason",
+    "rejectionReasonPlaceholder": "Enter the reason for rejection here...",
+    "selectRejectionReason": "Select Rejection Reason",
+    "selectReason": "Select a reason",
+    "incompleteDocuments": "Incomplete Documents",
+    "invalidInformation": "Invalid Information",
+    "other": "Other"
   }
   

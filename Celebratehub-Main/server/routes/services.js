@@ -10,7 +10,7 @@ router.post("/", upload.array("images", 8), async (req, res) => {
   try {
     const {
       name,
-      type,
+      category,
       location,
       pricePerHour,
       pricePerPerson,
@@ -80,7 +80,7 @@ router.post("/", upload.array("images", 8), async (req, res) => {
 
     const newService = new Service({
       name,
-      type,
+      category,
       location,
       pricePerHour,
       pricePerPerson,
@@ -134,7 +134,7 @@ router.put("/:id", upload.array("images", 8), async (req, res) => {
   try {
     const {
       name,
-      type,
+      category,
       location,
       pricePerHour,
       pricePerPerson,
@@ -196,7 +196,7 @@ router.put("/:id", upload.array("images", 8), async (req, res) => {
 
     const updatedData = {
       name,
-      type,
+      category,
       location,
       pricePerHour,
       pricePerPerson,

@@ -70,7 +70,7 @@ const AddService = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
-    type: '',
+    category: '',
     pricePerHour: '',
     pricePerPerson: '',
     location: '',
@@ -206,7 +206,7 @@ const AddService = () => {
     const data = new FormData();
     console.log('formData state:', formData);
     data.append('name', formData.name);
-    data.append('type', formData.type);
+    data.append('category', formData.category);
     data.append('pricePerHour', formData.pricePerHour);
     data.append('pricePerPerson', formData.pricePerPerson);
     data.append('location', formData.location);
@@ -349,8 +349,8 @@ const AddService = () => {
     <input id="name" type="text" name="name" value={formData.name} onChange={handleChange} required />
 </div>
 <div className="form-group">
-    <label htmlFor="type">{t('roleLabel')}</label>
-    <input id="type" type="text" name="type" value={formData.type} onChange={handleChange} required />
+    <label htmlFor="category">{t('categoryLabel')}</label>
+    <input id="category" type="text" name="category" value={formData.category} onChange={handleChange} required />
 </div>
 <div className="form-group">
     <label htmlFor="location">{t('locationLabel')}</label>

@@ -11,7 +11,7 @@
     "adminDashboard": "Admin Dashboard",
     "logout": "Logout",
     "manageServices": "Manage Services",
-    "manageServicesDescription": "edit, or delete services",
+    "manageServicesDescription": "view, or delete services",
     "userManagement": "User Management",
     "userManagementDescription": "Edit/Delete users",
     "providerApprovals": "Provider Approvals",

@@ -36,6 +36,7 @@ import ReportService from './components/dashboards/ReportService';
 import BookingPage from './components/dashboards/BookingPage';
 import BookingConfirmation from './components/dashboards/BookingConfirmation';
 import ServicesList from './components/dashboards/ServicesList';
+import EditService from './components/dashboards/admin/EditService';
 import { ThemeProvider } from './context/ThemeContext';
 import './App.css';
 
@@ -108,6 +109,7 @@ const AppContent = () => {
         <Route path="/provider-profile/:providerId" element={<ProtectedRoute allowedRoles={['provider', 'customer']}><ProviderProfile /></ProtectedRoute>} />
         <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/manage-services" element={<ProtectedRoute allowedRoles={['admin']}><ManageServices /></ProtectedRoute>} />
+        <Route path="/admin/edit-service/:id" element={<ProtectedRoute allowedRoles={['admin']}><EditService /></ProtectedRoute>} />
         <Route path="/admin/user-management" element={<ProtectedRoute allowedRoles={['admin']}><UserManagement /></ProtectedRoute>} />
         <Route path="/admin/provider-approvals" element={<ProtectedRoute allowedRoles={['admin']}><ProviderApprovals /></ProtectedRoute>} />
         <Route path="/admin/reports-and-feedback" element={<ProtectedRoute allowedRoles={['admin']}><ReportsAndFeedback /></ProtectedRoute>} />

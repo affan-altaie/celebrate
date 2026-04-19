@@ -397,6 +397,14 @@
     "availableTimesFor": "الأوقات المتاحة لـ {{date}}",
     "addTime": "إضافة وقت",
     "imagePreview": "معاينة الصورة",
-    "serviceNameExample": "مثال على اسم الخدمة"
+    "serviceNameExample": "مثال على اسم الخدمة",
+    "selectReason": "اختر سبباً",
+    "reasonNoLongerOffered": "الخدمة لم تعد متوفرة",
+    "reasonPolicyViolation": "انتهاك السياسة",
+    "reasonSpam": "سبام",
+    "reasonOther": "أخرى",
+    "deleteService": "حذف الخدمة",
+    "deleteServiceReasonPrompt": "يرجى تقديم سبب لحذف هذه الخدمة.",
+    "deletionReasonPlaceholder": "أدخل سبب الحذف"
   }
   

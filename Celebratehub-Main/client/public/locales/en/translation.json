@@ -379,6 +379,14 @@
     "Haima": "Haima",
     "Duqm": "Duqm",
     "Al Buraimi": "Al Buraimi",
-    "Mahdah": "Mahdah"
+    "Mahdah": "Mahdah",
+    "selectReason": "Select a reason",
+    "reasonNoLongerOffered": "Service no longer offered",
+    "reasonPolicyViolation": "Policy violation",
+    "reasonSpam": "Spam",
+    "reasonOther": "Other",
+    "deleteService": "Delete Service",
+    "deleteServiceReasonPrompt": "Please provide a reason for deleting this service.",
+    "deletionReasonPlaceholder": "Enter reason for deletion"
   }
   

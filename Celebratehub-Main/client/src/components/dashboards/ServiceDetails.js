@@ -33,6 +33,7 @@ const ServiceDetails = () => {
   const userString = localStorage.getItem('user');
   const user = userString ? JSON.parse(userString) : null;
   const isProvider = user?.role === 'provider';
+  const isAdmin = user?.role === 'admin';
 
   return (
     <div className="service-details-container">
@@ -56,12 +57,12 @@ const ServiceDetails = () => {
                 <span className="price-display">OMR {service.pricePerHour} / hour</span>
                 {service.pricePerPerson && <span className="price-per-person">OMR {service.pricePerPerson} / {t('personLabel')}</span>}
               </div>
-              {!isProvider && (
-                <button className="book-now-button" onClick={() => navigate(`/booking/${service._id}`)}>{t('bookNow')}</button>
+              {!isProvider && !isAdmin && (
+                <button className="book-now-button" onClick={() => navigate(`/booking/${service._id}`)}>{t("bookNow")}</button>
               )}
             </div>
-            {!isProvider && (
-              <button onClick={() => navigate(`/report-service/${service._id}`)} className="report-btn">{t('reportService')}</button>
+            {!isProvider && !isAdmin && (
+              <button onClick={() => navigate(`/report-service/${service._id}`)} className="report-btn">{t("reportService")}</button>
             )}
           </div>
         </div>

@@ -125,20 +125,31 @@ const AddService = () => {
   const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState(null);
   const [timeInput, setTimeInput] = useState('');
   const [isDragging, setIsDragging] = useState(false);
+  const [providerName, setProviderName] = useState('');
+  const [serviceName, setServiceName] = useState('');
 
   useEffect(() => {
     const userString = localStorage.getItem('user');
     if (userString) {
       const user = JSON.parse(userString);
       if (user && user.username) {
-        setFormData(prev => ({ ...prev, name: user.username }));
+        setProviderName(user.username);
       }
     }
   }, []);
 
+  useEffect(() => {
+    const combinedName = providerName ? `${providerName}: ${serviceName}` : serviceName;
+    setFormData(prev => ({ ...prev, name: combinedName }));
+  }, [serviceName, providerName]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'name') {
+        setServiceName(value);
+    } else {
+        setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handlePricingOptionChange = (option) => {
@@ -405,7 +416,7 @@ const AddService = () => {
             <form onSubmit={handleSubmit} className="add-service-form">
 <div className="form-group">
     <label htmlFor="name">{t('serviceNameLabel')}</label>
-    <input id="name" type="text" name="name" value={formData.name} onChange={handleChange} required />
+    <input id="name" type="text" name="name" value={serviceName} onChange={handleChange} required />
 </div>
 <div className="form-group">
     <label htmlFor="category">{t('categoryLabel')}</label>

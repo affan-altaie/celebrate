@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import './Dashboard.css';
 import './dark-dropdown.css';
 import logo1 from '../../assets/logo1.png'; // Fallback image
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const EditProviderProfile = () => {
   const { t } = useTranslation();
@@ -33,6 +34,10 @@ const EditProviderProfile = () => {
     number: false,
     specialChar: false,
   });
+
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const locations = [
     "Muscat", "Seeb", "Bawshar", "Muttrah", "Al Amerat", "Qurayyat",
@@ -362,26 +367,44 @@ const EditProviderProfile = () => {
           <form onSubmit={handlePasswordChange} style={{ textAlign: 'left' }}>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('currentPassword')}</label>
-              <input
-                type="password"
-                value={passwordData.currentPassword}
-                onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                required
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showCurrentPassword ? 'text' : 'password'}
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+                  required
+                  style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                  style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  {showCurrentPassword ? <FaEye /> : <FaEyeSlash />}
+                </button>
+              </div>
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('newPassword')}</label>
-              <input
-                type="password"
-                name="newPassword"
-                value={passwordData.newPassword}
-                onChange={handlePasswordDataChange}
-                onFocus={() => setPasswordRequirementsVisible(true)}
-                onBlur={() => setPasswordRequirementsVisible(false)}
-                required
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showNewPassword ? 'text' : 'password'}
+                  name="newPassword"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordDataChange}
+                  onFocus={() => setPasswordRequirementsVisible(true)}
+                  onBlur={() => setPasswordRequirementsVisible(false)}
+                  required
+                  style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  {showNewPassword ? <FaEye /> : <FaEyeSlash />}
+                </button>
+              </div>
               {passwordRequirementsVisible && (
                 <div className="password-requirements">
                   <ul>
@@ -407,14 +430,23 @@ const EditProviderProfile = () => {
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('confirmNewPassword')}</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={passwordData.confirmPassword}
-                onChange={handlePasswordDataChange}
-                required
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-              />
+              <div style={{ position: 'relative' }}>
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  name="confirmPassword"
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordDataChange}
+                  required
+                  style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+                </button>
+              </div>
               {passwordErrors.confirmPassword && <div className="error-message">{passwordErrors.confirmPassword}</div>}
             </div>
             <button 

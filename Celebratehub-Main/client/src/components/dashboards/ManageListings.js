@@ -54,6 +54,12 @@ const ManageListings = () => {
     }
   };
 
+  const getServiceName = (fullName) => {
+    if (!fullName) return '';
+    const parts = fullName.split(': ');
+    return parts.length > 1 ? parts.slice(1).join(': ') : fullName;
+  };
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
@@ -86,7 +92,7 @@ const ManageListings = () => {
                     >
                       <img src={service.images[service.mainImageIndex || 0]} alt={service.name} className="service-thumbnail" />
                       <div>
-                        <strong>{service.name}</strong>
+                        <strong>{getServiceName(service.name)}</strong>
                         <p>{service.type}</p>
                       </div>
                     </div>

@@ -27,7 +27,7 @@ const ServicePreview = ({ service, mainImageIndex }) => {
     if (image instanceof File) {
       return URL.createObjectURL(image);
     }
-    return image; // Assuming it's a URL string from Supabase
+    return image;
   };
 
   return (
@@ -78,7 +78,7 @@ const EditListing = () => {
   const { id } = useParams();
   const [formData, setFormData] = useState({
     name: '',
-    type: '',
+    category: '',
     pricePerHour: '',
     pricePerPerson: '',
     location: '',
@@ -87,6 +87,7 @@ const EditListing = () => {
     images: [],
     availability: {},
   });
+  const [pricingOption, setPricingOption] = useState('perHour');
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [imageError, setImageError] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -94,18 +95,40 @@ const EditListing = () => {
   const [timeInput, setTimeInput] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [providerName, setProviderName] = useState('');
+  const [serviceName, setServiceName] = useState('');
 
   useEffect(() => {
     const fetchService = async () => {
       try {
         const response = await axios.get(`/api/services/${id}`);
         const data = response.data;
+        const nameParts = data.name.split(': ');
+        if (nameParts.length > 1) {
+          setProviderName(nameParts[0]);
+          setServiceName(nameParts.slice(1).join(': '));
+        } else {
+          setServiceName(data.name);
+          const userString = localStorage.getItem('user');
+          if (userString) {
+            const user = JSON.parse(userString);
+            if (user && user.username) {
+              setProviderName(user.username);
+            }
+          }
+        }
+
         setFormData({
           ...data,
           features: Array.isArray(data.features) ? data.features.join(', ') : '',
           images: data.images || [],
           availability: data.availability || {},
         });
+        if (data.pricePerPerson && !data.pricePerHour) {
+            setPricingOption('perPerson');
+        } else {
+            setPricingOption('perHour');
+        }
         setMainImageIndex(data.mainImageIndex || 0);
         setLoading(false);
       } catch (error) {
@@ -117,9 +140,26 @@ const EditListing = () => {
     fetchService();
   }, [id]);
 
+  useEffect(() => {
+    setFormData(prev => ({...prev, name: providerName ? `${providerName}: ${serviceName}` : serviceName}));
+  }, [serviceName, providerName]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'name') {
+      setServiceName(value);
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handlePricingOptionChange = (option) => {
+    setPricingOption(option);
+    setFormData(prev => ({
+      ...prev,
+      pricePerHour: option === 'perHour' ? prev.pricePerHour : '',
+      pricePerPerson: option === 'perPerson' ? prev.pricePerPerson : '',
+    }));
   };
 
   const handleFiles = (files) => {
@@ -234,7 +274,7 @@ const EditListing = () => {
 
     const data = new FormData();
     data.append('name', formData.name);
-    data.append('type', formData.type);
+    data.append('category', formData.category);
     data.append('pricePerHour', formData.pricePerHour);
     data.append('pricePerPerson', formData.pricePerPerson);
     data.append('location', formData.location);
@@ -362,24 +402,79 @@ const EditListing = () => {
             <form onSubmit={handleSubmit} className="add-service-form">
               <div className="form-group">
                   <label htmlFor="name">{t('serviceNameLabel')}</label>
-                  <input id="name" type="text" name="name" value={formData.name} onChange={handleChange} required />
+                  <input id="name" type="text" name="name" value={serviceName} onChange={handleChange} required />
               </div>
               <div className="form-group">
-                  <label htmlFor="type">{t('roleLabel')}</label>
-                  <input id="type" type="text" name="type" value={formData.type} onChange={handleChange} required />
+                <label htmlFor="category">{t('categoryLabel')}</label>
+                <select id="category" name="category" value={formData.category} onChange={handleChange} required>
+                    <option value="">{t('selectCategory')}</option>
+                    <option value="wedding-halls">{t('weddingHalls')}</option>
+                    <option value="catering">{t('catering')}</option>
+                    <option value="photography">{t('photography')}</option>
+                    <option value="birthdays">{t('birthdays')}</option>
+                </select>
               </div>
               <div className="form-group">
-                  <label htmlFor="location">{t('locationLabel')}</label>
-                  <input id="location" type="text" name="location" value={formData.location} onChange={handleChange} required />
+                <label htmlFor="location">{t('locationLabel')}</label>
+                <select id="location" name="location" value={formData.location} onChange={handleChange} required>
+                    <option value="">{t('selectLocation')}</option>
+                    <option value="Muscat">Muscat</option>
+                    <option value="Muttrah">Muttrah</option>
+                    <option value="Ruwi">Ruwi</option>
+                    <option value="Seeb">Seeb</option>
+                    <option value="Azaiba">Azaiba</option>
+                    <option value="Ghubra">Ghubra</option>
+                    <option value="Bausher">Bausher</option>
+                    <option value="Salalah">Salalah</option>
+                    <option value="Taqah">Taqah</option>
+                    <option value="Mirbat">Mirbat</option>
+                    <option value="Thumrait">Thumrait</option>
+                    <option value="Khasab">Khasab</option>
+                    <option value="Dibba Al-Baya">Dibba Al-Baya</option>
+                    <option value="Sohar">Sohar</option>
+                    <option value="Shinas">Shinas</option>
+                    <option value="Liwa">Liwa</option>
+                    <option value="Barka">Barka</option>
+                    <option value="Rustaq">Rustaq</option>
+                    <option value="Musannah">Musannah</option>
+                    <option value="Nizwa">Nizwa</option>
+                    <option value="Bahla">Bahla</option>
+                    <option value="Sumail">Sumail</option>
+                    <option value="Izki">Izki</option>
+                    <option value="Ibri">Ibri</option>
+                    <option value="Yanqul">Yanqul</option>
+                    <option value="Ibra">Ibra</option>
+                    <option value="Bidiyah">Bidiyah</option>
+                    <option value="Sur">Sur</option>
+                    <option value="Jalan Bani Bu Ali">Jalan Bani Bu Ali</option>
+                    <option value="Haima">Haima</option>
+                    <option value="Duqm">Duqm</option>
+                    <option value="Al Buraimi">Al Buraimi</option>
+                    <option value="Mahdah">Mahdah</option>
+                </select>
               </div>
-              <div className="form-group">
-                  <label htmlFor="pricePerHour">{t('pricePerHour')}</label>
-                  <input id="pricePerHour" type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} required />
-              </div>
-              <div className="form-group">
-                  <label htmlFor="pricePerPerson">{t('pricePerPerson')}</label>
-                  <input id="pricePerPerson" type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} />
-              </div>
+                <div className="form-group">
+                    <label>{t('priceOption', 'Pricing Option')}</label>
+                    <div className="toggle-switch">
+                        <button type="button" className={`toggle-btn ${pricingOption === 'perHour' ? 'active' : ''}`} onClick={() => handlePricingOptionChange('perHour')}>
+                            {t('perHour', 'Per Hour')}
+                        </button>
+                        <button type="button" className={`toggle-btn ${pricingOption === 'perPerson' ? 'active' : ''}`} onClick={() => handlePricingOptionChange('perPerson')}>
+                            {t('perPerson', 'Per Person')}
+                        </button>
+                    </div>
+                </div>
+                {pricingOption === 'perHour' ? (
+                    <div className="form-group">
+                        <label htmlFor="pricePerHour">{t('pricePerHour')}</label>
+                        <input id="pricePerHour" type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} placeholder="OMR 20 / hour" required />
+                    </div>
+                ) : (
+                    <div className="form-group">
+                        <label htmlFor="pricePerPerson">{t('pricePerPerson')}</label>
+                        <input id="pricePerPerson" type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} placeholder="OMR 2 / person" required />
+                    </div>
+                )}
               <div className="form-group">
                   <label htmlFor="description">{t('descriptionLabel')}</label>
                   <textarea id="description" name="description" value={formData.description} onChange={handleChange} required />

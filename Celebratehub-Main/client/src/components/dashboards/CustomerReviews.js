@@ -1,74 +1,107 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 import './Dashboard.css';
+import { FaStar } from 'react-icons/fa';
 
 const CustomerReviews = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [reviews, setReviews] = useState([]);
-  const user = JSON.parse(localStorage.getItem('user'));
+  const [servicesWithReviews, setServicesWithReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      setUser(storedUser);
+    } else {
+      setLoading(false);
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    const fetchServicesAndReviews = async () => {
+      if (!user) return;
+
+      setLoading(true);
+      try {
+        // First, fetch the provider's services
+        const servicesResponse = await axios.get(`/api/services/provider/${user.id}`);
+        const services = servicesResponse.data;
+
+        // Then, for each service, fetch its reviews
+        const servicesWithReviewsData = await Promise.all(services.map(async (service) => {
+          const reviewsResponse = await axios.get(`/api/reviews/service/${service._id}`);
+          const reviews = reviewsResponse.data;
+          return { ...service, reviews };
+        }));
+
+        setServicesWithReviews(servicesWithReviewsData);
+      } catch (error) {
+        console.error('Failed to fetch services or reviews', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (user) {
-      setReviews([
-        { _id: 1, serviceId: { name: 'Elegant Wedding Halls', image: 'https://www.shangri-la.com/-/media/Shangri-La/muscat_barraljissahresort/settings/weddings-celebrations/SLMU_Events_Spaces_1920x940.jpg' }, customerId: { username: 'John Doe', profilePicture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80' }, rating: 5, comment: 'Beautiful venue and great service!' },
-        { _id: 2, serviceId: { name: 'Elegant Wedding Halls', image: 'https://www.shangri-la.com/-/media/Shangri-La/muscat_barraljissahresort/settings/weddings-celebrations/SLMU_Events_Spaces_1920x940.jpg' }, customerId: { username: 'Jane Smith', profilePicture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80' }, rating: 4, comment: 'The staff was very helpful.' },
-        { _id: 3, serviceId: { name: 'Joyful Birthday Parties', image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=60' }, customerId: { username: 'Peter Pan', profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=100&q=80' }, rating: 5, comment: 'My kids had a blast!' },
-      ]);
+      fetchServicesAndReviews();
     }
   }, [user]);
 
-  if (!user) {
+  const renderStars = (rating) => {
+    return (
+      <div className="star-rating">
+        {[...Array(5)].map((_, index) => (
+          <FaStar key={index} color={index < rating ? '#ffc107' : '#e4e5e9'} />
+        ))}
+      </div>
+    );
+  };
+
+  if (loading) {
     return <div>{t('loading')}</div>;
   }
-
-  const groupedReviews = reviews.reduce((acc, review) => {
-    const serviceName = review.serviceId.name;
-    if (!acc[serviceName]) {
-      acc[serviceName] = {
-        image: review.serviceId.image,
-        reviews: [],
-      };
-    }
-    acc[serviceName].reviews.push(review);
-    return acc;
-  }, {});
 
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
-        <h1>{t('customerReviewsTitle')}</h1>
-        <button onClick={() => navigate(-1)} className="action-btn">{t('backToDashboard')}</button>
+        <h1>{t('customerReviews')}</h1>
+        <button onClick={() => navigate('/provider-dashboard')} className="action-btn">
+          {t('backToDashboard')}
+        </button>
       </header>
-      <main className="dashboard-content">
-        {Object.keys(groupedReviews).length > 0 ? (
-          Object.keys(groupedReviews).map(serviceName => (
-            <div key={serviceName} className="dashboard-card full-width">
+      <main className="dashboard-content" style={{ display: 'block' }}>
+        {servicesWithReviews.length > 0 ? (
+          servicesWithReviews.map((service) => (
+            <div key={service._id} className="dashboard-card" style={{ marginBottom: '2rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                <img src={groupedReviews[serviceName].image} alt={serviceName} style={{ width: '120px', height: '90px', objectFit: 'cover', borderRadius: '8px' }} />
-                <h3>{serviceName}</h3>
+                <img src={service.images[0]} alt={service.name} style={{ width: '100px', height: '100px', borderRadius: '8px', objectFit: 'cover' }} />
+                <h2>{service.name}</h2>
               </div>
-              {groupedReviews[serviceName].reviews.map(review => (
-                <div key={review._id} className="review-card" style={{ marginBottom: '1rem', padding: '1rem', border: '1px solid #ddd', borderRadius: '8px', display: 'flex', gap: '1rem' }}>
-                  <img src={review.customerId.profilePicture} alt={review.customerId.username} style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }} />
-                  <div>
-                    <div className="review-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <strong>{review.customerId.username}</strong>
-                      <div className="review-rating">
-                        {[...Array(review.rating)].map((_, i) => <span key={i}>⭐</span>)}
+              {service.reviews.length > 0 ? (
+                service.reviews.map((review) => (
+                  <div key={review._id} className="review-card">
+                    <div className="review-header">
+                      <img src={review.userId.profilePicture || '/default-avatar.png'} alt={review.userId.username} className="reviewer-avatar" />
+                      <div className="review-info">
+                        <strong>{review.userId.username}</strong>
+                        {renderStars(review.rating)}
                       </div>
                     </div>
                     <p>{review.comment}</p>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p>{t('noReviewsYet')}</p>
+              )}
             </div>
           ))
         ) : (
-          <div className="dashboard-card full-width">
-            <p>{t('noReviewsFound')}</p>
-          </div>
+          <p>{t('noServicesWithReviews')}</p>
         )}
       </main>
     </div>

@@ -21,6 +21,20 @@ const NewBooking = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [services, setServices] = useState([]);
 
+  const locations = [
+    "Muscat", "Seeb", "Bawshar", "Muttrah", "Al Amerat", "Qurayyat",
+    "Sohar", "Shinas", "Liwa", "Saham", "Al Khaburah", "As Suwayq",
+    "Rustaq", "Al Awabi", "Nakhal", "Wadi Al Maawil", "Barka", "Al Musannah",
+    "Nizwa", "Bahla", "Manah", "Al Hamra", "Adam", "Izki", "Samail", "Bidbid",
+    "Ibra", "Al Mudaybi", "Bidiyah", "Al Qabil", "Wadi Bani Khalid", "Dima Wa At Taiyyin",
+    "Sur", "Al Kamil Wal Wafi", "Jalan Bani Bu Hassan", "Jalan Bani Bu Ali", "Masirah",
+    "Ibri", "Yanqul", "Dhank",
+    "Haima", "Duqm", "Mahout", "Al Jazir",
+    "Salalah", "Taqah", "Mirbat", "Sadah", "Rakhyut", "Dhalkut", "Muqshin", "Shalim and the Hallaniyat Islands", "Thumrait",
+    "Khasab", "Bukha", "Dibba Al-Baya", "Madha",
+    "Al Buraimi", "Mahdah", "As Sunaynah"
+  ];
+
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -253,10 +267,9 @@ const NewBooking = () => {
               <FaMapMarkerAlt className="icon" />
               <select value={location} onChange={(e) => setLocation(e.target.value)}>
                 <option value="">{t('locationLabel')}</option>
-                <option value="Muscat">Muscat</option>
-                <option value="Salalah">Salalah</option>
-                <option value="Sohar">Sohar</option>
-                <option value="Nizwa">Nizwa</option>
+                {locations.map(loc => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
               </select>
             </div>
             <div className="search-input">

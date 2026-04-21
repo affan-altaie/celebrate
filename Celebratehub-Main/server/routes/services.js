@@ -132,6 +132,23 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", upload.array("images", 8), async (req, res) => {
   try {
+    // Handle status-only update
+    if (req.body.status && Object.keys(req.body).length === 1) {
+      const { status } = req.body;
+      const updatedService = await Service.findByIdAndUpdate(
+        req.params.id,
+        { status },
+        { new: true }
+      );
+      if (!updatedService) {
+        return res.status(404).json({ message: "Service not found" });
+      }
+      return res.json({
+        message: "Service status updated successfully",
+        service: updatedService,
+      });
+    }
+
     const {
       name,
       category,

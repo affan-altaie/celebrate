@@ -38,7 +38,7 @@ const ServiceDetails = () => {
   return (
     <div className="service-details-container">
       <div className="service-details-content">
-        <button onClick={() => navigate(-1)} className="back-button">{t('backToSearch')}</button>
+        <button onClick={() => navigate(-1)} className="back-button">go back</button>
         
         <div className="service-header">
           <img src={service.images[selectedImageIndex]} alt={service.name} className="service-main-image" />

@@ -154,7 +154,7 @@ const BookingPage = () => {
       <button onClick={() => navigate(-1)} className="back-button">{t('backToServiceDetails')}</button>
       <div className="booking-page-container">
         <div className="booking-details-column">
-          <img src={`http://localhost:5000${service.images[service.mainImageIndex]}`} alt={service.name} className="service-image" />
+          <img src={service.images[service.mainImageIndex]} alt={service.name} className="service-image" />
         <h2>{service.name}</h2>
         <div className="service-meta">
           <span><FaStar /> {service.rating}</span>

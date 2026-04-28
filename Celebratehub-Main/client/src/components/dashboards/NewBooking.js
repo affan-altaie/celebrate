@@ -356,6 +356,7 @@ const NewBooking = () => {
             </div>
           ))}
         </div>
+        <button className="view-all-services-button" onClick={() => navigate('/services')}>{t('viewAllServices')}</button>
       </div>
 
       {searchResults.length > 0 && (
@@ -386,7 +387,7 @@ const NewBooking = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            ))};
           </div>
         </div>
       )}

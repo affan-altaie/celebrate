@@ -14,11 +14,11 @@ const serviceSchema = new mongoose.Schema({
     required: true,
   },
   pricePerHour: {
-    type: String,
+    type: Number,
     required: false,
   },
   pricePerPerson: {
-    type: String,
+    type: Number,
     required: false,
   },
   description: {

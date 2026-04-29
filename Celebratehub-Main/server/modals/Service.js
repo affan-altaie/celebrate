@@ -1,69 +1,27 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const serviceSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  category: {
-    type: String,
-    required: true,
-  },
-  location: {
-    type: String,
-    required: true,
-  },
-  pricePerHour: {
-    type: Number,
-    required: false,
-  },
-  pricePerPerson: {
-    type: Number,
-    required: false,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  features: {
-    type: [String],
-    default: [],
-  },
-  images: {
-    type: [String],
-    required: true,
-  },
-  mainImageIndex: {
-    type: Number,
-    default: 0,
-  },
-  availability: {
-    type: Object,
-    default: {},
-  },
-  providerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-  },
-  reviews: {
-    type: Number,
-    default: 0,
-    required: false,
-  },
-  rating: {
-    type: Number,
-    default: 0,
-    required: false,
-  },
-  status: {
-    type: String,
-    enum: ['Active', 'Inactive'],
-    default: 'Active',
-    required: false,
-  },
+const reviewSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  rating: { type: Number, required: true },
+  comment: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
 });
 
-const Service = mongoose.model('Service', serviceSchema);
+const serviceSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  category: { type: String, required: true },
+  location: { type: String, required: true },
+  pricePerHour: { type: String, required: false, default: null },
+  pricePerPerson: { type: String, required: false, default: null },
+  description: { type: String, required: true },
+  features: { type: [String], required: true },
+  images: { type: [String], required: true },
+  mainImageIndex: { type: Number, default: 0 },
+  availability: { type: Object, required: true },
+  providerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  reviews: [reviewSchema], 
+  rating: { type: Number, default: 0 },
+  status: { type: String, default: "Active" } 
+}, { timestamps: true });
 
-module.exports = Service;
+module.exports = mongoose.model("Service", serviceSchema);

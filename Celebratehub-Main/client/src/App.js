@@ -96,7 +96,7 @@ const AppContent = () => {
         <Route path="/leave-review/:bookingId" element={<ProtectedRoute allowedRoles={['customer']}><LeaveReview /></ProtectedRoute>} />
         <Route path="/report-service/:serviceId" element={<ProtectedRoute allowedRoles={['customer']}><ReportService /></ProtectedRoute>} />
         <Route path="/new-booking" element={<ProtectedRoute allowedRoles={['customer']}><NewBooking /></ProtectedRoute>} />
-        <Route path="/services" element={<ServicesList />} />
+        <Route path="/services" element={<ProtectedRoute allowedRoles={['customer', 'provider', 'admin']}><ServicesList /></ProtectedRoute>} />
         <Route path="/service/:id" element={<ProtectedRoute allowedRoles={['customer', 'provider', 'admin']}><ServiceDetails /></ProtectedRoute>} />
         <Route path="/booking/:id" element={<ProtectedRoute allowedRoles={['customer']}><BookingPage /></ProtectedRoute>} />
         <Route path="/booking-confirmation" element={<ProtectedRoute allowedRoles={['customer']}><BookingConfirmation /></ProtectedRoute>} />
@@ -138,5 +138,3 @@ function App() {
 }
 
 export default App;
-// hassan
-//Test git

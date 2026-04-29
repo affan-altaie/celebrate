@@ -34,31 +34,31 @@ router.post("/", upload.array("images", 8), async (req, res) => {
         console.log(`Uploading image ${file.originalname} to Supabase path ${filePath}...`);
         try {
           const { data, error } = await supabase.storage
-            .from('celebrate-services-files')
+            .from("celebrate-services-files")
             .upload(filePath, file.buffer, {
               contentType: file.mimetype,
               upsert: true
             });
 
           if (error) {
-            console.error('Error uploading image to Supabase:', error);
+            console.error("Error uploading image to Supabase:", error);
             return res.status(500).json({ message: "Failed to upload image to storage", error: error.message });
           }
 
           console.log(`Image ${file.originalname} uploaded successfully. Getting public URL...`);
           const { data: publicUrlData } = supabase.storage
-            .from('celebrate-services-files')
+            .from("celebrate-services-files")
             .getPublicUrl(filePath);
 
           if (!publicUrlData || !publicUrlData.publicUrl) {
-            console.error('Error getting public URL from Supabase');
+            console.error("Error getting public URL from Supabase");
             return res.status(500).json({ message: "Failed to get public URL for image" });
           }
 
           console.log(`Public URL for ${file.originalname}: ${publicUrlData.publicUrl}`);
           images.push(publicUrlData.publicUrl);
         } catch (uploadCatchError) {
-          console.error('Catch error during Supabase upload:', uploadCatchError);
+          console.error("Catch error during Supabase upload:", uploadCatchError);
           return res.status(500).json({ message: "Exception during image upload", error: uploadCatchError.message });
         }
       }
@@ -66,14 +66,14 @@ router.post("/", upload.array("images", 8), async (req, res) => {
 
     let parsedFeatures = [];
     if (features) {
-      parsedFeatures = typeof features === 'string' 
-        ? features.split(',').map(f => f.trim()).filter(f => f) 
+      parsedFeatures = typeof features === "string" 
+        ? features.split(",").map(f => f.trim()).filter(f => f) 
         : features;
     }
 
     let parsedAvailability = {};
     if (availability) {
-      parsedAvailability = typeof availability === 'string' 
+      parsedAvailability = typeof availability === "string" 
         ? JSON.parse(availability) 
         : availability;
     }
@@ -92,9 +92,9 @@ router.post("/", upload.array("images", 8), async (req, res) => {
       providerId: provider._id
     });
 
-    console.log('Saving service to MongoDB:', newService);
+    console.log("Saving service to MongoDB:", newService);
     await newService.save();
-    console.log('Service saved successfully to MongoDB.');
+    console.log("Service saved successfully to MongoDB.");
 
      res.status(201).json({ message: "Service added successfully", service: newService });
    } catch (error) {
@@ -105,7 +105,19 @@ router.post("/", upload.array("images", 8), async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
+    const services = await Service.find({ status: "Active" });
+    console.log("Fetched services:", services);
+    res.json(services);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// TEMPORARY: Get all services for debugging
+router.get("/all", async (req, res) => {
+  try {
     const services = await Service.find();
+    console.log("Fetched all services (DEBUG):");
     res.json(services);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -169,26 +181,26 @@ router.put("/:id", upload.array("images", 8), async (req, res) => {
 
     let images = [];
     if (existingImages) {
-      images = typeof existingImages === 'string' ? JSON.parse(existingImages) : existingImages;
+      images = typeof existingImages === "string" ? JSON.parse(existingImages) : existingImages;
     }
 
     if (req.files && req.files.length > 0) {
       for (const file of req.files) {
         const filePath = `${Date.now()}-${file.originalname}`;
         const { data, error } = await supabase.storage
-          .from('celebrate-services-files')
+          .from("celebrate-services-files")
           .upload(filePath, file.buffer, {
             contentType: file.mimetype,
             upsert: true
           });
 
         if (error) {
-          console.error('Error uploading image to Supabase:', error);
+          console.error("Error uploading image to Supabase:", error);
           continue;
         }
 
         const { data: publicUrlData } = supabase.storage
-          .from('celebrate-services-files')
+          .from("celebrate-services-files")
           .getPublicUrl(filePath);
 
         if (publicUrlData && publicUrlData.publicUrl) {
@@ -199,14 +211,14 @@ router.put("/:id", upload.array("images", 8), async (req, res) => {
 
     let parsedFeatures = [];
     if (features) {
-      parsedFeatures = typeof features === 'string' 
-        ? features.split(',').map(f => f.trim()).filter(f => f) 
+      parsedFeatures = typeof features === "string" 
+        ? features.split(",").map(f => f.trim()).filter(f => f) 
         : features;
     }
 
     let parsedAvailability = {};
     if (availability) {
-      parsedAvailability = typeof availability === 'string' 
+      parsedAvailability = typeof availability === "string" 
         ? JSON.parse(availability) 
         : availability;
     }

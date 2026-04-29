@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaCalendarAlt, FaStar, FaUserFriends, FaCheckCircle, FaClock } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaCalendarAlt, FaStar, FaUserFriends, FaCheckCircle, FaClock, FaCreditCard } from 'react-icons/fa';
 import './BookingPage.css';
 
 const BookingPage = () => {
@@ -11,6 +11,7 @@ const BookingPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [service, setService] = useState(null);
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
   const [hours, setHours] = useState(1);
@@ -24,13 +25,18 @@ const BookingPage = () => {
     expiryDate: '',
     cvc: '',
     cardHolderName: '',
+    saveCard: false,
   });
 
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/services/${id}`);
+        const response = await axios.get(`/api/services/${id}`);
         setService(response.data);
+        if (response.data.availability && Object.keys(response.data.availability).length > 0) {
+          const firstAvailableDate = Object.keys(response.data.availability).sort()[0];
+          setCurrentDate(new Date(firstAvailableDate));
+        }
       } catch (error) {
         console.error('Error fetching service:', error);
       }
@@ -47,15 +53,57 @@ const BookingPage = () => {
   }, [service, hours, numberOfPersons]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Date and time validation
     if (!selectedDate || !selectedTime) {
       toast.error(t("selectDateTimeAlert"));
       return;
+    }
+
+    // Cardholder Name Validation
+    if (!formData.cardHolderName.trim()) {
+      toast.error(t('cardHolderNameRequired') || 'Card holder name is required.');
+      return;
+    }
+    if (!/^[a-zA-Z\s]+$/.test(formData.cardHolderName)) {
+      toast.error(t('cardHolderNameInvalid') || 'Card holder name can only contain letters and spaces.');
+      return;
+    }
+
+    // Card Number Validation
+    const cardNumberDigits = formData.cardNumber.replace(/\D/g, '');
+    if (cardNumberDigits.length !== 16) {
+      toast.error(t('invalidCardNumber') || 'Card number must be 16 digits.');
+      return;
+    }
+
+    // Expiry Date Validation
+    if (!/^(0[1-9]|1[0-2])\/([0-9]{2})$/.test(formData.expiryDate)) {
+      toast.error(t("invalidExpiryDate") || "Invalid expiry date format. Please use MM/YY.");
+      return;
+    }
+
+    const [month, year] = formData.expiryDate.split('/');
+    const currentYear = new Date().getFullYear() % 100;
+    const currentMonth = new Date().getMonth() + 1;
+    const expiryMonth = parseInt(month, 10);
+    const expiryYear = parseInt(year, 10);
+
+    if (expiryYear < currentYear || (expiryYear === currentYear && expiryMonth < currentMonth)) {
+      toast.error(t("expiredCardError") || "Card has expired. Please enter a valid expiry date.");
+      return;
+    }
+
+    // CVC validation
+    if (!/^\d{3,4}$/.test(formData.cvc)) {
+        toast.error(t('invalidCvc') || 'CVC must be 3 or 4 digits.');
+        return;
     }
 
     const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -68,7 +116,7 @@ const BookingPage = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/api/bookings", {
+      const response = await axios.post("/api/bookings", {
         userId: userId,
         serviceId: service._id,
         serviceName: service.name,
@@ -77,6 +125,13 @@ const BookingPage = () => {
         hours: hours,
         totalPrice: totalPrice,
         location: formData.location,
+        payment: {
+          cardNumber: formData.cardNumber,
+          expiryDate: formData.expiryDate,
+          cvc: formData.cvc,
+          cardHolderName: formData.cardHolderName,
+        },
+        saveCard: formData.saveCard,
       });
 
       if (response.status === 201) {
@@ -98,10 +153,17 @@ const BookingPage = () => {
     }
   };
 
+  const handlePrevMonth = () => {
+    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+      setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  };
+
   const renderCalendar = () => {
-    const today = new Date('2025-12-01');
-    const month = today.getMonth();
-    const year = today.getFullYear();
+    const month = currentDate.getMonth();
+    const year = currentDate.getFullYear();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
     const dates = [];
@@ -132,15 +194,22 @@ const BookingPage = () => {
     }
 
     return (
-      <div className="calendar-grid">
-        <div className="calendar-header">{t('sun')}</div>
-        <div className="calendar-header">{t('mon')}</div>
-        <div className="calendar-header">{t('tue')}</div>
-        <div className="calendar-header">{t('wed')}</div>
-        <div className="calendar-header">{t('thu')}</div>
-        <div className="calendar-header">{t('fri')}</div>
-        <div className="calendar-header">{t('sat')}</div>
-        {dates}
+      <div>
+        <div className="calendar-navigation">
+          <button type="button" onClick={handlePrevMonth}>&lt;</button>
+          <h3>{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</h3>
+          <button type="button" onClick={handleNextMonth}>&gt;</button>
+        </div>
+        <div className="calendar-grid">
+          <div className="calendar-header">{t('sun')}</div>
+          <div className="calendar-header">{t('mon')}</div>
+          <div className="calendar-header">{t('tue')}</div>
+          <div className="calendar-header">{t('wed')}</div>
+          <div className="calendar-header">{t('thu')}</div>
+          <div className="calendar-header">{t('fri')}</div>
+          <div className="calendar-header">{t('sat')}</div>
+          {dates}
+        </div>
       </div>
     );
   };
@@ -161,7 +230,7 @@ const BookingPage = () => {
           <span><FaUserFriends /> {t('reviewsCount', { count: service.reviews })}</span>
         </div>
         <p className="service-info"><FaMapMarkerAlt /> {service.location}</p>
-        <p className="service-info">OMR {service.pricePerHour} / hour</p>
+        <p className-info="service-info">OMR {service.pricePerHour} / hour</p>
         {service.pricePerPerson && <p className="service-info">OMR {service.pricePerPerson} / {t('personLabel')}</p>}
         <p className="service-description">{service.description}</p>
         <div className="service-features">
@@ -175,7 +244,7 @@ const BookingPage = () => {
       </div>
       <div className="booking-form-column">
         <h2>{t('bookThisService')}</h2>
-        <form onSubmit={handleSubmit} className="booking-form">
+        <form onSubmit={handleSubmit} className="booking-form" noValidate>
           <div className="form-group">
             <label><FaMapMarkerAlt /> {t('locationDetails')}</label>
             <input
@@ -264,6 +333,119 @@ const BookingPage = () => {
               </div>
             </div>
           )}
+
+          <div className="payment-section-container">
+            <h3 style={{ textAlign: 'center' }}><FaCreditCard /> {t('paymentInformation')}</h3>
+            
+              <div className="card-visualization" style={{ marginBottom: '2rem' }}>
+                  <div className="card-chip"></div>
+                  <div className="card-number">
+                  {formData.cardNumber ? formData.cardNumber.replace(/\s?/g, '').replace(/(\d{4})/g, '$1 ').trim() : '**** **** **** ****'}
+                  </div>
+                  <div className="card-info-row">
+                  <div className="card-holder">
+                      <div className="card-holder-label">{t('cardHolderName')}</div>
+                      <div className="card-holder-name">{formData.cardHolderName || 'Your Name'}</div>
+                  </div>
+                  <div className="card-expiry">
+                      <div className="card-expiry-label">{t('expiryDate')}</div>
+                      <div className="card-expiry-date">{formData.expiryDate || 'MM/YY'}</div>
+                  </div>
+                  </div>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '1.2rem' }}>
+                <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
+                  {t('cardHolderName')}
+                </label>
+                <input
+                  type="text"
+                  name="cardHolderName"
+                  value={formData.cardHolderName.toUpperCase()}
+                  onChange={(e) => {
+                      const formattedValue = e.target.value.replace(/[^a-zA-Z ]/g, "");
+                      setFormData({...formData, cardHolderName: formattedValue.toUpperCase()});
+                  }}
+                  placeholder="e.g. John Doe"
+                  maxLength="20"
+                  required
+                  style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)', textTransform: 'uppercase' }}
+                />
+              </div>
+              <div className="form-group" style={{ marginBottom: '1.2rem' }}>
+                  <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
+                    {t('cardNumber')}
+                  </label>
+                  <input
+                    type="text"
+                    name="cardNumber"
+                    inputMode="numeric"
+                    maxLength="19"
+                    value={formData.cardNumber.replace(/\D/g, '').replace(/(\d{4})(?=\d)/g, '$1 ').trim()}
+                    onChange={(e) => {
+                      const formattedValue = e.target.value.replace(/\D/g, '');
+                      setFormData({...formData, cardNumber: formattedValue});
+                    }}
+                    placeholder="0000 0000 0000 0000"
+                    required
+                    style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
+                  />
+                </div>
+              <div className="form-row" style={{ marginBottom: '1.5rem', alignItems: 'flex-end' }}>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
+                    {t('expiryDate')}
+                  </label>
+                  <input
+                    type="text"
+                    name="expiryDate"
+                    inputMode="numeric"
+                    maxLength="5"
+                    value={formData.expiryDate}
+                    onChange={(e) => {
+                      const input = e.target.value.replace(/\D/g, '');
+                      let formattedValue = input;
+                      if (input.length > 2) {
+                        formattedValue = input.substring(0, 2) + '/' + input.substring(2, 4);
+                      }
+                      setFormData({...formData, expiryDate: formattedValue});
+                    }}
+                    placeholder="MM/YY"
+                    required
+                    style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
+                  />
+                </div>
+                <div className="form-group" style={{ flex: 1 }}>
+                  <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
+                    {t('cvc')}
+                  </label>
+                  <input
+                    type="text"
+                    name="cvc"
+                    inputMode="numeric"
+                    maxLength="4"
+                    value={formData.cvc.replace(/\D/g, '')}
+                    onChange={(e) => {
+                      const formattedValue = e.target.value.replace(/\D/g, '');
+                      setFormData({...formData, cvc: formattedValue});
+                    }}
+                    placeholder="CVC"
+                    required
+                    style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
+                  />
+                </div>
+              </div>
+              <div className="form-group-checkbox">
+                <input
+                  id="saveCard"
+                  type="checkbox"
+                  name="saveCard"
+                  checked={formData.saveCard}
+                  onChange={handleChange}
+                />
+                <label htmlFor="saveCard">{t('saveCardForFuture')}</label>
+              </div>
+          </div>
           
           <button type="submit" className="submit-booking-button" disabled={!selectedDate || !selectedTime}>{t('confirmBooking')}</button>
         </form>

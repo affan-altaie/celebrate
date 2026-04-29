@@ -105,7 +105,7 @@ router.post("/", upload.array("images", 8), async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const services = await Service.find({ status: "Active" });
+    const services = await Service.find();
     console.log("Fetched services:", services);
     res.json(services);
   } catch (error) {

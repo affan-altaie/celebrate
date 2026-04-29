@@ -257,3 +257,118 @@
   color: white;
   border-color: var(--primary-color);
 }
+
+/* Credit Card Styling */
+.credit-card-preview {
+  background: linear-gradient(45deg, #6d5ed3, #7864e6);
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+  height: 180px;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.credit-card-chip {
+  width: 40px;
+  height: 30px;
+  background: #f0c27b;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.credit-card-number {
+  font-family: 'monospace';
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+
+.credit-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.credit-card-label {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  margin-bottom: 5px;
+}
+
+.credit-card-value {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.form-group-checkbox {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.form-group-checkbox input {
+  width: auto;
+  margin-right: 0.5rem;
+}
+
+.card-visualization {
+  background: linear-gradient(45deg, #6d5ed3, #7864e6);
+  border-radius: 15px;
+  padding: 20px;
+  color: white;
+  height: 180px;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-chip {
+  width: 40px;
+  height: 30px;
+  background: #f0c27b;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+.card-number {
+  font-family: 'monospace';
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+}
+
+.card-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.card-holder-label, .card-expiry-label {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  margin-bottom: 5px;
+}
+
+.card-holder-name, .card-expiry-date {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.calendar-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-navigation button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--primary-color);
+}

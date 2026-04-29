@@ -38,8 +38,9 @@ const NewBooking = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/services');
+        const response = await axios.get('/api/services');
         setServices(response.data);
+        setSearchResults(response.data);
       } catch (error) {
         console.error('Error fetching services:', error);
       }
@@ -330,7 +331,7 @@ const NewBooking = () => {
           {topProviders.map((provider, index) => (
             <div key={index} className="result-card" onClick={() => navigate(`/service/${provider._id}`)}>
               <div className="card-image-container">
-                <img src={`http://localhost:5000${provider.images[provider.mainImageIndex]}`} alt={provider.name} className="result-image" />
+                <img src={provider.images[provider.mainImageIndex]} alt={provider.name} className="result-image" />
                 <div className="rating-badge">
                   <FaStar /> {provider.rating}
                 </div>
@@ -366,7 +367,7 @@ const NewBooking = () => {
           {searchResults.map((result, index) => (
             <div key={index} className="result-card">
               <div className="card-image-container">
-                <img src={`http://localhost:5000${result.images[result.mainImageIndex]}`} alt={result.name} className="result-image" />
+                <img src={result.images[result.mainImageIndex]} alt={result.name} className="result-image" />
                 <div className="rating-badge">
                     <FaStar /> {result.rating}
                   </div>
@@ -383,11 +384,11 @@ const NewBooking = () => {
                   </ul>
                   <div className="card-footer">
                     <p className="price">OMR {result.pricePerHour} / hour</p>
-                    <button className="book-button" onClick={() => navigate(`/service/${result._id}`)}>{t('bookButton')}</button>
+                    <button className="book-button" onClick={() => navigate(`/booking/${result._id}`)}>{t('bookButton')}</button>
                   </div>
                 </div>
               </div>
-            ))};
+            ))}
           </div>
         </div>
       )}

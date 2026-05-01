@@ -47,7 +47,15 @@ const BookingPage = () => {
 
   useEffect(() => {
     if (service) {
-      const total = (service.pricePerHour * hours) + (service.pricePerPerson * numberOfPersons);
+      let total = 0;
+      const numHours = parseInt(hours, 10);
+      const numPersons = parseInt(numberOfPersons, 10);
+
+      if (service.pricePerHour && !isNaN(numHours)) {
+        total = parseFloat(service.pricePerHour) * numHours;
+      } else if (service.pricePerPerson && !isNaN(numPersons)) {
+        total = parseFloat(service.pricePerPerson) * numPersons;
+      }
       setTotalPrice(total);
     }
   }, [service, hours, numberOfPersons]);
@@ -230,7 +238,7 @@ const BookingPage = () => {
           <span><FaUserFriends /> {t('reviewsCount', { count: service.reviews })}</span>
         </div>
         <p className="service-info"><FaMapMarkerAlt /> {service.location}</p>
-        <p className="service-info">OMR {service.pricePerHour} / hour</p>
+        {service.pricePerHour && <p className="service-info">OMR {service.pricePerHour} / hour</p>}
         {service.pricePerPerson && <p className="service-info">OMR {service.pricePerPerson} / {t('personLabel')}</p>}
         <p className="service-description">{service.description}</p>
         <div className="service-features">
@@ -278,17 +286,20 @@ const BookingPage = () => {
               required
             />
           </div>
-          <div className="form-group">
-            <label><FaClock /> {t('numberOfHours')}</label>
-            <input
-              type="number"
-              name="hours"
-              value={hours}
-              onChange={(e) => setHours(e.target.value)}
-              min="1"
-              required
-            />
-          </div>
+
+          {service.pricePerHour && (
+            <div className="form-group">
+              <label><FaClock /> {t('numberOfHours')}</label>
+              <input
+                type="number"
+                name="hours"
+                value={hours}
+                onChange={(e) => setHours(e.target.value)}
+                min="1"
+                required
+              />
+            </div>
+          )}
 
           {service.pricePerPerson && (
             <div className="form-group">

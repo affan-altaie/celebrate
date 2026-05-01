@@ -233,8 +233,12 @@ const AddService = () => {
   };
 
   const handleDateClick = (date) => {
-    setSelectedAvailabilityDate(date);
-    setTimeInput('');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (date >= today) {
+      setSelectedAvailabilityDate(date);
+      setTimeInput('');
+    }
   };
 
   const addTimeSlot = () => {
@@ -329,6 +333,8 @@ const AddService = () => {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
     const dates = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     for (let i = 0; i < firstDayOfMonth; i++) {
         dates.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
@@ -339,12 +345,13 @@ const AddService = () => {
         const dateStr = date.toISOString().split('T')[0];
         const isSelected = selectedAvailabilityDate && selectedAvailabilityDate.toDateString() === date.toDateString();
         const hasAvailability = formData.availability[dateStr] && formData.availability[dateStr].length > 0;
+        const isPast = date < today;
 
         dates.push(
             <div
                 key={day}
-                className={`calendar-day ${hasAvailability ? 'available' : ''} ${isSelected ? 'selected' : ''}`}
-                onClick={() => handleDateClick(date)}
+                className={`calendar-day ${hasAvailability ? 'available' : ''} ${isSelected ? 'selected' : ''} ${isPast ? 'disabled' : ''}`}
+                onClick={() => !isPast && handleDateClick(date)}
             >
                 {day}
             </div>

@@ -338,9 +338,9 @@ const EditListing = () => {
     return (
         <div className="availability-calendar">
             <div className="calendar-navigation">
-                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}></button>
+                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}>&lt;</button>
                 <h3>{currentMonth.toLocaleString(t('locale'), { month: 'long', year: 'numeric' })}</h3>
-                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}></button>
+                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}>&gt;</button>
             </div>
             <div className="calendar-grid">
                 <div className="calendar-header">{t('sun')}</div>

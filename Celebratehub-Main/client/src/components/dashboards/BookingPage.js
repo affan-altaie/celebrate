@@ -108,8 +108,6 @@ const BookingPage = () => {
 
     const storedUser = JSON.parse(localStorage.getItem("user"));
     const userId = storedUser?._id;
-    console.log("storedUser:", storedUser);
-    console.log("userId:", userId);
 
     if (!storedUser || !userId) {
       toast.error(t("loginToBook"));
@@ -232,7 +230,7 @@ const BookingPage = () => {
           <span><FaUserFriends /> {t('reviewsCount', { count: service.reviews })}</span>
         </div>
         <p className="service-info"><FaMapMarkerAlt /> {service.location}</p>
-        <p className-info="service-info">OMR {service.pricePerHour} / hour</p>
+        <p className="service-info">OMR {service.pricePerHour} / hour</p>
         {service.pricePerPerson && <p className="service-info">OMR {service.pricePerPerson} / {t('personLabel')}</p>}
         <p className="service-description">{service.description}</p>
         <div className="service-features">

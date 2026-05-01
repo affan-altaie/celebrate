@@ -115,7 +115,7 @@ const BookingPage = () => {
     }
 
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    const userId = storedUser?._id;
+    const userId = storedUser?.id;
 
     if (!storedUser || !userId) {
       toast.error(t("loginToBook"));

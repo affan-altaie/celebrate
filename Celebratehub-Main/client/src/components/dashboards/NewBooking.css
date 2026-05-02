@@ -634,3 +634,18 @@
   background-color: #5847d3;
   transform: translateY(-2px);
 }
+
+.provider-logo-placeholder {
+  width: 50px;
+  height: 50px;
+  background-color: #ccc;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+}
+.provider-logo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  object-fit: cover;
+}

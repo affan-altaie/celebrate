@@ -8,39 +8,88 @@ import {
 } from 'react-icons/fa';
 import axios from 'axios';
 import './NewBooking.css';
+import defaultProfilePic from '../../assets/logo1.png';
 
 const NewBooking = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [location, setLocation] = useState('');
-  const [price, setPrice] = useState('');
-  const [rating, setRating] = useState('');
+  const [priceSort, setPriceSort] = useState('');
+  const [ratingSort, setRatingSort] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [services, setServices] = useState([]);
 
   const locations = [
-    "Muscat", "Seeb", "Bawshar", "Muttrah", "Al Amerat", "Qurayyat",
-    "Sohar", "Shinas", "Liwa", "Saham", "Al Khaburah", "As Suwayq",
-    "Rustaq", "Al Awabi", "Nakhal", "Wadi Al Maawil", "Barka", "Al Musannah",
-    "Nizwa", "Bahla", "Manah", "Al Hamra", "Adam", "Izki", "Samail", "Bidbid",
-    "Ibra", "Al Mudaybi", "Bidiyah", "Al Qabil", "Wadi Bani Khalid", "Dima Wa At Taiyyin",
-    "Sur", "Al Kamil Wal Wafi", "Jalan Bani Bu Hassan", "Jalan Bani Bu Ali", "Masirah",
-    "Ibri", "Yanqul", "Dhank",
-    "Haima", "Duqm", "Mahout", "Al Jazir",
-    "Salalah", "Taqah", "Mirbat", "Sadah", "Rakhyut", "Dhalkut", "Muqshin", "Shalim and the Hallaniyat Islands", "Thumrait",
-    "Khasab", "Bukha", "Dibba Al-Baya", "Madha",
-    "Al Buraimi", "Mahdah", "As Sunaynah"
-  ];
+    "Adam",
+    "Al Amerat",
+    "Al Awabi",
+    "Al Buraimi",
+    "Al Hamra",
+    "Al Jazir",
+    "Al Kamil Wal Wafi",
+    "Al Khaburah",
+    "Al Mudaybi",
+    "Al Musannah",
+    "Al Qabil",
+    "As Sunaynah",
+    "As Suwayq",
+    "Bahla",
+    "Barka",
+    "Bawshar",
+    "Bidbid",
+    "Bidiyah",
+    "Bukha",
+    "Dhalkut",
+    "Dhank",
+    "Dibba Al-Baya",
+    "Dima Wa At Taiyyin",
+    "Duqm",
+    "Haima",
+    "Ibra",
+    "Ibri",
+    "Izki",
+    "Jalan Bani Bu Ali",
+    "Jalan Bani Bu Hassan",
+    "Khasab",
+    "Liwa",
+    "Madha",
+    "Mahdah",
+    "Mahout",
+    "Manah",
+    "Masirah",
+    "Mirbat",
+    "Muqshin",
+    "Muscat",
+    "Muttrah",
+    "Nakhal",
+    "Nizwa",
+    "Qurayyat",
+    "Rakhyut",
+    "Rustaq",
+    "Sadah",
+    "Saham",
+    "Salalah",
+    "Samail",
+    "Seeb",
+    "Shalim and the Hallaniyat Islands",
+    "Shinas",
+    "Sohar",
+    "Sur",
+    "Taqah",
+    "Thumrait",
+    "Wadi Al Maawil",
+    "Wadi Bani Khalid",
+    "Yanqul"
+  ].sort();
 
   useEffect(() => {
     const fetchServices = async () => {
       try {
         const response = await axios.get('/api/services');
         setServices(response.data);
-        setSearchResults(response.data);
       } catch (error) {
         console.error('Error fetching services:', error);
       }
@@ -65,10 +114,10 @@ const NewBooking = () => {
 
     // Add service names as suggestions
     services.forEach(service => {
-      if (service.name.toLowerCase().includes(lowerTerm) && !suggestions.includes(service.name)) {
+      if (service.name && service.name.toLowerCase().includes(lowerTerm) && !suggestions.includes(service.name)) {
         suggestions.push(service.name);
       }
-      if (service.type.toLowerCase().includes(lowerTerm) && !suggestions.includes(service.type)) {
+      if (service.type && service.type.toLowerCase().includes(lowerTerm) && !suggestions.includes(service.type)) {
         suggestions.push(service.type);
       }
     });
@@ -100,10 +149,10 @@ const NewBooking = () => {
   const handleSearchHistoryClick = (historyItem) => {
     setSearchTerm(historyItem.term);
     setLocation(historyItem.location);
-    setPrice(historyItem.price);
-    setRating(historyItem.rating);
+    setPriceSort('');
+    setRatingSort('');
     setShowSuggestions(false);
-    handleSearch({ term: historyItem.term, location: historyItem.location, price: historyItem.price, rating: historyItem.rating });
+    handleSearch({ term: historyItem.term, location: historyItem.location });
   };
 
   const handleClearSearch = () => {
@@ -125,47 +174,60 @@ const NewBooking = () => {
   const handleSearch = (searchParams) => {
     const termToSearch = searchParams && typeof searchParams.term !== 'undefined' ? searchParams.term : searchTerm;
     const locationToSearch = searchParams && typeof searchParams.location !== 'undefined' ? searchParams.location : location;
-    const priceToSearch = searchParams && typeof searchParams.price !== 'undefined' ? searchParams.price : price;
-    const ratingToSearch = searchParams && typeof searchParams.rating !== 'undefined' ? searchParams.rating : rating;
+    const priceSortOrder = priceSort;
+    const ratingSortOrder = ratingSort;
 
-    if (!termToSearch.trim() && !locationToSearch && !priceToSearch && !ratingToSearch) {
-      return; // Don't search if all fields are empty
+    if (!termToSearch.trim() && !locationToSearch && !priceSortOrder && !ratingSortOrder) {
+      return;
     }
 
     setIsSearching(true);
 
-    // Add to search history
     const searchQuery = {
       term: termToSearch,
       location: locationToSearch,
-      price: priceToSearch,
-      rating: ratingToSearch,
       timestamp: Date.now()
     };
     
     const newHistory = [searchQuery, ...searchHistory.filter(h => 
-      !(h.term === termToSearch && h.location === locationToSearch && h.price === priceToSearch && h.rating === ratingToSearch)
-    )].slice(0, 10); // Keep only last 10 searches
+      !(h.term === termToSearch && h.location === locationToSearch)
+    )].slice(0, 10);
     
     setSearchHistory(newHistory);
 
-    // Simulate search delay for better UX
     setTimeout(() => {
       let results = services.filter(service =>
-        service.name.toLowerCase().includes(termToSearch.toLowerCase()) ||
-        service.type.toLowerCase().includes(termToSearch.toLowerCase())
+        (service.name && service.name.toLowerCase().includes(termToSearch.toLowerCase())) ||
+        (service.type && service.type.toLowerCase().includes(termToSearch.toLowerCase())) ||
+        (service.category && service.category.toLowerCase().includes(termToSearch.toLowerCase()))
       );
 
       if (locationToSearch) {
         results = results.filter(service => service.location.toLowerCase().includes(locationToSearch.toLowerCase()));
       }
 
-      if (priceToSearch) {
-        results = results.filter(service => service.pricePerHour <= parseInt(priceToSearch));
+      if (priceSortOrder) {
+        results.sort((a, b) => {
+          const priceA = a.pricePerHour || a.pricePerPerson || 0;
+          const priceB = b.pricePerHour || b.pricePerPerson || 0;
+          if (priceSortOrder === 'asc') {
+            return priceA - priceB;
+          } else { // desc
+            return priceB - priceA;
+          }
+        });
       }
 
-      if (ratingToSearch) {
-        results = results.filter(service => service.rating >= parseFloat(ratingToSearch));
+      if (ratingSortOrder) {
+        results.sort((a, b) => {
+          const ratingA = a.rating || 0;
+          const ratingB = b.rating || 0;
+          if (ratingSortOrder === 'asc') {
+            return ratingA - ratingB;
+          } else { // desc
+            return ratingB - ratingA;
+          }
+        });
       }
 
       setSearchResults(results);
@@ -180,9 +242,9 @@ const NewBooking = () => {
   const handleServiceClick = (serviceType) => {
     setSearchTerm(serviceType);
     setLocation('');
-    setPrice('');
-    setRating('');
-    handleSearch({ term: serviceType, location: '', price: '', rating: '' });
+    setPriceSort('');
+    setRatingSort('');
+    handleSearch({ term: serviceType, location: '' });
   };
 
   const backgroundImageUrl = 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80';
@@ -214,7 +276,7 @@ const NewBooking = () => {
               <input 
                 ref={searchInputRef}
                 type="text" 
-                placeholder={t('searchPlaceholder')} 
+                placeholder={t('searchPlaceholder')}
                 value={searchTerm}
                 onChange={handleSearchInputChange}
                 onKeyDown={handleKeyDown}
@@ -275,20 +337,18 @@ const NewBooking = () => {
             </div>
             <div className="search-input">
               <FaMoneyBillAlt className="icon" />
-              <select value={price} onChange={(e) => setPrice(e.target.value)}>
-                <option value="">{t('maxPriceLabel')}</option>
-                <option value="50">OMR 50</option>
-                <option value="150">OMR 150</option>
-                <option value="300">OMR 300</option>
+              <select value={priceSort} onChange={(e) => setPriceSort(e.target.value)}>
+                <option value="">{t('sortByPriceLabel', 'Sort by Price')}</option>
+                <option value="asc">{t('priceLowToHigh', 'Price: Low to High')}</option>
+                <option value="desc">{t('priceHighToLow', 'Price: High to Low')}</option>
               </select>
             </div>
             <div className="search-input">
               <FaStar className="icon" />
-              <select value={rating} onChange={(e) => setRating(e.target.value)}>
-                <option value="">{t('ratingLabel')}</option>
-                <option value="4.5">4.5+</option>
-                <option value="4">4.0+</option>
-                <option value="3">3.0+</option>
+              <select value={ratingSort} onChange={(e) => setRatingSort(e.target.value)}>
+                <option value="">{t('sortByRatingLabel', 'Sort by Rating')}</option>
+                <option value="desc">{t('ratingHighToLow', 'Rating: High to Low')}</option>
+                <option value="asc">{t('ratingLowToHigh', 'Rating: Low to High')}</option>
               </select>
             </div>
             <button className="search-button" onClick={() => handleSearch()} disabled={isSearching}>
@@ -337,9 +397,14 @@ const NewBooking = () => {
                 </div>
               </div>
               <div className="result-details">
+              <img 
+                src={provider.providerId && provider.providerId.profilePicture ? provider.providerId.profilePicture : defaultProfilePic}
+                alt={provider.providerId ? provider.providerId.username : 'Default'}
+                className="provider-logo" 
+              />
                 <div className="service-tag">{provider.type}</div>
                 <h3>{provider.name}</h3>
-                <p className="reviews">{t('reviewsCount', { count: provider.reviews || 0 })}</p>
+                <p className="reviews">{t('reviewsCount', { count: provider.reviews ? provider.reviews.length : 0 })}</p>
               </div>
             </div>
           ))}
@@ -357,7 +422,6 @@ const NewBooking = () => {
             </div>
           ))}
         </div>
-        <button className="view-all-services-button" onClick={() => navigate('/services')}>{t('viewAllServices')}</button>
       </div>
 
       {searchResults.length > 0 && (
@@ -373,9 +437,15 @@ const NewBooking = () => {
                   </div>
                 </div>
                 <div className="result-details">
+                <img 
+                  src={result.providerId && result.providerId.profilePicture ? result.providerId.profilePicture : defaultProfilePic}
+                  alt={result.providerId ? result.providerId.username : 'Default'}
+                  className="provider-logo" 
+                />
                   <div className="service-tag">{result.type}</div>
                   <h3>{result.name}</h3>
-                  <p className="reviews">{t('reviewsCount', { count: result.reviews || 0 })}</p>
+                  {result.location && <p className="location"><FaMapMarkerAlt className="icon" /> {result.location}</p>}
+                  <p className="reviews">{t('reviewsCount', { count: result.reviews ? result.reviews.length : 0 })}</p>
                   <p className="description">{result.description}</p>
                   <ul className="features-list">
                     {result.features.map((feature, i) => (
@@ -383,7 +453,7 @@ const NewBooking = () => {
                     ))}
                   </ul>
                   <div className="card-footer">
-                    <p className="price">OMR {result.pricePerHour} / hour</p>
+                    <p className="price">OMR {result.pricePerHour || result.pricePerPerson} / {result.pricePerHour ? 'hour' : 'person'}</p>
                     <button className="book-button" onClick={() => navigate(`/booking/${result._id}`)}>{t('bookButton')}</button>
                   </div>
                 </div>

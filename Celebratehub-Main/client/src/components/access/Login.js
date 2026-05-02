@@ -50,7 +50,7 @@ const Login = () => {
             break;
           case "customer":
           default:
-            navigate("/customer-dashboard", { state: { user: data.user } });
+            navigate("/new-booking", { state: { user: data.user } });
         }
       } else {
         if (

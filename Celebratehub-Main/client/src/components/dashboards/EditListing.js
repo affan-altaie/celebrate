@@ -98,6 +98,70 @@ const EditListing = () => {
   const [providerName, setProviderName] = useState('');
   const [serviceName, setServiceName] = useState('');
 
+  const locations = [
+    "Adam",
+    "Al Amerat",
+    "Al Awabi",
+    "Al Buraimi",
+    "Al Hamra",
+    "Al Jazir",
+    "Al Jabal Al Akhdar",
+    "Al Kamil Wal Wafi",
+    "Al Khaburah",
+    "Al Mudaybi",
+    "Al Musannah",
+    "Al Qabil",
+    "As Sunaynah",
+    "As Suwaiq",
+    "Bahla",
+    "Barka",
+    "Bawshar",
+    "Bidbid",
+    "Bidiyah",
+    "Bukha",
+    "Dhalkut",
+    "Dhank",
+    "Dibba Al-Baya",
+    "Dima Wa Al Taiyyin",
+    "Duqm",
+    "Haima",
+    "Ibra",
+    "Ibri",
+    "Izki",
+    "Jaalan Bani Bu Ali",
+    "Jaalan Bani Bu Hassan",
+    "Khasab",
+    "Liwa",
+    "Madha",
+    "Mahdah",
+    "Mahout",
+    "Manah",
+    "Masirah",
+    "Mirbat",
+    "Muqshin",
+    "Muttrah",
+    "Muscat",
+    "Nakhal",
+    "Nizwa",
+    "Qurayyat",
+    "Rakhyut",
+    "Rustaq",
+    "Sadah",
+    "Saham",
+    "Salalah",
+    "Samail",
+    "Seeb",
+    "Shalim and the Hallaniyat Islands",
+    "Shinas",
+    "Sohar",
+    "Sur",
+    "Taqah",
+    "Thumrait",
+    "Wadi Al Maawil",
+    "Wadi Bani Khalid",
+    "Yanqul"
+  ].sort();
+
   useEffect(() => {
     const fetchService = async () => {
       try {
@@ -418,39 +482,7 @@ const EditListing = () => {
                 <label htmlFor="location">{t('locationLabel')}</label>
                 <select id="location" name="location" value={formData.location} onChange={handleChange} required>
                     <option value="">{t('selectLocation')}</option>
-                    <option value="Muscat">Muscat</option>
-                    <option value="Muttrah">Muttrah</option>
-                    <option value="Ruwi">Ruwi</option>
-                    <option value="Seeb">Seeb</option>
-                    <option value="Azaiba">Azaiba</option>
-                    <option value="Ghubra">Ghubra</option>
-                    <option value="Bausher">Bausher</option>
-                    <option value="Salalah">Salalah</option>
-                    <option value="Taqah">Taqah</option>
-                    <option value="Mirbat">Mirbat</option>
-                    <option value="Thumrait">Thumrait</option>
-                    <option value="Khasab">Khasab</option>
-                    <option value="Dibba Al-Baya">Dibba Al-Baya</option>
-                    <option value="Sohar">Sohar</option>
-                    <option value="Shinas">Shinas</option>
-                    <option value="Liwa">Liwa</option>
-                    <option value="Barka">Barka</option>
-                    <option value="Rustaq">Rustaq</option>
-                    <option value="Musannah">Musannah</option>
-                    <option value="Nizwa">Nizwa</option>
-                    <option value="Bahla">Bahla</option>
-                    <option value="Sumail">Sumail</option>
-                    <option value="Izki">Izki</option>
-                    <option value="Ibri">Ibri</option>
-                    <option value="Yanqul">Yanqul</option>
-                    <option value="Ibra">Ibra</option>
-                    <option value="Bidiyah">Bidiyah</option>
-                    <option value="Sur">Sur</option>
-                    <option value="Jalan Bani Bu Ali">Jalan Bani Bu Ali</option>
-                    <option value="Haima">Haima</option>
-                    <option value="Duqm">Duqm</option>
-                    <option value="Al Buraimi">Al Buraimi</option>
-                    <option value="Mahdah">Mahdah</option>
+                    {locations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
                 </select>
               </div>
                 <div className="form-group">

@@ -4,6 +4,7 @@ const { upload } = require("../middleware/multer");
 const Service = require("../modals/Service");
 const supabase = require("../supabase");
 const User = require("../modals/User");
+const { sendDeletionEmail } = require("../email");
 
 // Service Routes
 router.post("/", upload.array("images", 8), async (req, res) => {
@@ -231,7 +232,7 @@ router.put("/:id", upload.array("images", 8), async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    const service = await Service.findById(req.params.id);
+    const service = await Service.findById(req.params.id).populate("providerId");
     if (!service) {
       return res.status(404).json({ message: "Service not found" });
     }
@@ -250,6 +251,11 @@ router.delete("/:id", async (req, res) => {
         console.error(`Exception while deleting image ${imageUrl}:`, e);
         // Continue processing to attempt to delete other images and the service
       }
+    }
+    
+    const { reason } = req.body;
+    if (service.providerId && service.providerId.email) {
+      sendDeletionEmail(service.providerId.email, reason, service.name);
     }
 
     await Service.findByIdAndDelete(req.params.id);

@@ -99,7 +99,7 @@ const ManageServices = () => {
                 <td>{service.category}</td>
                 <td>{service.location}</td>
                 <td>{service.pricePerHour}</td>
-                <td>{service.providerId}</td>
+                <td>{service.providerId ? service.providerId.username : 'N/A'}</td>
                 <td>
                   <button onClick={() => handleDelete(service._id)} className="delete-btn">{t('delete')}</button>
                 </td>

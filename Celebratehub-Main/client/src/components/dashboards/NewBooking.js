@@ -331,7 +331,7 @@ const NewBooking = () => {
               <select value={location} onChange={(e) => setLocation(e.target.value)}>
                 <option value="">{t('locationLabel')}</option>
                 {locations.map(loc => (
-                  <option key={loc} value={loc}>{loc}</option>
+                  <option key={loc} value={loc}>{t(loc)}</option>
                 ))}
               </select>
             </div>

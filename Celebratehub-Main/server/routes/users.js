@@ -22,6 +22,17 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+// Get all users
+router.get("/", async (req, res) => {
+  try {
+    const users = await User.find({}, '-password'); // Exclude passwords from the result
+    res.json(users);
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // Update Profile Picture
 router.put("/:id/profile-picture", upload.single("profilePicture"), async (req, res) => {
   try {

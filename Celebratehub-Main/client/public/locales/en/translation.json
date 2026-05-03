@@ -413,6 +413,9 @@
     "reasonOther": "Other",
     "deleteService": "Delete Service",
     "deleteServiceReasonPrompt": "Please provide a reason for deleting this service.",
-    "deletionReasonPlaceholder": "Enter reason for deletion"
+    "deletionReasonPlaceholder": "Enter reason for deletion",
+    "approveOrDisapprove": "Approve or disapprove provider registrations",
+    "selectReasonPrompt": "Select a reason",
+    "confirm": "Confirm"
   }
   

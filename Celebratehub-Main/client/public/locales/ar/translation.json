@@ -438,6 +438,9 @@
     "priceHighToLow": "السعر: من الأعلى إلى الأقل",
     "sortByRatingLabel": "الترتيب حسب التقييم",
     "ratingHighToLow": "التقييم: من الأعلى إلى الأقل",
-    "ratingLowToHigh": "التقييم: من الأقل إلى الأعلى"
+    "ratingLowToHigh": "التقييم: من الأقل إلى الأقل",
+    "approveOrDisapprove": "الموافقة أو عدم الموافقة على تسجيلات المزود",
+    "selectReasonPrompt": "اختر سببًا",
+    "confirm": "تأكيد"
   }
   

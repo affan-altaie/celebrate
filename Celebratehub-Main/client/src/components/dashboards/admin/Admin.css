@@ -52,6 +52,7 @@
   padding: 1rem;
   text-align: left;
   border-bottom: 1px solid #dee2e6;
+  vertical-align: middle;
 }
 
 .admin-table th {
@@ -203,6 +204,15 @@
   border: 1px solid #ced4da;
 }
 
+.modal-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #ced4da;
+  min-height: 100px;
+}
+
 .modal-actions {
   display: flex;
   justify-content: center;
@@ -235,3 +245,11 @@
 .btn.cancel:hover {
   background-color: #5a6268;
 }
+
+.service-image {
+    width: 100px;
+    height: auto;
+    object-fit: cover;
+    border-radius: 5px;
+  }
+  

@@ -10,6 +10,7 @@ const ProviderApprovals = () => {
     const [isRejectionModalOpen, setIsRejectionModalOpen] = useState(false);
     const [selectedRequestId, setSelectedRequestId] = useState(null);
     const [rejectionReason, setRejectionReason] = useState('');
+    const [otherRejectionReason, setOtherRejectionReason] = useState('');
 
     useEffect(() => {
         const fetchRequests = async () => {
@@ -44,15 +45,25 @@ const ProviderApprovals = () => {
         setSelectedRequestId(null);
         setIsRejectionModalOpen(false);
         setRejectionReason('');
+        setOtherRejectionReason('');
     };
 
     const handleReject = async () => {
-        if (!rejectionReason) {
+        let reason = rejectionReason;
+        if (rejectionReason === 'other') {
+            if (!otherRejectionReason) {
+                alert('Please specify the reason for rejection.');
+                return;
+            }
+            reason = otherRejectionReason;
+        }
+
+        if (!reason) {
             alert(t('selectRejectionReason'));
             return;
         }
         try {
-            await axios.put(`/api/providers/${selectedRequestId}/reject`, { reason: rejectionReason });
+            await axios.put(`/api/providers/${selectedRequestId}/reject`, { reason: reason });
             setRequests(requests.filter(req => req._id !== selectedRequestId));
             closeRejectionModal();
         } catch (error) {
@@ -126,6 +137,14 @@ const ProviderApprovals = () => {
                             <option value="invalidDocument">{t('invalidDocument')}</option>
                             <option value="other">{t('other')}</option>
                         </select>
+                        {rejectionReason === 'other' && (
+                            <textarea
+                                className="modal-textarea"
+                                placeholder="Enter other reason"
+                                value={otherRejectionReason}
+                                onChange={(e) => setOtherRejectionReason(e.target.value)}
+                            />
+                        )}
                         <div className="modal-actions">
                             <button className="btn cancel" onClick={closeRejectionModal}>{t('cancel')}</button>
                             <button className="btn confirm" onClick={handleReject}>{t('confirm')}</button>

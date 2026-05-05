@@ -54,7 +54,7 @@ const ServiceDetails = () => {
         <div className="service-header">
           <img src={service.images[selectedImageIndex]} alt={service.name} className="service-main-image" />
           <div className="service-header-info">
-            <Link to={`/provider-profile/${service.providerId}`} className="provider-link">
+            <Link to={`/provider/${service.providerId}`} className="provider-link">
               <h1>{service.name}</h1>
             </Link>
             <div className="service-meta">

@@ -4,6 +4,7 @@ const router = express.Router();
 const Booking = require('../modals/Booking');
 const User = require('../modals/User');
 const Payment = require('../modals/Payment');
+const Service = require('../modals/Service');
 const { validate, paymentCardValidation } = require('../middleware/validation');
 const nodemailer = require('nodemailer');
 const path = require('path');
@@ -123,6 +124,11 @@ router.post('/', async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
+    const existingBooking = await Booking.findOne({ serviceId, date, time });
+    if (existingBooking) {
+      return res.status(409).json({ message: 'This time slot has already been booked.' });
+    }
+
     if (user.walletBalance < totalPrice) {
         return res.status(400).json({ message: `Insufficient funds. Your balance is OMR ${user.walletBalance.toFixed(2)}` });
     }
@@ -148,6 +154,14 @@ router.post('/', async (req, res) => {
     // Create Booking
     const newBooking = new Booking({ userId, serviceId, serviceName, date, time, hours, totalPrice, location, status: 'confirmed' });
     await newBooking.save();
+
+    // Update service availability to remove booked slot
+    const service = await Service.findById(serviceId);
+    if (service && service.availability && service.availability[date]) {
+        service.availability[date] = service.availability[date].filter(t => t !== time);
+        service.markModified('availability');
+        await service.save();
+    }
 
     // Create Payment Record
     const lastFour = cardDetails.cardNumber.slice(-4);
@@ -175,5 +189,49 @@ router.post('/', async (req, res) => {
     res.status(500).json({ message: 'Failed to create booking' });
   }
 });
+
+// GET USER BOOKINGS
+router.get('/user/:userId', async (req, res) => {
+  try {
+    const bookings = await Booking.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch bookings' });
+  }
+});
+
+// CANCEL (DELETE) BOOKING
+router.delete('/:id', async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ message: 'Booking not found' });
+    }
+
+    // Refund user
+    const user = await User.findById(booking.userId);
+    if (user) {
+      user.walletBalance += booking.totalPrice;
+      await user.save();
+    }
+
+    // Restore service availability
+    const service = await Service.findById(booking.serviceId);
+    if (service && service.availability && booking.date in service.availability) {
+        service.availability[booking.date].push(booking.time);
+        service.markModified('availability'); // Let Mongoose know the object has changed
+        await service.save();
+    }
+
+    // Delete the booking
+    await Booking.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: 'Booking cancelled successfully' });
+  } catch (error) {
+    console.error('Error cancelling booking:', error);
+    res.status(500).json({ message: 'Failed to cancel booking' });
+  }
+});
+
 
 module.exports = router;

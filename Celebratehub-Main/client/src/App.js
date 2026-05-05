@@ -106,7 +106,7 @@ const AppContent = () => {
         <Route path="/edit-listing/:id" element={<ProtectedRoute allowedRoles={['provider']}><EditListing /></ProtectedRoute>} />
         <Route path="/edit-provider-profile" element={<ProtectedRoute allowedRoles={['provider']}><EditProviderProfile /></ProtectedRoute>} />
         <Route path="/customer-reviews" element={<ProtectedRoute allowedRoles={['provider']}><CustomerReviews /></ProtectedRoute>} />
-        <Route path="/provider-profile/:providerId" element={<ProtectedRoute allowedRoles={['provider', 'customer']}><ProviderProfile /></ProtectedRoute>} />
+        <Route path="/provider/:providerId" element={<ProtectedRoute allowedRoles={['provider', 'customer']}><ProviderProfile /></ProtectedRoute>} />
         <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/manage-services" element={<ProtectedRoute allowedRoles={['admin']}><ManageServices /></ProtectedRoute>} />
         <Route path="/admin/edit-service/:id" element={<ProtectedRoute allowedRoles={['admin']}><EditService /></ProtectedRoute>} />

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import './Dashboard.css';
 
 const BookingHistory = () => {
@@ -14,7 +15,7 @@ const BookingHistory = () => {
 
   useEffect(() => {
     if (userId) {
-      axios.get(`/api/payments/user-bookings/${userId}`)
+      axios.get(`/api/bookings/user/${userId}`)
         .then(res => {
           setBookings(res.data);
           setLoading(false);
@@ -27,6 +28,19 @@ const BookingHistory = () => {
       setLoading(false);
     }
   }, [userId]);
+
+  const handleCancelBooking = async (bookingId) => {
+    if (window.confirm(t('confirmCancelBooking'))) {
+      try {
+        await axios.delete(`/api/bookings/${bookingId}`);
+        toast.success(t('bookingCancelledSuccessfully'));
+        setBookings(bookings.filter(booking => booking._id !== bookingId));
+      } catch (error) {
+        console.error("Error cancelling booking:", error);
+        toast.error(t('failedToCancelBooking'));
+      }
+    }
+  };
 
   if (loading) {
     return <div className="dashboard-container"><div className="loading">{t('loading')}</div></div>;
@@ -47,17 +61,22 @@ const BookingHistory = () => {
               <p>{t('timeLabel')}: {booking.time}</p>
               <p>{t('priceLabel') || 'Price'}: OMR {booking.totalPrice.toFixed(2)}</p>
               <p>{t('statusLabel')}: <span className={`status ${booking.status}`}>{t(booking.status.toLowerCase())}</span></p>
-              {booking.status === 'confirmed' && (
-                <button onClick={() => navigate(`/leave-review/${booking.serviceId}`)} className="action-btn review-btn">
-                  {t('leaveReview')}
+              <div className="booking-actions">
+                {booking.status === 'confirmed' && (
+                  <button onClick={() => navigate(`/leave-review/${booking.serviceId}`)} className="action-btn review-btn">
+                    {t('leaveReview')}
+                  </button>
+                )}
+                <button onClick={() => handleCancelBooking(booking._id)} className="action-btn cancel-btn">
+                  {t('cancelBooking')}
                 </button>
-              )}
+              </div>
             </div>
           ))
         ) : (
           <div className="no-bookings">
             <p>{t('noBookingsFound') || 'No bookings found.'}</p>
-            <button onClick={() => navigate('/new-booking')} className="action-btn">{t('bookNow')}</button>
+            <button onClick={() => navigate('/services')} className="action-btn">{t('bookNow')}</button>
           </div>
         )}
       </main>

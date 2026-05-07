@@ -204,6 +204,7 @@
     "inactive": "Inactive",
     "providerIdLabel": "Provider ID",
     "providerNameLabel": "Provider Name",
+    "providerCompanyName": "Provider/Company Name",
     "approve": "Approve",
     "reject": "Reject",
     "userIdLabel": "User ID",
@@ -418,4 +419,3 @@
     "selectReasonPrompt": "Select a reason",
     "confirm": "Confirm"
   }
-  

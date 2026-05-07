@@ -77,34 +77,38 @@ const ManageServices = () => {
               <th>{t('category')}</th>
               <th>{t('location')}</th>
               <th>{t('pricePerHour')}</th>
-              <th>{t('providerId')}</th>
+              <th>{t('providerNameLabel')}</th>
               <th>{t('actionsLabel')}</th>
             </tr>
           </thead>
           <tbody>
-            {services.map(service => (
-              <tr key={service._id}>
-                <td>
-                  {service.images && service.images.length > 0 && (
-                    <img
-                      src={service.images[0]}
-                      alt={service.name}
-                      className="service-image"
-                      onClick={() => navigate(`/service/${service._id}`)}
-                      style={{ cursor: 'pointer' }} // Add a pointer cursor to indicate clickability
-                    />
-                  )}
-                </td>
-                <td>{service.name}</td>
-                <td>{service.category}</td>
-                <td>{service.location}</td>
-                <td>{service.pricePerHour}</td>
-                <td>{service.providerId ? service.providerId.username : 'N/A'}</td>
-                <td>
-                  <button onClick={() => handleDelete(service._id)} className="delete-btn">{t('delete')}</button>
-                </td>
-              </tr>
-            ))}
+            {services.map(service => {
+              const serviceName = service.name.split(': ')[1] || service.name;
+
+              return (
+                <tr key={service._id}>
+                  <td>
+                    {service.images && service.images.length > 0 && (
+                      <img
+                        src={service.images[0]}
+                        alt={service.name}
+                        className="service-image"
+                        onClick={() => navigate(`/service/${service._id}`)}
+                        style={{ cursor: 'pointer' }} // Add a pointer cursor to indicate clickability
+                      />
+                    )}
+                  </td>
+                  <td>{serviceName}</td>
+                  <td>{service.category}</td>
+                  <td>{service.location}</td>
+                  <td>{service.pricePerHour}</td>
+                  <td>{service.providerId ? service.providerId.username : 'N/A'}</td>
+                  <td>
+                    <button onClick={() => handleDelete(service._id)} className="delete-btn">{t('delete')}</button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

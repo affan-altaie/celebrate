@@ -204,6 +204,7 @@
     "inactive": "غير نشط",
     "providerIdLabel": "معرف المزود",
     "providerNameLabel": "اسم المزود",
+    "providerCompanyName": "اسم المزود/الشركة",
     "approve": "موافقة",
     "reject": "رفض",
     "userIdLabel": "معرف المستخدم",
@@ -443,4 +444,3 @@
     "selectReasonPrompt": "اختر سببًا",
     "confirm": "تأكيد"
   }
-  

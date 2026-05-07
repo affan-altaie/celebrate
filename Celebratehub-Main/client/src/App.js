@@ -23,6 +23,8 @@ import ProviderProfile from './components/dashboards/ProviderProfile';
 import AdminDashboard from './components/dashboards/AdminDashboard';
 import ManageServices from './components/dashboards/admin/ManageServices';
 import UserManagement from './components/dashboards/admin/UserManagement';
+import CreateUser from './components/dashboards/admin/CreateUser';
+import EditUser from './components/dashboards/admin/EditUser';
 import ProviderApprovals from './components/dashboards/admin/ProviderApprovals';
 import ReportsAndFeedback from './components/dashboards/admin/ReportsAndFeedback';
 import ManageListings from './components/dashboards/ManageListings';
@@ -112,6 +114,8 @@ const AppContent = () => {
         <Route path="/admin/manage-services" element={<ProtectedRoute allowedRoles={['admin']}><ManageServices /></ProtectedRoute>} />
         <Route path="/admin/edit-service/:id" element={<ProtectedRoute allowedRoles={['admin']}><EditService /></ProtectedRoute>} />
         <Route path="/admin/user-management" element={<ProtectedRoute allowedRoles={['admin']}><UserManagement /></ProtectedRoute>} />
+        <Route path="/admin/create-user" element={<ProtectedRoute allowedRoles={['admin']}><CreateUser /></ProtectedRoute>} />
+        <Route path="/admin/edit-user/:id" element={<ProtectedRoute allowedRoles={['admin']}><EditUser /></ProtectedRoute>} />
         <Route path="/admin/provider-approvals" element={<ProtectedRoute allowedRoles={['admin']}><ProviderApprovals /></ProtectedRoute>} />
         <Route path="/admin/reports-and-feedback" element={<ProtectedRoute allowedRoles={['admin']}><ReportsAndFeedback /></ProtectedRoute>} />
         <Route path="/login" element={<Login />} />

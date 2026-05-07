@@ -1,20 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import './Admin.css';
 
-const CreateUser = () => {
+const EditUser = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    password: '',
-    role: 'provider',
+    phoneNumber: '',
   });
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`/api/users/${id}`);
+        setFormData({
+          username: response.data.username,
+          email: response.data.email,
+          phoneNumber: response.data.phoneNumber || '',
+        });
+      } catch (err) {
+        setError('Failed to fetch user data.');
+      }
+    };
+    fetchUser();
+  }, [id]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,19 +42,18 @@ const CreateUser = () => {
     setSuccess(null);
 
     try {
-      await axios.post('/api/users', formData);
-      setSuccess('User created successfully!');
-      // Optionally, redirect to the user management page
+      await axios.put(`/api/users/${id}`, formData);
+      setSuccess('User updated successfully!');
       setTimeout(() => navigate('/admin/user-management'), 2000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create user.');
+      setError(err.response?.data?.message || 'Failed to update user.');
     }
   };
 
   return (
     <div className="admin-container">
-      <h1>{t('createUser')}</h1>
-      <p>{t('createUserDescription')}</p>
+      <h1>{t('editUser')}</h1>
+      <p>{t('editUserDescription')}</p>
 
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
@@ -69,29 +84,20 @@ const CreateUser = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="password">{t('passwordLabel')}</label>
+          <label htmlFor="phoneNumber">{t('phoneNumberLabel')}</label>
           <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
+            type="text"
+            id="phoneNumber"
+            name="phoneNumber"
+            value={formData.phoneNumber}
             onChange={handleChange}
-            required
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="role">{t('roleLabel')}</label>
-          <select id="role" name="role" value={formData.role} onChange={handleChange}>
-            <option value="provider">{t('serviceProvider')}</option>
-            <option value="admin">{t('admin')}</option>
-          </select>
-        </div>
-
-        <button type="submit" className="btn-submit">{t('createUser')}</button>
+        <button type="submit" className="btn-submit">{t('updateUser')}</button>
       </form>
     </div>
   );
 };
 
-export default CreateUser;
+export default EditUser;

@@ -16,21 +16,31 @@ const UserManagement = () => {
   const [usersPerPage, setUsersPerPage] = useState(10);
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get('/api/users');
-        setUsers(response.data);
-      } catch (err) {
-        setError('Failed to fetch users.');
-        console.error(err);
-      }
-    };
-
     fetchUsers();
   }, []);
 
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('/api/users');
+      setUsers(response.data);
+    } catch (err) {
+      setError('Failed to fetch users.');
+      console.error(err);
+    }
+  };
+
   const handleImageError = (e) => {
     e.target.src = logo1;
+  };
+
+  const handleSuspend = async (userId) => {
+    try {
+      await axios.put(`/api/users/${userId}/suspend`);
+      fetchUsers(); // Refresh the user list
+    } catch (err) {
+      setError('Failed to suspend user.');
+      console.error(err);
+    }
   };
 
   const getRoleBadge = (role) => {
@@ -69,6 +79,9 @@ const UserManagement = () => {
         break;
       case 'rejected':
         badgeClass = 'badge-rejected';
+        break;
+      case 'suspended':
+        badgeClass = 'badge-suspended';
         break;
       default:
         return status || 'N/A';
@@ -213,12 +226,14 @@ const UserManagement = () => {
               {currentProviders.map(user => (
                 <tr key={user._id}>
                   <td>
-                    <img 
-                      src={user.profilePicture || logo1} 
-                      alt={user.username} 
-                      style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover' }}
-                      onError={handleImageError}
-                    />
+                    <Link to={`/provider/${user._id}`}>
+                      <img 
+                        src={user.profilePicture || logo1} 
+                        alt={user.username} 
+                        style={{ width: '50px', height: '50px', borderRadius: '50%', objectFit: 'cover', cursor: 'pointer' }}
+                        onError={handleImageError}
+                      />
+                    </Link>
                   </td>
                   <td>{user._id}</td>
                   <td>{user.username}</td>
@@ -227,8 +242,8 @@ const UserManagement = () => {
                   <td>{user.rating ? `${Number(user.rating).toFixed(1)} ⭐` : 'N/A'}</td>
                   <td>{getStatusBadge(user.status)}</td>
                   <td>
-                    <Link to={`/admin/provider-profile/${user._id}`} className="action-btn">{t('viewProfile')}</Link>
-                    <button className="action-btn">{t('edit')}</button>
+                    <Link to={`/admin/edit-user/${user._id}`} className="action-btn">{t('edit')}</Link>
+                    <button className="suspend-btn" onClick={() => handleSuspend(user._id)}>{t('suspend')}</button>
                     <button className="delete-btn">{t('delete')}</button>
                   </td>
                 </tr>

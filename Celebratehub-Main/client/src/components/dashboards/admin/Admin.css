@@ -35,6 +35,10 @@
   background-color: #dc3545; /* Red */
 }
 
+.badge-suspended {
+  background-color: #ffc107; /* Yellow */
+}
+
 .user-section-card {
   background-color: #f8f9fa;
   border: 1px solid #dee2e6;
@@ -60,7 +64,7 @@
   background-color: #f8f9fa;
 }
 
-.action-btn, .delete-btn {
+.action-btn, .delete-btn, .suspend-btn {
   padding: 0.25rem 0.5rem;
   font-size: 0.8rem;
   border-radius: 0.2rem;
@@ -94,6 +98,17 @@
 .delete-btn:hover {
   color: #fff;
   background-color: #dc3545;
+}
+
+.suspend-btn {
+  color: #ffc107;
+  background-color: transparent;
+  border: 1px solid #ffc107;
+}
+
+.suspend-btn:hover {
+  color: #fff;
+  background-color: #ffc107;
 }
 
 .user-filters {
@@ -253,3 +268,49 @@
     object-fit: cover;
     border-radius: 5px;
   }
+
+.create-user-form {
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+  background-color: #0056b3;
+}

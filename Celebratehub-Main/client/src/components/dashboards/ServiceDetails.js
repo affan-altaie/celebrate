@@ -46,6 +46,9 @@ const ServiceDetails = () => {
     return date.toLocaleDateString();
   };
 
+  const serviceName = service.name.split(': ')[1] || service.name;
+  const providerName = service.providerId ? service.providerId.username : '';
+
   return (
     <div className="service-details-container">
       <div className="service-details-content">
@@ -54,9 +57,16 @@ const ServiceDetails = () => {
         <div className="service-header">
           <img src={service.images[selectedImageIndex]} alt={service.name} className="service-main-image" />
           <div className="service-header-info">
-            <Link to={`/provider/${service.providerId}`} className="provider-link">
-              <h1>{service.name}</h1>
-            </Link>
+            <h1>
+              {service.providerId ? (
+                <Link to={`/provider/${service.providerId._id}`} className="provider-link">
+                  {providerName}:
+                </Link>
+              ) : (
+                `${providerName}:`
+              )}
+              {` ${serviceName}`}
+            </h1>
             <div className="service-meta">
               <span><FaStar /> {service.rating || 'N/A'} ({t('reviewsCount', { count: service.reviews || 0 })})</span>
               <span><FaMapMarkerAlt /> <strong>{t('locationLabel')}:</strong> {service.location}</span>

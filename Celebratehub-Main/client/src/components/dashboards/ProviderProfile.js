@@ -10,25 +10,36 @@ const ProviderProfile = () => {
   const { providerId } = useParams();
   const navigate = useNavigate();
   const [provider, setProvider] = useState(null);
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProvider = async () => {
+    const fetchProviderAndServices = async () => {
       try {
-        const response = await fetch(`/api/providers/${providerId}`);
-        if (!response.ok) {
+        // Fetch provider data
+        const providerResponse = await fetch(`/api/providers/${providerId}`);
+        if (!providerResponse.ok) {
           throw new Error('Provider not found');
         }
-        const data = await response.json();
-        setProvider(data);
+        const providerData = await providerResponse.json();
+        setProvider(providerData);
+
+        // Fetch services by the provider
+        const servicesResponse = await fetch(`/api/services/provider/${providerId}`);
+        if (!servicesResponse.ok) {
+          throw new Error('Services not found');
+        }
+        const servicesData = await servicesResponse.json();
+        setServices(servicesData);
+
       } catch (error) {
-        console.error('Error fetching provider:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProvider();
+    fetchProviderAndServices();
   }, [providerId]);
   
   if (loading) {
@@ -43,6 +54,8 @@ const ProviderProfile = () => {
     e.target.src = logo1;
   };
 
+  const latestServices = services.slice(0, 3);
+
   return (
     <div className="provider-profile-container">
       <button onClick={() => navigate(-1)} className="back-button">{t('back')}</button>
@@ -56,6 +69,23 @@ const ProviderProfile = () => {
             <span><FaPhone /> {provider.phoneNumber}</span>
           </div>
         </div>
+      </div>
+
+      <div className="services-section">
+        <h2>{t('latestServices')}</h2>
+        <div className="services-grid">
+          {latestServices.map(service => (
+            <div key={service._id} className="service-card" onClick={() => navigate(`/service/${service._id}`)}>
+              <img src={service.images[0] || logo1} alt={service.name} className="service-image" onError={handleImageError} />
+              <h3>{service.name.split(': ')[1] || service.name}</h3>
+              <p>{service.location}</p>
+              <p>{service.pricePerHour} OMR</p>
+            </div>
+          ))}
+        </div>
+        {services.length > 3 && (
+          <button onClick={() => navigate(`/services/provider/${providerId}`)} className="view-all-btn">{t('viewAllServices')}</button>
+        )}
       </div>
     </div>
   );

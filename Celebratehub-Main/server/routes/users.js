@@ -33,6 +33,20 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Get a single user by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id, '-password'); // Exclude password
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // Update Profile Picture
 router.put("/:id/profile-picture", upload.single("profilePicture"), async (req, res) => {
   try {

@@ -287,6 +287,8 @@
     "signInLink": "Sign in",
     "customerReviewsTitle": "Customer Reviews",
     "noReviewsFound": "No reviews found.",
+    "editUser": "Edit User",
+    "editUserDescription": "Edit the user's information below.",
     "editListing": "Edit Listing",
     "serviceName": "Service Name",
     "serviceType": "Service Type",

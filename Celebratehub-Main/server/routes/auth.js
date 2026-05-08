@@ -204,6 +204,8 @@ router.post("/login", async (req, res) => {
       } else if (user.role === "provider") {
         return res.status(401).json({ message: "Your account is pending admin approval." });
       }
+    } else if (user.status === "suspended") {
+      return res.status(401).json({ message: "Your account has been suspended. Please contact support for assistance." });
     }
 
     if (user.role === "provider" && user.status === "rejected") {

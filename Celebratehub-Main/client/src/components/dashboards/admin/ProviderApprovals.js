@@ -27,6 +27,10 @@ const ProviderApprovals = () => {
         fetchRequests();
     }, []);
 
+    const truncateId = (id) => {
+        return `${id.substring(0, 7)}...${id.substring(id.length - 5)}`;
+      };
+
     const handleApprove = async (id) => {
         try {
             await axios.put(`/api/providers/${id}/approve`);
@@ -93,7 +97,7 @@ const ProviderApprovals = () => {
                     <tbody>
                         {requests.map(request => (
                             <tr key={request._id}>
-                                <td>{request._id}</td>
+                                <td>{truncateId(request._id)}</td>
                                 <td>{request.username}</td>
                                 <td>{request.email}</td>
                                 <td>

@@ -5,6 +5,7 @@ const User = require("../modals/User");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
+const sendEmail = require("../utils/email");
 
 // Configure Multer for file uploads
 const storage = multer.diskStorage({
@@ -148,6 +149,65 @@ router.put("/:id", async (req, res) => {
     });
   } catch (error) {
     console.error("Profile update error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Suspend a user
+router.put("/:id/suspend", async (req, res) => {
+  try {
+    const { reason } = req.body;
+    if (!reason) {
+      return res.status(400).json({ message: "Suspension reason is required" });
+    }
+
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.status = "suspended";
+    user.suspensionReason = reason;
+    user.suspensionDate = new Date();
+    
+    await user.save();
+
+    // Send an email to the user
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: "Your account has been suspended",
+        message: `Your account has been suspended for the following reason: ${reason}`,
+      });
+    } catch (emailError) {
+      console.error("Error sending suspension email:", emailError);
+      // Decide if you want to return an error to the client if email fails
+    }
+
+    res.json({ message: "User suspended successfully", user });
+  } catch (error) {
+    console.error("Error suspending user:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Unsuspend a user
+router.put("/:id/unsuspend", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.status = "approved";
+    user.suspensionReason = null;
+    user.suspensionDate = null;
+
+    await user.save();
+
+    res.json({ message: "User unsuspended successfully", user });
+  } catch (error) {
+    console.error("Error unsuspending user:", error);
     res.status(500).json({ message: "Server error" });
   }
 });

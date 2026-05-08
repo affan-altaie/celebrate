@@ -52,30 +52,38 @@
   border-collapse: collapse;
 }
 
-.admin-table th,
-.admin-table td {
+.admin-table th {
   padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+  vertical-align: middle;
+  background-color: #f8f9fa;
+}
+
+.admin-table td {
+  padding: 18px 14px;
   text-align: left;
   border-bottom: 1px solid #dee2e6;
   vertical-align: middle;
 }
 
-.admin-table th {
-  background-color: #f8f9fa;
+.admin-table tbody tr:hover {
+  background: #f8fafc;
 }
 
-.action-btn, .delete-btn, .suspend-btn {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.8rem;
-  border-radius: 0.2rem;
+.action-btn, .delete-btn, .suspend-btn, .reactivate-btn {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  border-radius: 0.375rem;
   margin: 0 2px;
   text-decoration: none;
   display: inline-block;
-  line-height: 1.2;
+  line-height: 1.5;
   text-align: center;
   vertical-align: middle;
   cursor: pointer;
   border: 1px solid transparent;
+  transition: all 0.15s ease-in-out;
 }
 
 .action-btn {
@@ -109,6 +117,17 @@
 .suspend-btn:hover {
   color: #fff;
   background-color: #ffc107;
+}
+
+.reactivate-btn {
+  color: #28a745;
+  background-color: transparent;
+  border: 1px solid #28a745;
+}
+
+.reactivate-btn:hover {
+  color: #fff;
+  background-color: #28a745;
 }
 
 .user-filters {
@@ -245,12 +264,12 @@
 }
 
 .btn.confirm {
-  background-color: #dc3545;
+  background-color: #ffc107;
   color: white;
 }
 
 .btn.confirm:hover {
-  background-color: #c82333;
+  background-color: #e0a800;
 }
 
 .btn.cancel {
@@ -313,4 +332,9 @@
 
 .btn-submit:hover {
   background-color: #0056b3;
+}
+
+.actions-container {
+  display: flex;
+  flex-wrap: nowrap;
 }

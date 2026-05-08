@@ -22,11 +22,19 @@ const userSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["pending", "approved", "rejected"],
+    enum: ["pending", "approved", "rejected", "suspended"],
     default: "approved"
   },
   rejectionReason: {
     type: String,
+    default: null
+  },
+  suspensionReason: {
+    type: String,
+    default: null
+  },
+  suspensionDate: {
+    type: Date,
     default: null
   },
   profilePicture: {

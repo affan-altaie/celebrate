@@ -649,3 +649,36 @@
   margin-bottom: 1rem;
   object-fit: cover;
 }
+
+[data-theme='dark'] .overlay {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+[data-theme='dark'] .search-box {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .search-input:hover {
+    box-shadow: 0 0 0 2px rgba(187, 134, 252, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .search-input input:focus,
+[data-theme='dark'] .search-input select:focus {
+    box-shadow: 0 0 0 3px rgba(187, 134, 252, 0.15);
+}
+
+[data-theme='dark'] .search-suggestions {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 
+                0 10px 20px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='dark'] .service-card:hover,
+[data-theme='dark'] .result-card:hover {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme='dark'] .book-button,
+[data-theme='dark'] .view-all-services-button {
+    color: var(--button-text-color);
+}

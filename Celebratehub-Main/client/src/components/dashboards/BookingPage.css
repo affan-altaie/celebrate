@@ -372,3 +372,39 @@
   cursor: pointer;
   color: var(--primary-color);
 }
+
+[data-theme='dark'] .back-button {
+    color: var(--button-text-color);
+}
+
+[data-theme='dark'] .booking-page-container {
+    background-color: #1e1e1e;
+}
+
+[data-theme='dark'] .booking-details-column,
+[data-theme='dark'] .booking-form-column {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .calendar-day.available {
+    background-color: var(--dark-secondary-color);
+    color: var(--dark-primary-color);
+}
+
+[data-theme='dark'] .time-slot-button {
+    color: var(--text-color);
+}
+
+[data-theme='dark'] .time-slot-button.selected {
+    color: white;
+}
+
+[data-theme='dark'] .credit-card-preview,
+[data-theme='dark'] .card-visualization {
+    background: linear-gradient(45deg, #7864e6, #bb86fc);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+[data-theme='dark'] .submit-booking-button{
+    color: var(--button-text-color);
+}

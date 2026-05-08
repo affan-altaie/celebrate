@@ -372,3 +372,44 @@
   content: "✗"; /* X mark */
   color: #dc3545;
 }
+[data-theme='dark'] .dashboard-container {
+  background-color: #121212;
+}
+
+[data-theme='dark'] .dashboard-header {
+  background-color: #1e1e1e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme='dark'] .dashboard-card:hover {
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .action-btn {
+    color: var(--button-text-color);
+}
+
+[data-theme='dark'] .action-btn:hover {
+    box-shadow: 0 5px 15px rgba(187, 134, 252, 0.2);
+}
+
+[data-theme='dark'] .status.active {
+    color: var(--button-text-color);
+}
+
+[data-theme='dark'] .card-visualization {
+    background: linear-gradient(135deg, #7864e6 0%, #bb86fc 100%);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+[data-theme='dark'] .success-message {
+    background-color: #2e7d32;
+    color: #c8e6c9;
+    border-color: #388e3c;
+}
+
+[data-theme='dark'] .error-message {
+    background-color: #d32f2f;
+    color: #ffcdd2;
+    border-color: #c62828;
+}

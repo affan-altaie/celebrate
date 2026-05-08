@@ -171,3 +171,16 @@
   .provider-link:hover {
     text-decoration: underline;
   }
+
+[data-theme='dark'] .service-details-content {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .back-button,
+[data-theme='dark'] .book-now-button {
+    color: var(--button-text-color);
+}
+
+[data-theme='dark'] .price-display {
+    color: #4caf50;
+}

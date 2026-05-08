@@ -270,3 +270,7 @@
   .password-toggle-btn:hover {
     color: var(--primary-color);
   }
+
+[data-theme='dark'] .access-logo {
+    filter: invert(1) brightness(2);
+}

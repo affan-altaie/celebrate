@@ -50,3 +50,11 @@
 .side-menu.rtl .lang-btn:not(.active):hover {
   transform: translateX(-4px);
 }
+
+[data-theme='dark'] .lang-btn.active {
+    color: var(--button-text-color);
+}
+
+[data-theme='dark'] .lang-btn.active .lang-code {
+    color: var(--button-text-color);
+}

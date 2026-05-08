@@ -132,3 +132,10 @@
     }
   }
   
+  [data-theme='dark'] .confirmation-card {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+
+  [data-theme='dark'] .dashboard-link {
+    color: var(--button-text-color);
+  }

@@ -86,3 +86,11 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(106, 90, 249, 0.2);
 }
+
+[data-theme='dark'] .navbar-logo {
+    filter: invert(1) brightness(2);
+}
+
+[data-theme='dark'] .menu-button:hover {
+    color: var(--button-text-color);
+}

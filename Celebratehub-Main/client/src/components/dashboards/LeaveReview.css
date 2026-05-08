@@ -21,7 +21,7 @@
 }
 
 .review-form-card {
-  background-color: #ffffff;
+  background-color: var(--card-background);
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
@@ -32,6 +32,7 @@
 .review-form-card h2 {
   text-align: center;
   margin-bottom: 1.5rem;
+  color: var(--text-color);
 }
 
 .review-form-card .form-group {
@@ -42,6 +43,7 @@
   font-weight: 500;
   margin-bottom: 0.5rem;
   display: block;
+  color: var(--text-color);
 }
 
 .star-rating {
@@ -54,11 +56,13 @@
 .review-form-card textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 1rem;
   resize: vertical;
   min-height: 120px;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 .submit-review-button {
@@ -78,7 +82,7 @@
 }
 
 .image-upload-container {
-  border: 2px dashed #ccc;
+  border: 2px dashed var(--border-color);
   border-radius: 8px;
   padding: 2rem;
   text-align: center;
@@ -112,4 +116,12 @@
   height: 100px;
   object-fit: cover;
   border-radius: 8px;
+}
+
+[data-theme='dark'] .review-form-card {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='dark'] .submit-review-button {
+    color: var(--button-text-color);
 }

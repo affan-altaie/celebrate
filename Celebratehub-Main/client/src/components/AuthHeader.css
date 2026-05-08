@@ -26,3 +26,7 @@
   cursor: pointer;
   color: var(--text-color);
 }
+
+[data-theme='dark'] .auth-header-logo img {
+  filter: invert(1) brightness(2);
+}

@@ -61,3 +61,7 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(106, 90, 249, 0.4);
 }
+
+[data-theme='dark'] .overlay {
+  background-color: rgba(187, 134, 252, 0.7);
+}

@@ -4,7 +4,7 @@ html, body {
   height: 100%;
 }
 
-:root {
+[data-theme='light'] {
   --primary-color: #6a5af9;
   --secondary-color: #f7f7f7;
   --accent-color: #ff6f61;
@@ -18,13 +18,15 @@ html, body {
   --border-color: #dddddd;
 }
 
-body.dark {
+[data-theme='dark'] {
   --primary-color: #bb86fc;
   --secondary-color: #333333;
   --accent-color: #03dac6;
   --text-color: #ffffff;
   --background-color: #121212;
   --card-background: #1e1e1e;
+  --border-radius: 12px;
+  --box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
   --button-background-color: #bb86fc;
   --button-text-color: #121212;
   --border-color: #555555;

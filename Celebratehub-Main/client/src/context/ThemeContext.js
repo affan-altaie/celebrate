@@ -12,8 +12,7 @@ export const ThemeProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    document.body.className = '';
-    document.body.classList.add(theme);
+    document.body.setAttribute('data-theme', theme);
   }, [theme]);
 
   return (

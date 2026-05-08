@@ -239,7 +239,7 @@ const UserManagement = () => {
             <thead>
               <tr>
                 <th></th>
-                <th>{t('userIdLabel')}</th>
+                <th>{t('userID')}</th>
                 <th>{t('usernameLabel')}</th>
                 <th>{t('emailLabel')}</th>
                 <th>{t('roleLabel')}</th>
@@ -293,7 +293,7 @@ const UserManagement = () => {
             <thead>
               <tr>
                 <th></th>
-                <th>{t('userIdLabel')}</th>
+                <th>{t('userID')}</th>
                 <th>{t('usernameLabel')}</th>
                 <th>{t('emailLabel')}</th>
                 <th>{t('roleLabel')}</th>

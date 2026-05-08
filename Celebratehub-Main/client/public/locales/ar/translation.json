@@ -416,7 +416,7 @@
     "perHour": "بالساعة",
     "perPerson": "للشخص",
     "pricePerPerson": "السعر للشخص",
-    "imageUploadGuidelines": "صورتان كحد أدنى، 8 صور كحد أقصى. 5 ميجابايت كحد أقصى لكل صورة.",
+    "imageUploadGuidelines": " صورتان كحد أدنى، 8 صور كحد أقصى. 5 ميجابايت كحد أقصى لكل صورة. ",
     "main": "الرئيسية",
     "max8Images": "يمكنك تحميل 8 صور كحد أقصى.",
     "fileTooLarge": "الملف {{fileName}} كبير جدًا. الحجم الأقصى هو 5 ميجابايت.",
@@ -442,5 +442,14 @@
     "ratingLowToHigh": "التقييم: من الأقل إلى الأقل",
     "approveOrDisapprove": "الموافقة أو عدم الموافقة على تسجيلات المزود",
     "selectReasonPrompt": "اختر سببًا",
-    "confirm": "تأكيد"
+    "confirm": "تأكيد",
+    "iftarFeastDescription": "تقديم طعام أو وجبة لشخص صائم ليفطر عند غروب الشمس في رمضان. يعتبر عملاً خيرياً مجزياً للغاية في الإسلام، مع التركيز على الكرم والرحمة ودعم المجتمع.",
+    "person": "شخص",
+    "N/A": "غير متاح",
+    "rating": "تقييم",
+    "dateOfPublish": "تاريخ النشر",
+    "findPerfectHall": "العثور على القاعة المثالية",
+    "deliciousFoodOptions": "خيارات طعام لذيذة",
+    "captureEveryMoment": "التقاط كل لحظة",
+    "celebrateSpecialDays": "الاحتفال بالأيام الخاصة"
   }

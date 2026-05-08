@@ -37,11 +37,11 @@ const ServiceDetails = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) {
-      return 'N/A';
+      return t('N/A');
     }
     const date = new Date(dateString);
     if (isNaN(date.getTime())) {
-      return 'N/A';
+      return t('N/A');
     }
     return date.toLocaleDateString();
   };
@@ -52,7 +52,7 @@ const ServiceDetails = () => {
   return (
     <div className="service-details-container">
       <div className="service-details-content">
-        <button onClick={() => navigate(-1)} className="back-button">go back</button>
+        <button onClick={() => navigate(-1)} className="back-button">{t('back')}</button>
         
         <div className="service-header">
           <img src={service.images[selectedImageIndex]} alt={service.name} className="service-main-image" />
@@ -68,15 +68,15 @@ const ServiceDetails = () => {
               {` ${serviceName}`}
             </h1>
             <div className="service-meta">
-              <span><FaStar /> {service.rating || 'N/A'} ({t('reviewsCount', { count: service.reviews || 0 })})</span>
+              <span><FaStar /> {service.rating || t('N/A')} ({t('reviewsCount', { count: service.reviews || 0 })})</span>
               <span><FaMapMarkerAlt /> <strong>{t('locationLabel')}:</strong> {service.location}</span>
-              <span><FaCalendarAlt /> <strong>{t('dateOfPublishLabel')}:</strong> {formatDate(service.createdAt)}</span>
+              <span><FaCalendarAlt /> <strong>{t('dateOfPublish')}:</strong> {formatDate(service.createdAt)}</span>
             </div>
-            <p className="service-description">{service.description}</p>
+            <p className="service-description">{service.description === 'affan: iftar' ? t('iftarFeastDescription') : service.description}</p>
             <div className="service-price-book">
               <div className="price-info">
                 {service.pricePerHour && <span className="price-display">OMR {service.pricePerHour} / hour</span>}
-                {service.pricePerPerson && <span className="price-display">OMR {service.pricePerPerson} / {t('personLabel')}</span>}
+                {service.pricePerPerson && <span className="price-display">OMR {service.pricePerPerson} / {t('person')}</span>}
               </div>
               {!isProvider && !isAdmin && (
                 <button className="book-now-button" onClick={() => navigate(`/booking/${service._id}`)}>{t("bookNow")}</button>

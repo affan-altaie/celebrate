@@ -250,10 +250,10 @@ const NewBooking = () => {
   const backgroundImageUrl = 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80';
 
   const popularServices = [
-    { name: 'Wedding Halls', icon: <FaMapMarkedAlt />, description: 'Find the perfect hall' },
-    { name: 'Catering', icon: <FaUtensils />, description: 'Delicious food options' },
-    { name: 'Photography', icon: <FaCameraRetro />, description: 'Capture every moment' },
-    { name: 'Birthdays', icon: <FaMusic />, description: 'Celebrate special days' },
+    { name: t('weddingHalls'), icon: <FaMapMarkedAlt />, description: t('findPerfectHall') },
+    { name: t('catering'), icon: <FaUtensils />, description: t('deliciousFoodOptions') },
+    { name: t('photography'), icon: <FaCameraRetro />, description: t('captureEveryMoment') },
+    { name: t('birthdays'), icon: <FaMusic />, description: t('celebrateSpecialDays') },
   ];
 
   const topProviders = services
@@ -417,8 +417,8 @@ const NewBooking = () => {
           {popularServices.map((service, index) => (
             <div key={index} className="service-card" onClick={() => handleServiceClick(service.name)}>
               <div className="service-icon">{service.icon}</div>
-              <h3>{service.name}</h3>
-              <p>{service.description}</p>
+              <h3>{t(service.name)}</h3>
+              <p>{t(service.description)}</p>
             </div>
           ))}
         </div>

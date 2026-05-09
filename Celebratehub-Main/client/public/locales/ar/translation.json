@@ -451,5 +451,12 @@
     "findPerfectHall": "العثور على القاعة المثالية",
     "deliciousFoodOptions": "خيارات طعام لذيذة",
     "captureEveryMoment": "التقاط كل لحظة",
-    "celebrateSpecialDays": "الاحتفال بالأيام الخاصة"
+    "celebrateSpecialDays": "الاحتفال بالأيام الخاصة",
+    "invalidCardNumber": "يجب أن يتكون رقم البطاقة من 16 رقمًا.",
+    "invalidExpiryDate": "تنسيق تاريخ انتهاء صلاحية غير صالح. يرجى استخدام MM/YY.",
+    "expiredCardError": "انتهت صلاحية البطاقة. يرجى إدخال تاريخ انتهاء صلاحية صالح.",
+    "cardDeleted": "تم حذف تفاصيل البطاقة بنجاح.",
+    "cardDeletionFailed": "فشل حذف تفاصيل البطاقة.",
+    "confirmDeleteCard": "هل أنت متأكد أنك تريد حذف بطاقتك المحفوظة؟",
+    "deleteCard": "حذف البطاقة"
   }

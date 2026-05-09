@@ -428,5 +428,12 @@
     "findPerfectHall": "Find the perfect hall",
     "deliciousFoodOptions": "Delicious food options",
     "captureEveryMoment": "Capture every moment",
-    "celebrateSpecialDays": "Celebrate special days"
+    "celebrateSpecialDays": "Celebrate special days",
+    "invalidCardNumber": "Card number must be 16 digits.",
+    "invalidExpiryDate": "Invalid expiry date format. Please use MM/YY.",
+    "expiredCardError": "Card has expired. Please enter a valid expiry date.",
+    "cardDeleted": "Card details deleted successfully.",
+    "cardDeletionFailed": "Failed to delete card details.",
+    "confirmDeleteCard": "Are you sure you want to delete your saved card?",
+    "deleteCard": "Delete Card"
   }

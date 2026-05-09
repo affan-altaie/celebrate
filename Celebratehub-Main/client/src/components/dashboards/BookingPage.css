@@ -1,3 +1,4 @@
+
 .booking-page-container-wrapper {
   padding: 2rem;
   max-width: 1200px;
@@ -387,8 +388,12 @@
 }
 
 [data-theme='dark'] .calendar-day.available {
-    background-color: var(--dark-secondary-color);
-    color: var(--dark-primary-color);
+    background-color: #333;
+    color: #fff;
+}
+
+[data-theme='dark'] .calendar-day.selected {
+    color: #000;
 }
 
 [data-theme='dark'] .time-slot-button {

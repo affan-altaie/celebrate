@@ -21,6 +21,7 @@ const CustomerProfile = () => {
     cardNumber: '',
     expiryDate: ''
   });
+  const [cardError, setCardError] = useState('');
   
   useEffect(() => {
     if (!user) {
@@ -246,11 +247,12 @@ const CustomerProfile = () => {
 
   const handleCardUpdate = async (e) => {
     e.preventDefault();
+    setCardError('');
     const userId = user?.id || user?._id;
   
     const cardNumberDigits = cardData.cardNumber.replace(/\D/g, '');
     if (cardNumberDigits.length !== 16) {
-      toast.error(t('invalidCardNumber') || 'Card number must be 16 digits.');
+      setCardError(t('invalidCardNumber') || 'Card number must be 16 digits.');
       return;
     }
   
@@ -259,12 +261,12 @@ const CustomerProfile = () => {
     const currentMonth = new Date().getMonth() + 1;
   
     if (!month || !year || parseInt(month, 10) < 1 || parseInt(month, 10) > 12) {
-      toast.error(t("invalidExpiryDate") || "Invalid expiry date format. Please use MM/YY.");
+      setCardError(t("invalidExpiryDate") || "Invalid expiry date format. Please use MM/YY.");
       return;
     }
   
     if (parseInt(year, 10) < currentYear || (parseInt(year, 10) === currentYear && parseInt(month, 10) < currentMonth)) {
-      toast.error(t("expiredCardError") || "Card has expired. Please enter a valid expiry date.");
+      setCardError(t("expiredCardError") || "Card has expired. Please enter a valid expiry date.");
       return;
     }
   
@@ -279,11 +281,11 @@ const CustomerProfile = () => {
         setIsEditingCard(false);
         setCardData(prev => ({ ...prev, cardNumber: cardData.cardNumber }));
       } else {
-        toast.error(response.data.message || t("cardUpdateFailed") || "Failed to update card details");
+        setCardError(response.data.message || t("cardUpdateFailed") || "Failed to update card details");
       }
     } catch (err) {
       console.error("Card update failed:", err.response?.data?.message || err.message || err);
-      toast.error(err.response?.data?.message || t("genericError") || "An error occurred");
+      setCardError(err.response?.data?.message || t("genericError") || "An error occurred");
     }
   };
 
@@ -520,7 +522,7 @@ const CustomerProfile = () => {
                   </div>
                 </div>
 
-                {<div className="error-message" style={{ textAlign: 'center', marginBottom: '1rem' }}></div>}
+                {cardError && <div className="error-message" style={{ textAlign: 'center', marginBottom: '1rem' }}>{cardError}</div>}
                 
                 <div style={{ display: 'flex', gap: '1rem' }}>
                   <button type="submit" className="action-btn" style={{ flex: 2, borderRadius: '10px', padding: '12px' }}>

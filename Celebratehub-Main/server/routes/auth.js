@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("../modals/User");
 const nodemailer = require("nodemailer");
 const multer = require("multer");
@@ -93,7 +94,6 @@ router.post("/register", upload.none(), async (req, res) => {
       responseMessage += " Your account is pending admin approval.";
     }
 
-    req.session.user = { email: newUser.email };
     res.status(201).json({ message: responseMessage });
   } catch (error) {
     console.error("Registration error:", error);
@@ -140,7 +140,6 @@ router.post("/forgot-password", async (req, res) => {
 
     try {
         await transporter.sendMail(mailOptions);
-        req.session.user = { email: user.email };
         res.json({ message: "OTP sent to your email" });
     } catch (error) {
         console.error("Error sending OTP email:", error);
@@ -184,7 +183,7 @@ router.post("/reset-password", async (req, res) => {
 // Login Endpoint
 router.post("/login", async (req, res) => {
   try {
-    const { email, password, keepMeSignedIn } = req.body;
+    const { email, password } = req.body;
 
     // Check if user exists
     const user = await User.findOne({ email });
@@ -212,8 +211,8 @@ router.post("/login", async (req, res) => {
       return res.status(401).json({ message: "Your provider account has been rejected. Please register again or contact support." });
     }
 
-    // Create session
-    req.session.user = {
+    // Create and sign a JWT
+    const payload = {
       id: user._id,
       username: user.username,
       email: user.email,
@@ -222,17 +221,11 @@ router.post("/login", async (req, res) => {
       phoneNumber: user.phoneNumber
     };
 
-    // Set session expiration
-    if (keepMeSignedIn) {
-      // Extend session for a long period, e.g., 30 days
-      req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; 
-    } else {
-      // Session expires when the browser is closed
-      req.session.cookie.expires = false;
-    }
+    const token = jwt.sign(payload, "your_jwt_secret", { expiresIn: '1h' });
 
     res.json({ 
       message: "Login successful",
+      token,
       user: {
         id: user._id,
         username: user.username,

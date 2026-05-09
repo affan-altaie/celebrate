@@ -107,5 +107,7 @@
   "reasonPolicyViolation": "Policy violation",
   "reasonSpam": "Spam",
   "reasonOther": "Other",
-  "suspensionReasonPlaceholder": "Provide a reason for suspension"
+  "suspensionReasonPlaceholder": "Provide a reason for suspension",
+  "reviewSubmitted": "Review submitted successfully!",
+  "errorSubmittingReview": "Error submitting review. Please try again."
 }

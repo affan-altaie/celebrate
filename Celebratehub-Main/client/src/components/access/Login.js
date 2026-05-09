@@ -38,19 +38,20 @@ const Login = () => {
 
       if (response.ok) {
         toast.success(t("loginSuccess"));
+        localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
         // Redirect based on role
         switch (data.user.role) {
           case "admin":
-            navigate("/admin-dashboard", { state: { user: data.user } });
+            navigate("/admin-dashboard");
             break;
           case "provider":
-            navigate("/provider-dashboard", { state: { user: data.user } });
+            navigate("/provider-dashboard");
             break;
           case "customer":
           default:
-            navigate("/new-booking", { state: { user: data.user } });
+            navigate("/new-booking");
         }
       } else {
         if (

@@ -88,6 +88,7 @@ const providerRoutes = require("./routes/providers");
 const paymentRoutes = require("./routes/payments");
 const otpRoutes = require("./routes/otp");
 const bookingRoutes = require("./routes/bookings");
+const reviewRoutes = require("./routes/reviews");
 
 app.use("/api", authRoutes);
 app.use("/api", otpRoutes);
@@ -96,6 +97,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/providers", providerRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

@@ -107,5 +107,7 @@
   "reasonPolicyViolation": "مخالفة السياسة",
   "reasonSpam": "بريد مؤذي",
   "reasonOther": "آخر",
-  "suspensionReasonPlaceholder": "قدم سببا للتعليق"
+  "suspensionReasonPlaceholder": "قدم سببا للتعليق",
+  "reviewSubmitted": "تم إرسال المراجعة بنجاح!",
+  "errorSubmittingReview": "خطأ في إرسال المراجعة. يرجى المحاولة مرة أخرى."
 }

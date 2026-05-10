@@ -190,8 +190,8 @@
     "goToDashboard": "الذهاب للوحة التحكم",
     "printReceipt": "طباعة الإيصال",
     "statusLabel": "الحالة",
-    "leaveReview": "اترك تقييمًا",
-    "backToDashboard": "العودة إلى لوحة التحكم",
+    "leaveReview": "ترك تقييم",
+    "backToDashboard": "العودة للوحة التحكم",
     "completed": "مكتمل",
     "upcoming": "قادم",
     "serviceIdLabel": "معرف الخدمة",
@@ -459,11 +459,8 @@
     "cardDeletionFailed": "فشل حذف تفاصيل البطاقة.",
     "confirmDeleteCard": "هل أنت متأكد أنك تريد حذف بطاقتك المحفوظة؟",
     "deleteCard": "حذف البطاقة",
-    "noBookingsFound": "لم يتم العثور على حجوزات.",
-    "startCelebrating": "لا توجد حجوزات حتى الآن - ابدأ الاحتفال!",
-    "cancelBooking": "إلغاء الحجز",
-    "confirmCancelBooking": "هل أنت متأكد من رغبتك في إلغاء هذا الحجز؟",
-    "bookingCancelledSuccessfully": "تم إلغاء الحجز بنجاح",
-    "failedToCancelBooking": "فشل إلغاء الحجز",
-    "bookedOnLabel": "تم الحجز في"
-}
+    "reviewSubmitted": "تم إرسال المراجعة بنجاح!",
+    "errorSubmittingReview": "خطأ في إرسال المراجعة",
+    "serviceId": "معرف الخدمة",
+    "preview": "معاينة"
+  }

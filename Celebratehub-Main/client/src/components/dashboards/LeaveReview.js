@@ -122,7 +122,7 @@ const LeaveReview = () => {
             </div>
             <div className="image-previews">
               {images.map((image, index) => (
-                <img key={index} src={URL.createObjectURL(image)} alt={`preview ${index}`} className="image-preview" />
+                <img key={index} src={URL.createObjectURL(image)} alt={`${t('preview')} ${index}`} className="image-preview" />
               ))}
             </div>
           </div>

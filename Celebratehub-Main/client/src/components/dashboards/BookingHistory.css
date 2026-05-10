@@ -157,3 +157,36 @@
     width: 100%;
   }
 }
+/* Dark Mode Styles */
+[data-theme='dark'] .booking-history-container {
+  background-color: #333;
+  color: #fff;
+}
+
+[data-theme='dark'] .booking-card {
+  background-color: #444;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  color: #fff;
+}
+
+[data-theme='dark'] .booking-card:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme='dark'] .back-btn {
+  background-color: #555;
+  color: #fff;
+}
+
+[data-theme='dark'] .back-btn:hover {
+  background-color: #777;
+}
+
+[data-theme='dark'] .no-bookings h2,
+[data-theme='dark'] .no-bookings p {
+  color: #ccc;
+}
+
+[data-theme='dark'] .booking-card-body .label {
+  color: #bbb;
+}

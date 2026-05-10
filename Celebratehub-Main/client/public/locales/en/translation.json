@@ -435,5 +435,6 @@
     "cardDeleted": "Card details deleted successfully.",
     "cardDeletionFailed": "Failed to delete card details.",
     "confirmDeleteCard": "Are you sure you want to delete your saved card?",
-    "deleteCard": "Delete Card"
+    "deleteCard": "Delete Card",
+    "bookedOnLabel": "Booked on"
   }

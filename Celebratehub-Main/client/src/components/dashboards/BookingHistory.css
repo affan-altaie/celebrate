@@ -1,0 +1,159 @@
+/* General Styling */
+.booking-history-container {
+  padding: 20px;
+  font-family: sans-serif;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.booking-history-header {
+  position: relative;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.booking-history-header h1 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.back-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: #0056b3;
+}
+
+.booking-history-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Booking Card Styling */
+.booking-card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  padding: 20px;
+  max-width: 600px;
+  width: 100%;
+  animation: slideUp 0.5s ease-in-out;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.booking-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.booking-card-header h3 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.booking-card-body p {
+  margin: 10px 0;
+}
+
+.booking-card-body .label {
+  color: #888;
+}
+
+.status {
+  padding: 5px 10px;
+  border-radius: 20px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.status.confirmed {
+  background-color: #28a745;
+}
+
+.status.cancelled {
+  background-color: #dc3545;
+}
+
+.booking-card-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.action-btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.review-btn {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.review-btn:hover {
+  background-color: #0056b3;
+}
+
+.cancel-btn {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.cancel-btn:hover {
+  background-color: #c82333;
+}
+
+/* Empty State Styling */
+.no-bookings {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.no-bookings h2 {
+  font-size: 22px;
+  color: #555;
+}
+
+.no-bookings p {
+  color: #777;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .booking-card-footer {
+    flex-direction: column;
+  }
+
+  .action-btn {
+    width: 100%;
+  }
+}

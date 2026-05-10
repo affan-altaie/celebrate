@@ -155,8 +155,6 @@
     "bookThisService": "احجز هذه الخدمة",
     "locationDetails": "تفاصيل الموقع",
     "eventAddressPlaceholder": "أدخل عنوان الحدث الخاص بك",
-    "phoneNumberPlaceholder": "أدخل رقم هاتفك",
-    "emailAddressPlaceholder": "أدخل عنوان بريدك الإلكتروني",
     "numberOfHours": "أدخل عدد الساعات",
     "numberOfPersons": "أدخل عدد الأشخاص",
     "totalPrice": "السعر الإجمالي",
@@ -317,7 +315,6 @@
     "reportServiceTitle": "الإبلاغ عن خدمة",
     "reportSubmitted": "تم إرسال تقريرك. سنقوم بمراجعته قريبًا.",
     "reasonForReport": "سبب الإبلاغ",
-    "selectReason": "حدد سبباً",
     "inappropriateContent": "محتوى غير لائق",
     "scamOrFraud": "احتيال أو نصب",
     "poorServiceQuality": "جودة خدمة سيئة",
@@ -443,7 +440,6 @@
     "approveOrDisapprove": "الموافقة أو عدم الموافقة على تسجيلات المزود",
     "selectReasonPrompt": "اختر سببًا",
     "confirm": "تأكيد",
-    "iftarFeastDescription": "تقديم طعام أو وجبة لشخص صائم ليفطر عند غروب الشمس في رمضان. يعتبر عملاً خيرياً مجزياً للغاية في الإسلام، مع التركيز على الكرم والرحمة ودعم المجتمع.",
     "person": "شخص",
     "N/A": "غير متاح",
     "rating": "تقييم",
@@ -462,5 +458,7 @@
     "reviewSubmitted": "تم إرسال المراجعة بنجاح!",
     "errorSubmittingReview": "خطأ في إرسال المراجعة",
     "serviceId": "معرف الخدمة",
-    "preview": "معاينة"
+    "preview": "معاينة",
+    "bookedOnLabel": "تاريخ الحجز",
+    "cancelBooking": "إلغاء الحجز"
   }

@@ -11,7 +11,26 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock axios
-jest.mock('axios');
+jest.mock('axios', () => ({
+  create: jest.fn(() => ({
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    delete: jest.fn(),
+    interceptors: {
+      request: {
+        use: jest.fn(),
+      },
+      response: {
+        use: jest.fn(),
+      },
+    },
+  })),
+  get: jest.fn(),
+  post: jest.fn(),
+  put: jest.fn(),
+  delete: jest.fn(),
+}));
 
 const renderComponent = () =>
   render(
@@ -25,6 +44,8 @@ describe('AddService Component', () => {
     // Mock localStorage
     const user = { email: 'test@example.com' };
     localStorage.setItem('user', JSON.stringify(user));
+    // Mock axios post for all tests in this suite
+    axios.post.mockResolvedValue({ data: {} });
   });
 
   afterEach(() => {
@@ -35,10 +56,11 @@ describe('AddService Component', () => {
     renderComponent();
 
     expect(screen.getByLabelText(/serviceNameLabel/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/roleLabel/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/categoryLabel/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/locationLabel/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/pricePerHour/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/pricePerPerson/i)).toBeInTheDocument();
+    // pricePerPerson is conditionally rendered, so we only expect pricePerHour initially
+    expect(screen.queryByLabelText(/pricePerPerson/i)).not.toBeInTheDocument();
     expect(screen.getByLabelText(/descriptionLabel/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/featuresLabel/i)).toBeInTheDocument();
     expect(screen.getByText(/addServiceBtn/i)).toBeInTheDocument();
@@ -50,10 +72,10 @@ describe('AddService Component', () => {
     renderComponent();
 
     fireEvent.change(screen.getByLabelText(/serviceNameLabel/i), { target: { value: 'Test Service' } });
-    fireEvent.change(screen.getByLabelText(/roleLabel/i), { target: { value: 'Tester' } });
+    fireEvent.change(screen.getByLabelText(/categoryLabel/i), { target: { value: 'catering' } });
     fireEvent.change(screen.getByLabelText(/locationLabel/i), { target: { value: 'Test Location' } });
     fireEvent.change(screen.getByLabelText(/pricePerHour/i), { target: { value: '10' } });
-    fireEvent.change(screen.getByLabelText(/pricePerPerson/i), { target: { value: '5' } });
+    // pricePerPerson is not visible by default, so we don't interact with it here
     fireEvent.change(screen.getByLabelText(/descriptionLabel/i), { target: { value: 'Test Description' } });
     fireEvent.change(screen.getByLabelText(/featuresLabel/i), { target: { value: 'Feature 1, Feature 2' } });
 

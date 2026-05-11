@@ -40,6 +40,7 @@ import BookingConfirmation from './components/dashboards/BookingConfirmation';
 import ServicesList from './components/dashboards/ServicesList';
 import EditService from './components/dashboards/admin/EditService';
 import { ThemeProvider } from './context/ThemeContext';
+import FloatingChatbot from './components/chatbot/FloatingChatbot';
 import './App.css';
 
 // Protected Route Component
@@ -139,6 +140,7 @@ function App() {
     <ThemeProvider>
       <Router>
         <AppContent />
+        <FloatingChatbot />
       </Router>
     </ThemeProvider>
   );

@@ -11,6 +11,12 @@ const ReviewSchema = new mongoose.Schema({
     ref: 'Service',
     required: true,
   },
+  booking: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Booking',
+    required: true,
+    unique: true // Ensures one review per booking
+  },
   rating: {
     type: Number,
     required: true,

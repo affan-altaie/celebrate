@@ -246,7 +246,10 @@ const NewBooking = () => {
     setRatingSort('');
     handleSearch({ term: serviceType, location: '' });
   };
-
+const handleRemoveFromHistory = (itemToRemove) => {
+    const newHistory = searchHistory.filter(item => item.timestamp !== itemToRemove.timestamp);
+    setSearchHistory(newHistory);
+  };
   const backgroundImageUrl = 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80';
 
   const popularServices = [
@@ -321,6 +324,15 @@ const NewBooking = () => {
                           <FaMapMarkerAlt /> {historyItem.location}
                         </span>
                       )}
+<button 
+  className="remove-history-item" 
+  onClick={(e) => {
+    e.stopPropagation(); // Prevent search from triggering
+    handleRemoveFromHistory(historyItem);
+  }}
+>
+  <FaTimes />
+</button>
                     </div>
                   ))}
                 </div>

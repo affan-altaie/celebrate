@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../i18n'; // Import your i18n instance
 import AddService from '../components/dashboards/AddService';
+import axios from 'axios';
 
 // Mock react-router-dom
 const mockedNavigate = jest.fn();
@@ -31,6 +32,17 @@ jest.mock('axios', () => ({
   put: jest.fn(),
   delete: jest.fn(),
 }));
+
+// Mock react-toastify
+jest.mock('react-toastify', () => ({
+    toast: {
+      success: jest.fn(),
+      error: jest.fn(),
+    },
+  }));
+
+global.URL.createObjectURL = jest.fn();
+global.URL.revokeObjectURL = jest.fn();
 
 const renderComponent = () =>
   render(

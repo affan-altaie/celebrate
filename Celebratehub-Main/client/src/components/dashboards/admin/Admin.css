@@ -34,6 +34,14 @@
   .badge-rejected {
     background-color: #dc3545; /* Red */
   }
+
+  .badge-reviewed {
+    background-color: #17a2b8; /* Cyan */
+  }
+
+  .badge-resolved {
+    background-color: #28a745; /* Green */
+  }
   
   .badge-suspended {
     background-color: #ffc107; /* Yellow */

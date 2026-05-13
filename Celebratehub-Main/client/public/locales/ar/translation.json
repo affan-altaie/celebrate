@@ -285,6 +285,7 @@
     "signInLink": "تسجيل الدخول",
     "customerReviewsTitle": "تقييمات العملاء",
     "noReviewsFound": "لم يتم العثور على تقييمات.",
+    "noReportsFound": "لم يتم العثور على بلاغات.",
     "editListing": "تعديل القائمة",
     "serviceName": "اسم الخدمة",
     "serviceType": "نوع الخدمة",
@@ -467,9 +468,19 @@
     "bookingManagementDesc": "عرض وإدارة حجوزات عملائك",
     "viewBookings": "عرض الحجوزات",
     "pending": "قيد الانتظار",
+    "reviewed": "تمت المراجعة",
+    "resolved": "تم الحل",
     "confirmed": "تم التأكيد",
     "rejected": "مرفوض",
     "cancelled": "ملغى",
     "statusUpdatedSuccessfully": "تم تحديث الحالة بنجاح",
-    "failedToUpdateStatus": "فشل تحديث الحالة"
+    "failedToUpdateStatus": "فشل تحديث الحالة",
+    "markAsReviewed": "تحديد كمراجع",
+    "markAsResolved": "تحديد كمحلول",
+    "supportGuidelines": "إرشادات التواصل مع الدعم",
+    "guideline1": "استخدم نبرة مهذبة ومتعاطفة في جميع الأوقات.",
+    "guideline2": "تجنب استخدام المصطلحات التقنية المفرطة؛ حافظ على بساطة الشروحات.",
+    "guideline3": "اشكر العميل دائمًا على لفت انتباهنا إلى مخاوفه.",
+    "guideline4": "استجب بسرعة للحفاظ على الثقة والمعايير المهنية.",
+    "guidelineTitle": "النبرة والاحترافية"
   }

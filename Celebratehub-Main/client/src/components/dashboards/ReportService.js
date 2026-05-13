@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 import './ReportService.css';
 
 const ReportService = () => {
@@ -9,13 +10,30 @@ const ReportService = () => {
   const navigate = useNavigate();
   const [reason, setReason] = useState('');
   const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically submit the report to your backend
-    console.log('Report submitted:', { serviceId, reason, description });
-    alert(t('reportSubmitted'));
-    navigate(`/service/${serviceId}`);
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post('/api/reports', {
+        serviceId,
+        reason,
+        description
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      alert(t('reportSubmitted'));
+      navigate(`/service/${serviceId}`);
+    } catch (error) {
+      console.error('Error submitting report:', error);
+      alert(t('genericError'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,8 +62,10 @@ const ReportService = () => {
             />
           </div>
           <div className="report-actions">
-            <button type="button" onClick={() => navigate(-1)} className="cancel-btn">{t('cancel')}</button>
-            <button type="submit" className="submit-report-btn">{t('submitReport')}</button>
+            <button type="button" onClick={() => navigate(-1)} className="cancel-btn" disabled={loading}>{t('cancel')}</button>
+            <button type="submit" className="submit-report-btn" disabled={loading}>
+              {loading ? t('loading') : t('submitReport')}
+            </button>
           </div>
         </form>
       </div>

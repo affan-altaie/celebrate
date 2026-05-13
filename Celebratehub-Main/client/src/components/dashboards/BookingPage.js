@@ -153,12 +153,27 @@ const BookingPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedDate || !selectedTime) {
-      toast.error(t("selectDateTimeAlert"));
+    
+    if (!formData.location || !formData.phone || !formData.email || !selectedDate || !selectedTime) {
+      toast.error(t("fillAllFields"));
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+        toast.error(t('invalidEmailFormat'));
+        return;
+    }
+
+    if (formData.phone.replace(/\D/g, '').length !== 8) {
+        toast.error(t('invalidPhoneNumber')); return;
+    }
+
     if (!useSavedCard) {
+        if (!formData.cardHolderName || !formData.cardNumber || !formData.expiryDate || !formData.cvc) {
+            toast.error(t("fillAllFields"));
+            return;
+        }
         // Run validation only if using a new card
         if (!formData.cardHolderName.trim() || !/^[a-zA-Z\s]+$/.test(formData.cardHolderName)) {
             toast.error(t('cardHolderNameInvalid')); return;
@@ -270,7 +285,7 @@ const BookingPage = () => {
           <h2>{t('bookThisService')}</h2>
           <form onSubmit={handleSubmit} className="booking-form" noValidate>
             <div className="form-group"><label><FaMapMarkerAlt /> {t('locationDetails')}</label><select name="location" value={formData.location} onChange={handleChange} required><option value="">{t('selectLocation')}</option>{locations.map(l => <option key={l} value={l}>{l}</option>)}</select></div>
-            <div className="form-group"><label><FaPhone /> {t('phoneNumber')}</label><input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder={t('phoneNumberPlaceholder')} required /></div>
+            <div className="form-group"><label><FaPhone /> {t('phoneNumber')}</label><input type="tel" name="phone" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value.replace(/\D/g, '')})} placeholder={t('phoneNumberPlaceholder')} maxLength="8" required /></div>
             <div className="form-group"><label><FaEnvelope /> {t('emailAddress')}</label><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder={t('emailAddressPlaceholder')} required /></div>
             {service.pricePerHour && <div className="form-group"><label><FaClock /> {t('numberOfHours')}</label><input type="number" name="hours" value={hours} onChange={(e) => setHours(e.target.value)} min="1" required /></div>}
             {service.pricePerPerson && <div className="form-group"><label><FaUserFriends /> {t('numberOfPersons')}</label><input type="number" name="persons" value={numberOfPersons} onChange={(e) => setNumberOfPersons(e.target.value)} min="1" required /></div>}
@@ -317,7 +332,7 @@ const BookingPage = () => {
                 </div>
               )}
             </div>
-            <button type="submit" className="submit-booking-button" disabled={!selectedDate || !selectedTime}>{t('confirmBooking')}</button>
+            <button type="submit" className="submit-booking-button">{t('confirmBooking')}</button>
           </form>
         </div>
       </div>

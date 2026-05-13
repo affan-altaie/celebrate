@@ -463,5 +463,17 @@
   "perPerson": "Per Person",
   "pricePerPerson": "Price Per Person",
   "bookedOnLabel": "booked on",
-  "cancelBooking": "Cancel Booking"
+    "cancelBooking": "Cancel Booking",
+    "noUpcomingBookings": "No upcoming bookings.",
+    "noCompletedBookings": "No completed bookings.",
+    "bookingManagement": "Booking Management",
+  "bookingManagementDesc": "View and manage your customers' bookings",
+  "viewBookings": "View Bookings",
+  "pending": "Pending",
+  "confirmed": "Confirmed",
+  "completed": "Completed",
+  "rejected": "Rejected",
+  "cancelled": "Cancelled",
+  "statusUpdatedSuccessfully": "Status updated successfully",
+  "failedToUpdateStatus": "Failed to update status"
 }

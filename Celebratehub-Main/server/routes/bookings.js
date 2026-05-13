@@ -5,7 +5,7 @@ const Booking = require("../modals/Booking");
 const User = require("../modals/User");
 const Payment = require("../modals/Payment");
 const Service = require("../modals/Service");
-const Review = require("../modals/Review"); // Added this line
+const Review = require("../modals/Review");
 const { validate, paymentCardValidation } = require("../middleware/validation");
 const nodemailer = require("nodemailer");
 const path = require("path");
@@ -115,6 +115,7 @@ router.post("/", async (req, res) => {
   try {
     const {
         userId, serviceId, serviceName, date, time, hours, totalPrice, location, 
+        customerPhone, customerEmail,
         payment, // { cardNumber, expiryDate, cvc, cardHolderName }
         useSavedCard, // boolean
         saveCard // boolean
@@ -152,12 +153,29 @@ router.post("/", async (req, res) => {
     user.walletBalance -= totalPrice;
     await user.save();
 
+    const service = await Service.findById(serviceId);
+    if (!service) {
+      return res.status(404).json({ message: "Service not found" });
+    }
+
     // Create Booking
-    const newBooking = new Booking({ userId, serviceId, serviceName, date, time, hours, totalPrice, location, status: "confirmed" });
+    const newBooking = new Booking({ 
+      userId, 
+      serviceId, 
+      providerId: service.providerId, 
+      serviceName, 
+      date, 
+      time, 
+      hours, 
+      totalPrice, 
+      location, 
+      customerPhone,
+      customerEmail,
+      status: "pending" 
+    });
     await newBooking.save();
 
     // Update service availability to remove booked slot
-    const service = await Service.findById(serviceId);
     if (service && service.availability && service.availability[date]) {
         service.availability[date] = service.availability[date].filter(t => t !== time);
         service.markModified("availability");
@@ -191,15 +209,63 @@ router.post("/", async (req, res) => {
   }
 });
 
+// GET PROVIDER BOOKINGS
+router.get("/provider/:providerId", async (req, res) => {
+  try {
+    const bookings = await Booking.find({ providerId: req.params.providerId })
+      .populate("userId", "username email phoneNumber")
+      .sort({ createdAt: -1 });
+    res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch provider bookings" });
+  }
+});
+
+// UPDATE BOOKING STATUS
+router.patch("/:id/status", async (req, res) => {
+  try {
+    const { status } = req.body;
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    booking.status = status;
+    await booking.save();
+
+    // If rejected or cancelled, refund the user and restore availability
+    if (status === "rejected" || status === "cancelled") {
+      const user = await User.findById(booking.userId);
+      if (user) {
+        user.walletBalance += booking.totalPrice;
+        await user.save();
+      }
+
+      const service = await Service.findById(booking.serviceId);
+      if (service && service.availability && booking.date in service.availability) {
+        service.availability[booking.date].push(booking.time);
+        service.markModified("availability");
+        await service.save();
+      }
+    }
+
+    res.json({ message: "Booking status updated successfully", booking });
+  } catch (error) {
+    console.error("Error updating booking status:", error);
+    res.status(500).json({ message: "Failed to update booking status" });
+  }
+});
+
 // GET USER BOOKINGS
 router.get("/user/:userId", async (req, res) => {
   try {
-    const bookings = await Booking.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+    const bookings = await Booking.find({ userId: req.params.userId })
+      .populate("providerId", "username email phoneNumber")
+      .sort({ createdAt: -1 });
     
-    // Removed the manual check for reviews, now using isReviewed field from Booking model
     const bookingsWithReviewStatus = bookings.map(booking => ({
       ...booking.toObject(),
-      hasReview: booking.isReviewed // Use the new isReviewed field
+      hasReview: booking.isReviewed
     }));
 
     res.json(bookingsWithReviewStatus);
@@ -227,7 +293,7 @@ router.delete("/:id", async (req, res) => {
     const service = await Service.findById(booking.serviceId);
     if (service && service.availability && booking.date in service.availability) {
         service.availability[booking.date].push(booking.time);
-        service.markModified("availability"); // Let Mongoose know the object has changed
+        service.markModified("availability");
         await service.save();
     }
 
@@ -254,5 +320,4 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-
-module.exports = router; 
+module.exports = router;

@@ -190,6 +190,8 @@ const BookingPage = () => {
         hours: hours,
         totalPrice: totalPrice,
         location: formData.location,
+        customerPhone: formData.phone,
+        customerEmail: formData.email,
         useSavedCard: useSavedCard,
         payment: useSavedCard ? undefined : {
           cardNumber: formData.cardNumber,

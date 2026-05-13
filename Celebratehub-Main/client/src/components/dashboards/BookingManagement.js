@@ -3,44 +3,48 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "./BookingHistory.css";
+import "./BookingHistory.css"; // Reuse these styles
 
-const BookingHistory = () => {
+const BookingManagement = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const user = JSON.parse(localStorage.getItem("user"));
-  const userId = user?.id || user?._id;
+  const providerId = user?.id || user?._id;
 
   useEffect(() => {
-    if (userId) {
-      axios.get(`/api/bookings/user/${userId}`)
+    if (providerId) {
+      axios.get(`/api/bookings/provider/${providerId}`)
         .then(res => {
-          // Sort bookings by date descending
-          const sortedBookings = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+          // Sort bookings so that 'pending' ones are at the top
+          const sortedBookings = res.data.sort((a, b) => {
+            if (a.status === 'pending' && b.status !== 'pending') return -1;
+            if (a.status !== 'pending' && b.status === 'pending') return 1;
+            return new Date(b.createdAt) - new Date(a.createdAt);
+          });
           setBookings(sortedBookings);
           setLoading(false);
         })
         .catch(err => {
-          console.error("Error fetching bookings:", err);
+          console.error("Error fetching provider bookings:", err);
           setLoading(false);
         });
     } else {
       setLoading(false);
     }
-  }, [userId]);
+  }, [providerId]);
 
-  const handleCancelBooking = async (bookingId) => {
-    if (window.confirm(t("confirmCancelBooking"))) {
-      try {
-        await axios.delete(`/api/bookings/${bookingId}`);
-        toast.success(t("bookingCancelledSuccessfully"));
-        setBookings(bookings.filter(booking => booking._id !== bookingId));
-      } catch (error) {
-        console.error("Error cancelling booking:", error);
-        toast.error(t("failedToCancelBooking"));
-      }
+  const handleStatusChange = async (bookingId, newStatus) => {
+    try {
+      await axios.patch(`/api/bookings/${bookingId}/status`, { status: newStatus });
+      toast.success(t("statusUpdatedSuccessfully") || "Status updated successfully");
+      setBookings(bookings.map(booking => 
+        booking._id === bookingId ? { ...booking, status: newStatus } : booking
+      ));
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error(t("failedToUpdateStatus") || "Failed to update status");
     }
   };
 
@@ -57,23 +61,28 @@ const BookingHistory = () => {
           <h3>{booking.serviceName}</h3>
       </div>
       <div className="booking-card-body">
-        <p><span className="label">{t("providerLabel")}:</span> {booking.providerId?.username || t("N/A")}</p>
-        <p><span className="label">{t("phoneLabel")}:</span> {booking.providerId?.phoneNumber || t("N/A")}</p>
-        <p><span className="label">{t("bookedOnLabel")}:</span> {new Date(booking.createdAt).toLocaleDateString("en-GB")}</p>
+        <p><span className="label">{t("customer")}:</span> {booking.userId?.username} ({booking.customerEmail || booking.userId?.email})</p>
+        <p><span className="label">{t("phoneLabel")}:</span> {booking.customerPhone || booking.userId?.phoneNumber || t("N/A")}</p>
         <p><span className="label">{t("dateLabel")}:</span> {booking.date}</p>
         <p><span className="label">{t("timeLabel")}:</span> {booking.time}</p>
+        <p><span className="label">{t("locationLabel")}:</span> {booking.location}</p>
         <p><span className="label">{t("priceLabel") || "Price"}:</span> OMR {booking.totalPrice.toFixed(2)}</p>
         <p><span className="label">{t("statusLabel")}:</span> <span className={`status ${booking.status.toLowerCase()}`}>{t(booking.status.toLowerCase())}</span></p>
       </div>
       <div className="booking-card-footer">
-        {booking.status === "completed" && !booking.isReviewed && (
-          <button onClick={() => navigate(`/leave-review/${booking._id}`)} className="action-btn review-btn">
-            {t("leaveReview")}
-          </button>
+        {booking.status === "pending" && (
+          <>
+            <button onClick={() => handleStatusChange(booking._id, "confirmed")} className="action-btn review-btn">
+              {t("confirm") || "Confirm"}
+            </button>
+            <button onClick={() => handleStatusChange(booking._id, "rejected")} className="action-btn cancel-btn">
+              {t("reject") || "Reject"}
+            </button>
+          </>
         )}
-        {(booking.status === "pending" || booking.status === "confirmed") && (
-          <button onClick={() => handleCancelBooking(booking._id)} className="action-btn cancel-btn">
-            {t("cancelBooking")}
+        {booking.status === "confirmed" && (
+          <button onClick={() => handleStatusChange(booking._id, "completed")} className="action-btn review-btn">
+            {t("completed") || "Completed"}
           </button>
         )}
       </div>
@@ -83,8 +92,8 @@ const BookingHistory = () => {
   return (
     <div className="booking-history-container">
       <header className="booking-history-header">
-        <button onClick={() => navigate("/customer-dashboard")} className="back-btn">{t("backToDashboard")}</button>
-        <h1>{t("bookingHistory")}</h1>
+        <button onClick={() => navigate("/provider-dashboard")} className="back-btn">{t("backToDashboard")}</button>
+        <h1>{t("bookingManagement") || "Booking Management"}</h1>
       </header>
       <main className="booking-history-content">
         {bookings.length > 0 ? (
@@ -110,8 +119,6 @@ const BookingHistory = () => {
         ) : (
           <div className="no-bookings">
             <h2>{t("noBookingsFound") || "No bookings found."}</h2>
-            <p>{t("startCelebrating") || "No bookings yet — start celebrating!"}</p>
-            <button onClick={() => navigate("/services")} className="action-btn">{t("bookNow")}</button>
           </div>
         )}
       </main>
@@ -119,4 +126,4 @@ const BookingHistory = () => {
   );
 };
 
-export default BookingHistory;
+export default BookingManagement;

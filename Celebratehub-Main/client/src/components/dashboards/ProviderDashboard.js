@@ -25,6 +25,11 @@ const ProviderDashboard = () => {
           <button onClick={() => navigate('/customer-reviews')} className="action-btn">{t('viewReviews')}</button>
         </div>
         <div className="dashboard-card">
+          <h3>{t('bookingManagement')}</h3>
+          <p>{t('bookingManagementDesc')}</p>
+          <button onClick={() => navigate('/booking-management')} className="action-btn">{t('viewBookings')}</button>
+        </div>
+        <div className="dashboard-card">
           <h3>{t('editProfile')}</h3>
           <p>{t('editProviderProfileDesc')}</p>
           <button onClick={() => navigate('/edit-provider-profile')} className="action-btn">{t('editProfile')}</button>

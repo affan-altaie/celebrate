@@ -38,6 +38,33 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
+}
+
+.booking-section {
+  width: 100%;
+  max-width: 800px;
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.section-title {
+  width: 100%;
+  text-align: left;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #eee;
+  color: #333;
+}
+
+.no-bookings-subtext {
+  color: #888;
+  font-style: italic;
+  margin-top: 10px;
 }
 
 /* Booking Card Styling */
@@ -80,12 +107,25 @@
   font-weight: bold;
 }
 
+.status.pending {
+  background-color: #ffc107;
+  color: #000;
+}
+
 .status.confirmed {
   background-color: #28a745;
 }
 
-.status.cancelled {
+.status.completed {
+  background-color: #007bff;
+}
+
+.status.rejected {
   background-color: #dc3545;
+}
+
+.status.cancelled {
+  background-color: #6c757d;
 }
 
 .booking-card-footer {
@@ -189,4 +229,13 @@
 
 [data-theme='dark'] .booking-card-body .label {
   color: #bbb;
+}
+
+[data-theme='dark'] .section-title {
+  color: #fff;
+  border-bottom-color: #555;
+}
+
+[data-theme='dark'] .no-bookings-subtext {
+  color: #aaa;
 }

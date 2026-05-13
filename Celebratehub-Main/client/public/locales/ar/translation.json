@@ -460,5 +460,16 @@
     "serviceId": "معرف الخدمة",
     "preview": "معاينة",
     "bookedOnLabel": "تاريخ الحجز",
-    "cancelBooking": "إلغاء الحجز"
+    "cancelBooking": "إلغاء الحجز",
+    "noUpcomingBookings": "لا توجد حجوزات قادمة.",
+    "noCompletedBookings": "لا توجد حجوزات مكتملة.",
+    "bookingManagement": "إدارة الحجوزات",
+    "bookingManagementDesc": "عرض وإدارة حجوزات عملائك",
+    "viewBookings": "عرض الحجوزات",
+    "pending": "قيد الانتظار",
+    "confirmed": "تم التأكيد",
+    "rejected": "مرفوض",
+    "cancelled": "ملغى",
+    "statusUpdatedSuccessfully": "تم تحديث الحالة بنجاح",
+    "failedToUpdateStatus": "فشل تحديث الحالة"
   }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import './Dashboard.css';
+import './CustomerReviews.css';
 import { FaStar } from 'react-icons/fa';
 
 const CustomerReviews = () => {
@@ -77,34 +78,36 @@ const CustomerReviews = () => {
       <main className="dashboard-content" style={{ display: 'block' }}>
         {servicesWithReviews.length > 0 ? (
           servicesWithReviews.map((service) => (
-            <div key={service._id} className="dashboard-card" style={{ marginBottom: '2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+            <div key={service._id} className="dashboard-card service-review-group" style={{ marginBottom: '2rem', textAlign: 'left' }}>
+              <div className="service-review-header" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
                 <img src={service.images[0]} alt={service.name} style={{ width: '100px', height: '100px', borderRadius: '8px', objectFit: 'cover' }} />
                 <h2>{service.name}</h2>
               </div>
-              {service.reviews.length > 0 ? (
-                service.reviews.map((review) => (
-                  <div key={review._id} className="review-card">
-                    <div className="review-header">
-                      <img src={review.user?.profilePicture || '/default-avatar.png'} alt={review.user?.username} className="reviewer-avatar" />
-                      <div className="review-info">
-                        <strong>{review.user?.username || 'Anonymous'}</strong>
-                        {renderStars(review.rating)}
+              <div className="reviews-list">
+                {service.reviews.length > 0 ? (
+                  service.reviews.map((review) => (
+                    <div key={review._id} className="review-card">
+                      <div className="review-header">
+                        <img src={review.user?.profilePicture || '/default-avatar.png'} alt={review.user?.username} className="reviewer-avatar" />
+                        <div className="review-info">
+                          <strong>{review.user?.username || 'Anonymous'}</strong>
+                          {renderStars(review.rating)}
+                        </div>
                       </div>
+                      <p className="review-comment">{review.comment}</p>
+                      {review.images && review.images.length > 0 && (
+                        <div className="review-images">
+                          {review.images.map((img, idx) => (
+                            <img key={idx} src={img} alt="Review" className="review-image" />
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <p>{review.comment}</p>
-                    {review.images && review.images.length > 0 && (
-                      <div className="review-images" style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                        {review.images.map((img, idx) => (
-                          <img key={idx} src={img} alt="Review" style={{ width: '80px', height: '80px', borderRadius: '4px', objectFit: 'cover' }} />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <p>{t('noReviewsYet')}</p>
-              )}
+                  ))
+                ) : (
+                  <p style={{ textAlign: 'center', opacity: 0.7 }}>{t('noReviewsYet')}</p>
+                )}
+              </div>
             </div>
           ))
         ) : (

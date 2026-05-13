@@ -36,6 +36,7 @@ import AddService from './components/dashboards/AddService';
 import LeaveReview from './components/dashboards/LeaveReview';
 import ReportService from './components/dashboards/ReportService';
 import BookingPage from './components/dashboards/BookingPage';
+import BookingManagement from './components/dashboards/BookingManagement';
 import BookingConfirmation from './components/dashboards/BookingConfirmation';
 import ServicesList from './components/dashboards/ServicesList';
 import EditService from './components/dashboards/admin/EditService';
@@ -108,6 +109,7 @@ const AppContent = () => {
         <Route path="/booking-confirmation" element={<ProtectedRoute allowedRoles={['customer']}><BookingConfirmation /></ProtectedRoute>} />
         <Route path="/provider-dashboard" element={<ProtectedRoute allowedRoles={['provider']}><ProviderDashboard /></ProtectedRoute>} />
         <Route path="/manage-listings" element={<ProtectedRoute allowedRoles={['provider']}><ManageListings /></ProtectedRoute>} />
+        <Route path="/booking-management" element={<ProtectedRoute allowedRoles={['provider']}><BookingManagement /></ProtectedRoute>} />
         <Route path="/add-service" element={<ProtectedRoute allowedRoles={['provider']}><AddService /></ProtectedRoute>} />
         <Route path="/edit-listing/:id" element={<ProtectedRoute allowedRoles={['provider']}><EditListing /></ProtectedRoute>} />
         <Route path="/edit-provider-profile" element={<ProtectedRoute allowedRoles={['provider']}><EditProviderProfile /></ProtectedRoute>} />

@@ -91,6 +91,44 @@ router.patch("/:id/status", isAuthenticated, async (req, res) => {
       return res.status(404).json({ message: "Report not found" });
     }
 
+    // Send email to the reporter if status is 'reviewed' or 'resolved'
+    if (status === 'reviewed' || status === 'resolved') {
+      try {
+        const customerName = report.user?.username || "Customer";
+        const serviceName = report.service?.name || "the service";
+        let subject, message;
+
+        if (status === 'reviewed') {
+          subject = "Update regarding your report";
+          message = `Hello ${customerName},<br><br>
+          Thank you for submitting your report regarding ${serviceName}.<br>
+          We want you to know that your feedback has been received and is currently under review by our team.<br><br>
+          Our goal is to ensure every customer has a respectful and positive experience. If further details are needed, we’ll reach out to you directly. Otherwise, you’ll be notified once the report status changes from Pending to Reviewed or Resolved.<br><br>
+          We appreciate you taking the time to share your concerns.<br><br>
+          Best regards,<br>
+          CelebrateHub Support Team`;
+        } else {
+          subject = "Your report has been resolved";
+          message = `Hello ${customerName},<br><br>
+          We’re reaching out to let you know that your report regarding ${serviceName} has been reviewed and marked as Resolved.<br><br>
+          Our team has taken the necessary steps to address your concern, and we appreciate you bringing this to our attention. Your feedback helps us improve and ensures that we continue to provide a respectful, professional experience.<br><br>
+          If you have any further questions or feel the issue has not been fully addressed, please don’t hesitate to reply to this email.<br><br>
+          Thank you again for helping us improve.<br><br>
+          Best regards,<br>
+          CelebrateHub Support Team`;
+        }
+        
+        await sendEmail({
+          email: report.user.email,
+          subject,
+          message,
+          skipFooter: true
+        });
+      } catch (emailError) {
+        console.error(`Error sending ${status} notification email:`, emailError);
+      }
+    }
+
     res.json({ message: "Report status updated successfully", report });
   } catch (error) {
     console.error("Error updating report status:", error);

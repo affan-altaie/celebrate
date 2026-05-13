@@ -21,9 +21,11 @@ const sendEmail = async (options) => {
         <img src="cid:logo" alt="CelebrateHub" style="width: 200px;"/>
         <div style="text-align: left; padding: 20px;">
           <p>${options.message}</p>
+          ${!options.skipFooter ? `
           <p>If you have any questions, please contact our support team.</p>
           <p>Thank you,</p>
           <p>The CelebrateHub Team</p>
+          ` : ''}
         </div>
       </div>
     `,

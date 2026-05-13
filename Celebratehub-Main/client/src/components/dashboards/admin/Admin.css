@@ -354,6 +354,101 @@
     display: flex;
     flex-wrap: nowrap;
   }
+
+  /* Toolbar Styles */
+  .toolbar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    background-color: var(--card-background);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .toolbar-left, .toolbar-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .search-input-wrapper {
+    position: relative;
+    min-width: 250px;
+  }
+
+  .search-input-wrapper input {
+    width: 100%;
+    padding: 8px 12px;
+    padding-left: 35px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+  }
+
+  .toolbar-select {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-width: 150px;
+  }
+
+  .read-more-btn {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0;
+    margin-left: 5px;
+    text-decoration: underline;
+    font-size: 0.85rem;
+  }
+
+  /* Modal Details Styles */
+  .details-modal-box {
+    max-width: 600px !important;
+    text-align: left !important;
+  }
+
+  .detail-row {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .detail-row:last-child {
+    border-bottom: none;
+  }
+
+  .detail-label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+  }
+
+  .detail-value {
+    line-height: 1.6;
+    word-break: break-word;
+  }
   
 [data-theme='dark'] .user-section-card {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);

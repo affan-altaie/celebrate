@@ -1,111 +1,86 @@
-// server/routes/reviews.js
 const express = require("express");
 const router = express.Router();
-const { check, validationResult } = require("express-validator");
-const { isAuthenticated } = require("../middleware/auth");
-const Service = require("../modals/Service");
+const { upload } = require("../middleware/multer");
 const Review = require("../modals/Review");
 const Booking = require("../modals/Booking");
-const multer = require("multer");
 const supabase = require("../supabase");
 
-const upload = multer({ storage: multer.memoryStorage() });
+// @route   POST /api/reviews
+// @desc    Submit a review
+// @access  Private
+router.post("/", upload.array("images", 4), async (req, res) => {
+  try {
+    const { bookingId, rating, comment, userId, serviceId } = req.body;
 
-router.post("/:serviceId", [
-    isAuthenticated,
-    upload.array("images", 4),
-    check("rating", "Rating is required").not().isEmpty(),
-    check("comment", "Comment is required").not().isEmpty(),
-    check("bookingId", "Booking ID is required").not().isEmpty(), // Added bookingId validation
-], async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+    // Check if booking exists and belongs to user
+    const booking = await Booking.findById(bookingId);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
     }
 
-    const { rating, comment, bookingId } = req.body; // Extracted bookingId
-    const { serviceId } = req.params;
-    const userId = req.user.id;
-
-    try {
-        let service = await Service.findById(serviceId);
-        if (!service) {
-            return res.status(404).json({ msg: "Service not found" });
-        }
-
-        // Check if a review already exists for this booking
-        const existingReview = await Review.findOne({ booking: bookingId });
-        if (existingReview) {
-            return res.status(400).json({ msg: "A review for this booking already exists" });
-        }
-
-        let booking = await Booking.findById(bookingId);
-        if (!booking) {
-            return res.status(404).json({ msg: "Booking not found" });
-        }
-        if (booking.userId.toString() !== userId) {
-            return res.status(401).json({ msg: "User not authorized to review this booking" });
-        }
-
-        const imageUrls = [];
-        if (req.files) {
-            for (const file of req.files) {
-                const { data, error } = await supabase.storage
-                    .from("customers-reviews-imgs")
-                    .upload(`${userId}_${Date.now()}`, file.buffer, {
-                        contentType: file.mimetype
-                    });
-
-                if (error) {
-                    console.error("Error uploading image to Supabase:", error.message);
-                    return res.status(500).send("Server error");
-                }
-
-                const { data: publicUrlData } = supabase.storage
-                    .from("customers-reviews-imgs")
-                    .getPublicUrl(data.path);
-
-                imageUrls.push(publicUrlData.publicUrl);
-            }
-        }
-
-        const newReview = new Review({
-            user: userId,
-            service: serviceId,
-            booking: bookingId, // Added bookingId to review
-            rating,
-            comment,
-            images: imageUrls.filter(url => url), // Filter out any null/undefined URLs
-        });
-
-        await newReview.save();
-
-        // Mark booking as reviewed
-        booking.isReviewed = true;
-        await booking.save();
-
-        // Update the service's rating
-        const reviews = await Review.find({ service: serviceId });
-        const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
-        service.rating = totalRating / reviews.length;
-        await service.save();
-
-        res.json(newReview);
-
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).send("Server Error");
+    if (booking.isReviewed) {
+      return res.status(400).json({ message: "This booking has already been reviewed" });
     }
+
+    const images = [];
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const filePath = `${Date.now()}-${file.originalname}`;
+        const { data, error } = await supabase.storage
+          .from("customers-reviews-imgs")
+          .upload(filePath, file.buffer, {
+            contentType: file.mimetype,
+            upsert: true
+          });
+
+        if (error) {
+          console.error("Error uploading review image to Supabase:", error);
+          continue; // Skip failed uploads
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from("customers-reviews-imgs")
+          .getPublicUrl(filePath);
+
+        if (publicUrlData && publicUrlData.publicUrl) {
+          images.push(publicUrlData.publicUrl);
+        }
+      }
+    }
+
+    const newReview = new Review({
+      user: userId,
+      service: serviceId,
+      booking: bookingId,
+      rating: parseInt(rating),
+      comment,
+      images
+    });
+
+    await newReview.save();
+
+    // Mark booking as reviewed
+    booking.isReviewed = true;
+    await booking.save();
+
+    res.status(201).json({ message: "Review submitted successfully", review: newReview });
+  } catch (error) {
+    console.error("Error submitting review:", error);
+    res.status(500).json({ message: "Failed to submit review", error: error.message });
+  }
 });
 
-// GET all reviews for a specific service
+// @route   GET /api/reviews/service/:serviceId
+// @desc    Get reviews for a service
+// @access  Public
 router.get("/service/:serviceId", async (req, res) => {
   try {
-    const reviews = await Review.find({ service: req.params.serviceId }).populate("user", "username");
+    const reviews = await Review.find({ service: req.params.serviceId })
+      .populate("user", "username")
+      .sort({ createdAt: -1 });
     res.json(reviews);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch reviews", error: error.message });
   }
 });
 

@@ -241,5 +241,18 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// GET SINGLE BOOKING
+router.get("/:id", async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+    res.json(booking);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch booking" });
+  }
+});
+
 
 module.exports = router; 

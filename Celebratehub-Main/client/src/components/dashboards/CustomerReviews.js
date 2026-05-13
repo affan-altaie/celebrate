@@ -86,13 +86,20 @@ const CustomerReviews = () => {
                 service.reviews.map((review) => (
                   <div key={review._id} className="review-card">
                     <div className="review-header">
-                      <img src={review.userId.profilePicture || '/default-avatar.png'} alt={review.userId.username} className="reviewer-avatar" />
+                      <img src={review.user?.profilePicture || '/default-avatar.png'} alt={review.user?.username} className="reviewer-avatar" />
                       <div className="review-info">
-                        <strong>{review.userId.username}</strong>
+                        <strong>{review.user?.username || 'Anonymous'}</strong>
                         {renderStars(review.rating)}
                       </div>
                     </div>
                     <p>{review.comment}</p>
+                    {review.images && review.images.length > 0 && (
+                      <div className="review-images" style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                        {review.images.map((img, idx) => (
+                          <img key={idx} src={img} alt="Review" style={{ width: '80px', height: '80px', borderRadius: '4px', objectFit: 'cover' }} />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))
               ) : (

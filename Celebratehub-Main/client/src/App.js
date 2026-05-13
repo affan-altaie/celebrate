@@ -98,7 +98,7 @@ const AppContent = () => {
         <Route path="/customer-dashboard" element={<ProtectedRoute allowedRoles={['customer']}><CustomerDashboard /></ProtectedRoute>} />
         <Route path="/customer-profile" element={<ProtectedRoute allowedRoles={['customer']}><CustomerProfile /></ProtectedRoute>} />
         <Route path="/booking-history" element={<ProtectedRoute allowedRoles={['customer']}><BookingHistory /></ProtectedRoute>} />
-        <Route path="/leave-review/:serviceId" element={<ProtectedRoute allowedRoles={['customer']}><LeaveReview /></ProtectedRoute>} />
+        <Route path="/leave-review/:bookingId" element={<ProtectedRoute allowedRoles={['customer']}><LeaveReview /></ProtectedRoute>} />
         <Route path="/report-service/:serviceId" element={<ProtectedRoute allowedRoles={['customer']}><ReportService /></ProtectedRoute>} />
         <Route path="/new-booking" element={<ProtectedRoute allowedRoles={['customer']}><NewBooking /></ProtectedRoute>} />
         <Route path="/services" element={<ProtectedRoute allowedRoles={['customer', 'provider', 'admin']}><ServicesList /></ProtectedRoute>} />

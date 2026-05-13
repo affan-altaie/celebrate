@@ -76,7 +76,7 @@ router.post("/", upload.array("images", 4), async (req, res) => {
 router.get("/service/:serviceId", async (req, res) => {
   try {
     const reviews = await Review.find({ service: req.params.serviceId })
-      .populate("user", "username")
+      .populate("user", "username profilePicture")
       .sort({ createdAt: -1 });
     res.json(reviews);
   } catch (error) {

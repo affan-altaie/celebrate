@@ -2,26 +2,9 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../modals/User");
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
+const { upload } = require("../middleware/multer");
+const supabase = require("../supabase");
 const sendEmail = require("../utils/email");
-
-// Configure Multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const dir = "./uploads";
-    if (!fs.existsSync(dir)){
-        fs.mkdirSync(dir);
-    }
-    cb(null, dir);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ storage: storage });
 
 // Get all users
 router.get("/", async (req, res) => {
@@ -55,17 +38,48 @@ router.put("/:id/profile-picture", upload.single("profilePicture"), async (req, 
       return res.status(400).json({ message: "No file uploaded" });
     }
 
-    const profilePicturePath = `/uploads/${req.file.filename}`;
-    
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { profilePicture: profilePicturePath },
-      { new: true }
-    );
-
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    // Delete old profile picture from Supabase if it exists
+    if (user.profilePicture && user.profilePicture.includes("user-profile-logo")) {
+      try {
+        const oldFilePath = user.profilePicture.split("user-profile-logo/")[1];
+        if (oldFilePath) {
+          await supabase.storage.from("user-profile-logo").remove([oldFilePath]);
+        }
+      } catch (err) {
+        console.error("Error deleting old profile picture from Supabase:", err);
+      }
+    }
+
+    // Upload new profile picture to Supabase
+    const fileName = `${Date.now()}_${req.file.originalname.replace(/\s+/g, "_")}`;
+    const { data, error } = await supabase.storage
+      .from("user-profile-logo")
+      .upload(fileName, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: true
+      });
+
+    if (error) {
+      console.error("Supabase upload error:", error);
+      return res.status(500).json({ message: "Failed to upload image to Supabase", error: error.message });
+    }
+
+    // Get public URL
+    const { data: publicUrlData } = supabase.storage
+      .from("user-profile-logo")
+      .getPublicUrl(fileName);
+
+    if (!publicUrlData || !publicUrlData.publicUrl) {
+      return res.status(500).json({ message: "Failed to get public URL for profile picture" });
+    }
+
+    user.profilePicture = publicUrlData.publicUrl;
+    await user.save();
 
     res.json({ 
       message: "Profile picture updated", 
@@ -108,10 +122,24 @@ router.put("/:id/password", async (req, res) => {
 // Delete Account
 router.delete("/:id", async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    // Delete profile picture from Supabase if it exists
+    if (user.profilePicture && user.profilePicture.includes("user-profile-logo")) {
+      try {
+        const filePath = user.profilePicture.split("user-profile-logo/")[1];
+        if (filePath) {
+          await supabase.storage.from("user-profile-logo").remove([filePath]);
+        }
+      } catch (err) {
+        console.error("Error deleting profile picture from Supabase during account deletion:", err);
+      }
+    }
+
+    await User.findByIdAndDelete(req.params.id);
     res.json({ message: "Account deleted successfully" });
   } catch (error) {
     console.error("Delete account error:", error);

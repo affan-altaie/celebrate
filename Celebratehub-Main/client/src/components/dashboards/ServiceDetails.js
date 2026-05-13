@@ -144,9 +144,9 @@ const ServiceDetails = () => {
                   </div>
                 </div>
                 <p className="review-comment">{review.comment}</p>
-                <div className="review-images">
+                <div className="review-photos">
                   {review.images.map((image, index) => (
-                    <img key={index} src={image} alt={`Review ${index + 1}`} className="review-image" />
+                    <img key={index} src={image} alt={`Review ${index + 1}`} className="review-photo" />
                   ))}
                 </div>
               </div>

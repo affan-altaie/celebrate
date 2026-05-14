@@ -167,12 +167,17 @@ const EditListing = () => {
       try {
         const response = await axios.get(`/api/services/${id}`);
         const data = response.data;
-        const nameParts = data.name.split(': ');
+        if (!data) {
+           toast.error('Service not found.');
+           navigate('/manage-listings');
+           return;
+        }
+        const nameParts = (data.name || '').split(': ');
         if (nameParts.length > 1) {
           setProviderName(nameParts[0]);
           setServiceName(nameParts.slice(1).join(': '));
         } else {
-          setServiceName(data.name);
+          setServiceName(data.name || '');
           const userString = localStorage.getItem('user');
           if (userString) {
             const user = JSON.parse(userString);
@@ -184,7 +189,7 @@ const EditListing = () => {
 
         setFormData({
           ...data,
-          features: Array.isArray(data.features) ? data.features.join(', ') : '',
+          features: Array.isArray(data.features) ? data.features.join(', ') : (data.features || ''),
           images: data.images || [],
           availability: data.availability || {},
           cancellationPolicy: data.cancellationPolicy || '',
@@ -198,7 +203,7 @@ const EditListing = () => {
       }
     };
     fetchService();
-  }, [id]);
+  }, [id, navigate]);
 
   useEffect(() => {
     setFormData(prev => ({...prev, name: providerName ? `${providerName}: ${serviceName}` : serviceName}));
@@ -395,9 +400,9 @@ const EditListing = () => {
     return (
         <div className="availability-calendar">
             <div className="calendar-navigation">
-                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}>&lt;</button>
+                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}></button>
                 <h3>{currentMonth.toLocaleString(t('locale'), { month: 'long', year: 'numeric' })}</h3>
-                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}>&gt;</button>
+                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}></button>
             </div>
             <div className="calendar-grid">
                 <div className="calendar-header">{t('sun')}</div>
@@ -512,7 +517,7 @@ const EditListing = () => {
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onClick={() => document.getElementById('image-upload-input').click()}
-                >
+                 >
                   <input
                     type="file"
                     id="image-upload-input"

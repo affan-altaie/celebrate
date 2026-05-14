@@ -97,6 +97,21 @@ const NewBooking = () => {
 
     fetchServices();
   }, []);
+
+  const isServiceAvailable = (availability) => {
+    if (!availability || Object.keys(availability).length === 0) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Object.keys(availability).some(dateStr => {
+      const date = new Date(dateStr);
+      return date >= today && availability[dateStr].length > 0;
+    });
+  };
+
+  const userString = localStorage.getItem("user");
+  const user = userString ? JSON.parse(userString) : null;
+  const isCustomer = !user || user.role === "customer";
+
   const [searchHistory, setSearchHistory] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const resultsRef = useRef(null);
@@ -400,26 +415,30 @@ const handleRemoveFromHistory = (itemToRemove) => {
       <div className="top-providers-container">
         <h2>{t('topProvidersTitle')}</h2>
         <div className="results-grid">
-          {topProviders.map((provider, index) => (
-            <div key={index} className="result-card" onClick={() => navigate(`/service/${provider._id}`)}>
-              <div className="card-image-container">
-                <img src={provider.images[provider.mainImageIndex]} alt={provider.name} className="result-image" />
-                <div className="rating-badge">
-                  <FaStar /> {provider.rating}
+          {topProviders.map((provider, index) => {
+            const available = isServiceAvailable(provider.availability);
+            return (
+              <div key={index} className={`result-card ${!available ? 'unavailable' : ''}`} onClick={() => navigate(`/service/${provider._id}`)}>
+                <div className="card-image-container">
+                  <img src={provider.images[provider.mainImageIndex]} alt={provider.name} className="result-image" />
+                  {!available && isCustomer && <div className="unavailable-banner">{t('currentlyUnavailable')}</div>}
+                  <div className="rating-badge">
+                    <FaStar /> {provider.rating}
+                  </div>
+                </div>
+                <div className="result-details">
+                <img 
+                  src={provider.providerId && provider.providerId.profilePicture ? provider.providerId.profilePicture : defaultProfilePic}
+                  alt={provider.providerId ? provider.providerId.username : 'Default'}
+                  className="provider-logo" 
+                />
+                  <div className="service-tag">{provider.type}</div>
+                  <h3>{provider.name}</h3>
+                  <p className="reviews">{t('reviewsCount', { count: provider.reviews ? provider.reviews.length : 0 })}</p>
                 </div>
               </div>
-              <div className="result-details">
-              <img 
-                src={provider.providerId && provider.providerId.profilePicture ? provider.providerId.profilePicture : defaultProfilePic}
-                alt={provider.providerId ? provider.providerId.username : 'Default'}
-                className="provider-logo" 
-              />
-                <div className="service-tag">{provider.type}</div>
-                <h3>{provider.name}</h3>
-                <p className="reviews">{t('reviewsCount', { count: provider.reviews ? provider.reviews.length : 0 })}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -440,37 +459,47 @@ const handleRemoveFromHistory = (itemToRemove) => {
         <div className="search-results-container" ref={resultsRef}>
           <h2>{t('searchResultsTitle')}</h2>
           <div className="results-grid">
-          {searchResults.map((result, index) => (
-            <div key={index} className="result-card">
-              <div className="card-image-container">
-                <img src={result.images[result.mainImageIndex]} alt={result.name} className="result-image" />
-                <div className="rating-badge">
-                    <FaStar /> {result.rating}
+          {searchResults.map((result, index) => {
+            const available = isServiceAvailable(result.availability);
+            return (
+              <div key={index} className={`result-card ${!available ? 'unavailable' : ''}`}>
+                <div className="card-image-container" onClick={() => navigate(`/service/${result._id}`)} style={{ cursor: 'pointer' }}>
+                  <img src={result.images[result.mainImageIndex]} alt={result.name} className="result-image" />
+                  {!available && isCustomer && <div className="unavailable-banner">{t('currentlyUnavailable')}</div>}
+                  <div className="rating-badge">
+                      <FaStar /> {result.rating}
+                    </div>
+                  </div>
+                  <div className="result-details">
+                  <img 
+                    src={result.providerId && result.providerId.profilePicture ? result.providerId.profilePicture : defaultProfilePic}
+                    alt={result.providerId ? result.providerId.username : 'Default'}
+                    className="provider-logo" 
+                  />
+                    <div className="service-tag">{result.type}</div>
+                    <h3>{result.name}</h3>
+                    {result.location && <p className="location"><FaMapMarkerAlt className="icon" /> {result.location}</p>}
+                    <p className="reviews">{t('reviewsCount', { count: result.reviews ? result.reviews.length : 0 })}</p>
+                    <p className="description">{result.description}</p>
+                    <ul className="features-list">
+                      {result.features.map((feature, i) => (
+                        <li key={i}><FaCheckCircle /> {feature}</li>
+                      ))}
+                    </ul>
+                    <div className="card-footer">
+                      <p className="price">OMR {result.pricePerHour || result.pricePerPerson} / {result.pricePerHour ? 'hour' : 'person'}</p>
+                      <button 
+                        className={`book-button ${!available ? 'disabled' : ''}`} 
+                        onClick={() => available && navigate(`/booking/${result._id}`)}
+                        disabled={!available}
+                      >
+                        {t('bookButton')}
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div className="result-details">
-                <img 
-                  src={result.providerId && result.providerId.profilePicture ? result.providerId.profilePicture : defaultProfilePic}
-                  alt={result.providerId ? result.providerId.username : 'Default'}
-                  className="provider-logo" 
-                />
-                  <div className="service-tag">{result.type}</div>
-                  <h3>{result.name}</h3>
-                  {result.location && <p className="location"><FaMapMarkerAlt className="icon" /> {result.location}</p>}
-                  <p className="reviews">{t('reviewsCount', { count: result.reviews ? result.reviews.length : 0 })}</p>
-                  <p className="description">{result.description}</p>
-                  <ul className="features-list">
-                    {result.features.map((feature, i) => (
-                      <li key={i}><FaCheckCircle /> {feature}</li>
-                    ))}
-                  </ul>
-                  <div className="card-footer">
-                    <p className="price">OMR {result.pricePerHour || result.pricePerPerson} / {result.pricePerHour ? 'hour' : 'person'}</p>
-                    <button className="book-button" onClick={() => navigate(`/booking/${result._id}`)}>{t('bookButton')}</button>
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

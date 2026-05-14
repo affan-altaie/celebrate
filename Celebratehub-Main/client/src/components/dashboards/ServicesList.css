@@ -73,3 +73,58 @@
 [data-theme='dark'] .no-services-found {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
+
+.service-card.unavailable {
+  opacity: 0.85;
+  cursor: pointer; /* Still allow clicking to see details, or change to default if preferred */
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+}
+
+.unavailable-banner {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #dc3545;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  z-index: 1;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 1rem 0;
+}
+
+.service-card {
+  background: var(--card-background);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--box-shadow);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+}
+
+.service-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.service-card h3, .service-card p {
+  padding: 0.5rem 1rem;
+  margin: 0;
+}

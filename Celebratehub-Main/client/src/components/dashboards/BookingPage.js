@@ -95,6 +95,17 @@ const BookingPage = () => {
     "Wadi Bani Khalid",
     "Yanqul"
   ].sort();
+
+  const isServiceAvailable = (availability) => {
+    if (!availability || Object.keys(availability).length === 0) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Object.keys(availability).some(dateStr => {
+      const date = new Date(dateStr);
+      return date >= today && availability[dateStr].length > 0;
+    });
+  };
+
   // Fetch Service Details
   useEffect(() => {
     const fetchService = async () => {
@@ -102,8 +113,14 @@ const BookingPage = () => {
         const response = await axios.get(`/api/services/${id}`);
         setService(response.data);
         if (response.data.availability && Object.keys(response.data.availability).length > 0) {
-          const firstAvailableDate = Object.keys(response.data.availability).sort()[0];
-          setCurrentDate(new Date(firstAvailableDate));
+          const todayStr = new Date().toISOString().split('T')[0];
+          const futureDates = Object.keys(response.data.availability)
+            .filter(date => date >= todayStr && response.data.availability[date].length > 0)
+            .sort();
+          
+          if (futureDates.length > 0) {
+            setCurrentDate(new Date(futureDates[0]));
+          }
         }
       } catch (error) {
         console.error('Error fetching service:', error);
@@ -117,6 +134,13 @@ const BookingPage = () => {
     const fetchUserData = async () => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         if (storedUser && storedUser.id) {
+            // Pre-fill email and phone from stored user data
+            setFormData(prev => ({
+              ...prev,
+              email: storedUser.email || prev.email,
+              phone: (storedUser.phoneNumber || '').replace(/\D/g, '') || prev.phone
+            }));
+
             try {
                 const { data } = await axios.get(`/api/payments/balance/${storedUser.id}`);
                 if (data.savedCard) {
@@ -242,10 +266,14 @@ const BookingPage = () => {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
     const dates = [];
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
     for (let i = 0; i < firstDayOfMonth; i++) dates.push(<div key={`empty-${i}`} className="calendar-day empty"></div>);
     for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
       const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      const isAvailable = service.availability && service.availability[dateStr] && service.availability[dateStr].length > 0;
+      const isAvailable = service.availability && service.availability[dateStr] && service.availability[dateStr].length > 0 && date >= today;
       const isSelected = selectedDate === dateStr;
       dates.push(
         <div key={day} className={`calendar-day ${isAvailable ? 'available' : ''} ${isSelected ? 'selected' : ''}`} onClick={() => isAvailable && (setSelectedDate(dateStr), setSelectedTime(null))}>
@@ -256,9 +284,9 @@ const BookingPage = () => {
     return (
       <div>
         <div className="calendar-navigation">
-          <button type="button" onClick={handlePrevMonth}>&lt;</button>
+          <button type="button" onClick={handlePrevMonth}></button>
           <h3>{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</h3>
-          <button type="button" onClick={handleNextMonth}>&gt;</button>
+          <button type="button" onClick={handleNextMonth}></button>
         </div>
         <div className="calendar-grid">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => <div key={day} className="calendar-header">{t(day.toLowerCase())}</div>)}{dates}</div>
       </div>
@@ -267,6 +295,21 @@ const BookingPage = () => {
 
   if (!service) return <div className="loading">{t('loading')}</div>;
 
+  const available = isServiceAvailable(service.availability);
+
+  if (!available) {
+    return (
+      <div className="booking-page-container-wrapper">
+        <button onClick={() => navigate(-1)} className="back-button">{t('backToServiceDetails')}</button>
+        <div className="unavailable-message-container" style={{ textAlign: 'center', padding: '50px', background: 'var(--card-bg)', borderRadius: '15px', marginTop: '20px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}>
+          <h2 style={{ color: '#dc3545', marginBottom: '20px' }}>{t('currentlyUnavailable')}</h2>
+          <p style={{ fontSize: '1.2rem', marginBottom: '30px' }}>{t('noAvailableDates')}</p>
+          <button onClick={() => navigate('/new-booking')} className="submit-booking-button" style={{ maxWidth: '300px', margin: '0 auto' }}>{t('backToSearch')}</button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="booking-page-container-wrapper">
       <button onClick={() => navigate(-1)} className="back-button">{t('backToServiceDetails')}</button>
@@ -274,7 +317,7 @@ const BookingPage = () => {
         <div className="booking-details-column">
             <img src={service.images[service.mainImageIndex]} alt={service.name} className="service-image" />
             <h2>{service.name}</h2>
-            <div className="service-meta"><span><FaStar /> {service.rating}</span> <span><FaUserFriends /> {t('reviewsCount', { count: service.reviews })}</span></div>
+            <div className="service-meta"><span><FaStar /> {service.rating}</span> <span><FaUserFriends /> {t('reviewsCount', { count: service.reviews ? service.reviews.length : 0 })}</span></div>
             <p className="service-info"><FaMapMarkerAlt /> {service.location}</p>
             {service.pricePerHour && <p className="service-info">OMR {service.pricePerHour} / hour</p>}
             {service.pricePerPerson && <p className="service-info">OMR {service.pricePerPerson} / {t('personLabel')}</p>}

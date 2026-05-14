@@ -413,3 +413,15 @@
 [data-theme='dark'] .submit-booking-button{
     color: var(--button-text-color);
 }
+
+.unavailable-message-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+[data-theme='dark'] .unavailable-message-container {
+  background-color: #1e1e1e !important;
+}

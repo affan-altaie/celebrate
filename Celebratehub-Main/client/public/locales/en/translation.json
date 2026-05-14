@@ -538,6 +538,8 @@
     "chatbotHelp": "You can ask me about CelebrateHub, our services, or how to book. If you need more specific assistance, please contact our support team at noreply.celebrate.hub@gmail.com.",
     "chatbotDefault": "I'm sorry, I don't understand. You can ask me about CelebrateHub, our services, or how to book. For other questions, please contact support at noreply.celebrate.hub@gmail.com.",
     "chatbotInitialGreeting": "Hi! How can I help you today?",
-    "chatbotToggle": "Toggle Chatbot"
+    "chatbotToggle": "Toggle Chatbot",
+    "currentlyUnavailable": "Currently Unavailable",
+    "noAvailableDates": "This service provider has no available booking dates at the moment."
   }
   

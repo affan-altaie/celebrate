@@ -3,6 +3,7 @@ const router = express.Router();
 const { upload } = require("../middleware/multer");
 const Review = require("../modals/Review");
 const Booking = require("../modals/Booking");
+const Service = require("../modals/Service");
 const supabase = require("../supabase");
 
 // @route   POST /api/reviews
@@ -58,6 +59,24 @@ router.post("/", upload.array("images", 4), async (req, res) => {
     });
 
     await newReview.save();
+
+    // Sync review data to the Service model
+    const reviews = await Review.find({ service: serviceId });
+    const count = reviews.length;
+    const averageRating = reviews.reduce((acc, curr) => acc + curr.rating, 0) / count;
+
+    await Service.findByIdAndUpdate(serviceId, {
+      $push: {
+        reviews: {
+          user: userId,
+          rating: parseInt(rating),
+          comment,
+          images,
+          createdAt: newReview.createdAt
+        }
+      },
+      rating: parseFloat(averageRating.toFixed(1))
+    });
 
     // Mark booking as reviewed
     booking.isReviewed = true;

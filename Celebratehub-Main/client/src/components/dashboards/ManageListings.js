@@ -32,7 +32,7 @@ const ManageListings = () => {
       const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
       await axios.put(`/api/services/${id}`, { status: newStatus });
       setServices(services.map(service => 
-        service._id === id ? { ...service, status: newStatus } : service
+        (service._id === id || service.id === id) ? { ...service, status: newStatus } : service
       ));
       toast.success(t('statusUpdatedSuccess', { status: newStatus }));
     } catch (error) {
@@ -42,14 +42,14 @@ const ManageListings = () => {
   };
 
   const handleDeleteService = async (id) => {
-    if (window.confirm(t("confirmDeleteService"))) {
+    if (window.confirm(t("confirmDeleteService", "Are you sure you want to delete this service?"))) {
       try {
         await axios.delete(`/api/services/${id}`);
-        setServices(services.filter(service => service._id !== id));
-        toast.success(t("serviceDeletedSuccess"));
+        setServices(services.filter(service => (service._id !== id && service.id !== id)));
+        toast.success(t("serviceDeletedSuccess", "Service deleted successfully."));
       } catch (error) {
         console.error("Failed to delete service", error);
-        toast.error(t("serviceDeleteError"));
+        toast.error(t("serviceDeleteError", "Failed to delete service."));
       }
     }
   };
@@ -83,24 +83,24 @@ const ManageListings = () => {
             </thead>
             <tbody>
               {services.map(service => (
-                <tr key={service._id}>
+                <tr key={service._id || service.id}>
                   <td>
                     <div 
                       className="service-info clickable" 
-                      onClick={() => navigate(`/service/${service._id}`)}
+                      onClick={() => navigate(`/service/${service._id || service.id}`)}
                       style={{ cursor: 'pointer' }}
                     >
-                      <img src={service.images[service.mainImageIndex || 0]} alt={service.name} className="service-thumbnail" />
+                      <img src={service.images && service.images.length > 0 ? service.images[service.mainImageIndex || 0] : ''} alt={service.name} className="service-thumbnail" />
                       <div>
                         <strong>{getServiceName(service.name)}</strong>
-                        <p>{service.type}</p>
+                        <p>{service.type || service.category}</p>
                       </div>
                     </div>
                   </td>
                   <td>
                     <span 
                       className={`status ${service.status?.toLowerCase() || 'active'}`}
-                      onClick={(e) => { e.stopPropagation(); handleStatusToggle(service._id, service.status || 'Active'); }}
+                      onClick={(e) => { e.stopPropagation(); handleStatusToggle(service._id || service.id, service.status || 'Active'); }}
                       style={{ cursor: 'pointer' }}
                     >
                       {service.status || 'Active'}
@@ -108,8 +108,22 @@ const ManageListings = () => {
                   </td>
                   <td>{service.bookings ? service.bookings.length : 0}</td>
                   <td>
-                    <button onClick={() => navigate(`/edit-listing/${service._id}`)} className="action-btn">{t("edit")}</button>
-                    <button onClick={() => handleDeleteService(service._id)} className="delete-btn">{t("delete")}</button>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); navigate(`/edit-listing/${service._id || service.id}`); }} 
+                        className="action-btn"
+                        style={{ padding: '0.5rem 1rem' }}
+                      >
+                        {t("edit")}
+                      </button>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); handleDeleteService(service._id || service.id); }} 
+                        className="delete-btn"
+                        style={{ margin: 0, padding: '0.5rem 1rem' }}
+                      >
+                        {t("delete")}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

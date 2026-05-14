@@ -531,5 +531,7 @@
     "chatbotHelp": "يمكنك سؤالي عن CelebrateHub أو خدماتنا أو كيفية الحجز. إذا كنت بحاجة إلى مساعدة أكثر تخصصاً، فيرجى الاتصال بفريق الدعم لدينا على noreply.celebrate.hub@gmail.com.",
     "chatbotDefault": "عذراً، لم أفهم. يمكنك سؤالي عن CelebrateHub أو خدماتنا أو كيفية الحجز. للأسئلة الأخرى، يرجى الاتصال بالدعم على noreply.celebrate.hub@gmail.com.",
     "chatbotInitialGreeting": "أهلاً! كيف يمكنني مساعدتك اليوم؟",
-    "chatbotToggle": "تبديل الشات بوت"
+    "chatbotToggle": "تبديل روبوت الدردشة",
+    "currentlyUnavailable": "غير متاح حاليا",
+    "noAvailableDates": "لا يوجد تواريخ حجز متاحة لهذا المزود في الوقت الحالي."
   }

@@ -56,6 +56,7 @@ const ServiceDetails = () => {
   const user = userString ? JSON.parse(userString) : null;
   const isProvider = user?.role === "provider";
   const isAdmin = user?.role === "admin";
+  const isCustomer = !user || user.role === "customer";
 
   const formatDate = (dateString) => {
     if (!dateString) {
@@ -70,6 +71,18 @@ const ServiceDetails = () => {
 
   const serviceName = service.name.split(": ")[1] || service.name;
   const providerName = service.providerId ? service.providerId.username : "";
+
+  const isServiceAvailable = (availability) => {
+    if (!availability || Object.keys(availability).length === 0) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Object.keys(availability).some(dateStr => {
+      const date = new Date(dateStr);
+      return date >= today && availability[dateStr].length > 0;
+    });
+  };
+
+  const available = isServiceAvailable(service.availability);
 
   return (
     <div className="service-details-container">
@@ -107,7 +120,13 @@ const ServiceDetails = () => {
                 {service.pricePerPerson && <span className="price-display">OMR {service.pricePerPerson} / {t("person")}</span>}
               </div>
               {!isProvider && !isAdmin && (
-                <button className="book-now-button" onClick={() => navigate(`/booking/${service._id}`)}>{t("bookNow")}</button>
+                <button 
+                  className={`book-now-button ${!available ? 'disabled' : ''}`} 
+                  onClick={() => available && navigate(`/booking/${service._id}`)}
+                  disabled={!available}
+                >
+                  {t("bookNow")}
+                </button>
               )}
             </div>
             {!isProvider && !isAdmin && (
@@ -115,6 +134,12 @@ const ServiceDetails = () => {
             )}
           </div>
         </div>
+
+        {!available && isCustomer && (
+          <div className="unavailability-banner">
+            {t("noAvailableDates")}
+          </div>
+        )}
 
         <div className="service-gallery">
           <h2><FaCamera /> {t("photoGallery")}</h2>

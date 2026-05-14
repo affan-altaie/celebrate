@@ -86,8 +86,8 @@ const EditListing = () => {
     features: '',
     images: [],
     availability: {},
+    cancellationPolicy: '',
   });
-  const [pricingOption, setPricingOption] = useState('perHour');
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [imageError, setImageError] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -187,12 +187,8 @@ const EditListing = () => {
           features: Array.isArray(data.features) ? data.features.join(', ') : '',
           images: data.images || [],
           availability: data.availability || {},
+          cancellationPolicy: data.cancellationPolicy || '',
         });
-        if (data.pricePerPerson && !data.pricePerHour) {
-            setPricingOption('perPerson');
-        } else {
-            setPricingOption('perHour');
-        }
         setMainImageIndex(data.mainImageIndex || 0);
         setLoading(false);
       } catch (error) {
@@ -217,14 +213,6 @@ const EditListing = () => {
     }
   };
 
-  const handlePricingOptionChange = (option) => {
-    setPricingOption(option);
-    setFormData(prev => ({
-      ...prev,
-      pricePerHour: option === 'perHour' ? prev.pricePerHour : '',
-      pricePerPerson: option === 'perPerson' ? prev.pricePerPerson : '',
-    }));
-  };
 
   const handleFiles = (files) => {
     setImageError('');
@@ -331,6 +319,10 @@ const EditListing = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.pricePerHour && !formData.pricePerPerson) {
+        toast.error(t('priceRequiredError', 'Please provide at least one pricing option (per hour or per person).'));
+        return;
+    }
     if (formData.images.length < 2) {
       toast.error(t('min2Images', 'You must upload at least 2 images.'));
       return;
@@ -344,6 +336,7 @@ const EditListing = () => {
     data.append('location', formData.location);
     data.append('description', formData.description);
     data.append('features', formData.features);
+    data.append('cancellationPolicy', formData.cancellationPolicy);
     data.append('availability', JSON.stringify(formData.availability));
     data.append('mainImageIndex', mainImageIndex);
 
@@ -486,27 +479,13 @@ const EditListing = () => {
                 </select>
               </div>
                 <div className="form-group">
-                    <label>{t('priceOption', 'Pricing Option')}</label>
-                    <div className="toggle-switch">
-                        <button type="button" className={`toggle-btn ${pricingOption === 'perHour' ? 'active' : ''}`} onClick={() => handlePricingOptionChange('perHour')}>
-                            {t('perHour', 'Per Hour')}
-                        </button>
-                        <button type="button" className={`toggle-btn ${pricingOption === 'perPerson' ? 'active' : ''}`} onClick={() => handlePricingOptionChange('perPerson')}>
-                            {t('perPerson', 'Per Person')}
-                        </button>
-                    </div>
+                    <label htmlFor="pricePerHour">{t('pricePerHour')}</label>
+                    <input id="pricePerHour" type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} placeholder="OMR 20 / hour" />
                 </div>
-                {pricingOption === 'perHour' ? (
-                    <div className="form-group">
-                        <label htmlFor="pricePerHour">{t('pricePerHour')}</label>
-                        <input id="pricePerHour" type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} placeholder="OMR 20 / hour" required />
-                    </div>
-                ) : (
-                    <div className="form-group">
-                        <label htmlFor="pricePerPerson">{t('pricePerPerson')}</label>
-                        <input id="pricePerPerson" type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} placeholder="OMR 2 / person" required />
-                    </div>
-                )}
+                <div className="form-group">
+                    <label htmlFor="pricePerPerson">{t('pricePerPerson')}</label>
+                    <input id="pricePerPerson" type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} placeholder="OMR 2 / person" />
+                </div>
               <div className="form-group">
                   <label htmlFor="description">{t('descriptionLabel')}</label>
                   <textarea id="description" name="description" value={formData.description} onChange={handleChange} required />
@@ -514,6 +493,16 @@ const EditListing = () => {
               <div className="form-group">
                   <label htmlFor="features">{t('featuresLabel')}</label>
                   <input id="features" type="text" name="features" value={formData.features} onChange={handleChange} />
+              </div>
+              <div className="form-group">
+                  <label htmlFor="cancellationPolicy">{t('cancellationPolicy')}</label>
+                  <textarea 
+                      id="cancellationPolicy" 
+                      name="cancellationPolicy" 
+                      value={formData.cancellationPolicy} 
+                      onChange={handleChange} 
+                      placeholder={t('cancellationPolicyPlaceholder')} 
+                  />
               </div>
               <div className="form-group">
                 <label htmlFor="image-upload-input">{t('serviceImage', 'Service Images')}</label>

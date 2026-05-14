@@ -95,6 +95,12 @@ const ServiceDetails = () => {
               <span><FaCalendarAlt /> <strong>{t("dateOfPublish")}:</strong> {formatDate(service.createdAt)}</span>
             </div>
             <p className="service-description">{service.description === "affan: iftar" ? t("iftarFeastDescription") : service.description}</p>
+            
+            <div className="service-policy">
+              <h3>{t('cancellationPolicy')}</h3>
+              <p>{service.cancellationPolicy || t('noCancellationPolicy')}</p>
+            </div>
+
             <div className="service-price-book">
               <div className="price-info">
                 {service.pricePerHour && <span className="price-display">OMR {service.pricePerHour} / hour</span>}

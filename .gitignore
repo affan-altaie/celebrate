@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Production
+build/
+dist/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+
+# IDE/Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Misc
+*.onnx
+*.so
+*.so.*
+Celebratehub-Main/server/uploads/
+Celebratehub-Main/uploads/
+uploads/

@@ -19,6 +19,7 @@ const serviceSchema = new mongoose.Schema({
   images: { type: [String], required: true },
   mainImageIndex: { type: Number, default: 0 },
   availability: { type: Object, required: true },
+  cancellationPolicy: { type: String, required: false },
   providerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   reviews: [reviewSchema], 
   rating: { type: Number, default: 0 },

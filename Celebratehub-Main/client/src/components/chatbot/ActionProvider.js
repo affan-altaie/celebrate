@@ -12,15 +12,57 @@ class ActionProvider {
 
   handleCelebrateHub() {
     const message = this.createChatBotMessage(
-      "CelebrateHub is an online platform for booking event services. You can find everything from photographers and caterers to venues and entertainers."
+      "CelebrateHub is your premier destination for all event planning needs. We connect you with top-rated service providers to make your special occasions unforgettable. Whether it's a wedding, birthday, or corporate event, we've got you covered!"
     );
     this.updateChatbotState(message);
   }
 
-  handleServices() {
+  handleMission() {
     const message = this.createChatBotMessage(
-      "We offer a wide range of services for any event. You can browse all available services by navigating to the 'Services' page."
+      "Our mission is to simplify event planning by providing a centralized platform where clients can easily find, book, and manage reliable service providers. We aim to bring dream events to life with ease and excellence."
     );
+    this.updateChatbotState(message);
+  }
+
+  handleLocationInfo() {
+    const message = this.createChatBotMessage(
+      "CelebrateHub is based in Muscat, Oman. We serve clients across various locations including Seeb, Salalah, Sohar, Nizwa, and many more. You can filter services by your specific area on our Services page."
+    );
+    this.updateChatbotState(message);
+  }
+
+  handleBenefits() {
+    const message = this.createChatBotMessage(
+      "Booking through CelebrateHub offers several benefits: access to a curated selection of top-rated providers, easy-to-use management tools, secure payment options, and 24/7 customer support to ensure your event goes smoothly."
+    );
+    this.updateChatbotState(message);
+  }
+
+  handleHistory() {
+    const message = this.createChatBotMessage(
+      "Founded in 2025 by a team of experienced event planners and tech enthusiasts, CelebrateHub was created to fill the need for a reliable and centralized event booking platform in the region."
+    );
+    this.updateChatbotState(message);
+  }
+
+  handleOfferings() {
+    const message = this.createChatBotMessage(
+      "We offer a wide range of categories including Wedding Halls, Catering, Photography, Music & Entertainment, Decoration, and special Birthday packages. Our platform provides tools for instant booking and direct communication with providers."
+    );
+    this.updateChatbotState(message);
+  }
+
+  handleServices(recommendations = []) {
+    let messageText = "We offer a wide range of services for any event. You can browse all available services by navigating to the 'Services' page.";
+    
+    if (recommendations.length > 0) {
+      messageText += "\n\nBased on your interest, here are some recommended services:";
+      recommendations.forEach(service => {
+        messageText += `\n- ${service.name} (${service.category})`;
+      });
+    }
+
+    const message = this.createChatBotMessage(messageText);
     this.updateChatbotState(message);
   }
 
@@ -54,7 +96,7 @@ class ActionProvider {
 
   handlePayment() {
     const message = this.createChatBotMessage(
-      "Currently, we do not process payments online. All payments are made directly to the service provider according to their specified payment terms. We plan to integrate online payments in the future."
+      "Currently, CelebrateHub does not process payments online. All payments are handled directly between you and the service provider. We recommend discussing payment terms and methods with your chosen provider before finalizing your booking. We are working on integrating secure online payments in a future update!"
     );
     this.updateChatbotState(message);
   }
@@ -212,6 +254,7 @@ class ActionProvider {
   }
 
   updateChatbotState(message) {
+    console.log('Updating Chatbot State with message:', message);
     this.setState((prevState) => ({
       ...prevState,
       messages: [...prevState.messages, message],

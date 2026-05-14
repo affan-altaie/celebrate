@@ -117,8 +117,8 @@ const AddService = () => {
     features: '',
     images: [],
     availability: {},
+    cancellationPolicy: '',
   });
-  const [pricingOption, setPricingOption] = useState('perHour');
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [imageError, setImageError] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -216,14 +216,6 @@ const AddService = () => {
     }
   };
 
-  const handlePricingOptionChange = (option) => {
-    setPricingOption(option);
-    if (option === 'perHour') {
-        setFormData(prev => ({ ...prev, pricePerPerson: '' }));
-    } else {
-        setFormData(prev => ({ ...prev, pricePerHour: '' }));
-    }
-  };
 
   const handleFiles = (files) => {
     setImageError('');
@@ -334,6 +326,10 @@ const AddService = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.pricePerHour && !formData.pricePerPerson) {
+        toast.error(t('priceRequiredError', 'Please provide at least one pricing option (per hour or per person).'));
+        return;
+    }
     if (formData.images.length < 2) {
       const error = t('min2Images', 'You must upload at least 2 images.');
       setImageError(error);
@@ -350,6 +346,7 @@ const AddService = () => {
     data.append('location', formData.location);
     data.append('description', formData.description);
     data.append('features', formData.features);
+    data.append('cancellationPolicy', formData.cancellationPolicy);
     data.append('availability', JSON.stringify(formData.availability));
       data.append('mainImageIndex', mainImageIndex);
       const userString = localStorage.getItem('user');
@@ -507,27 +504,13 @@ const AddService = () => {
     </select>
 </div>
 <div className="form-group">
-    <label>{t('priceOption', 'Pricing Option')}</label>
-    <div className="toggle-switch">
-        <button type="button" className={`toggle-btn ${pricingOption === 'perHour' ? 'active' : ''}`} onClick={() => handlePricingOptionChange('perHour')}>
-            {t('perHour', 'Per Hour')}
-        </button>
-        <button type="button" className={`toggle-btn ${pricingOption === 'perPerson' ? 'active' : ''}`} onClick={() => handlePricingOptionChange('perPerson')}>
-            {t('perPerson', 'Per Person')}
-        </button>
-    </div>
+    <label htmlFor="pricePerHour">{t('pricePerHour')}</label>
+    <input id="pricePerHour" type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} placeholder="OMR 20 / hour" />
 </div>
-{pricingOption === 'perHour' ? (
-    <div className="form-group">
-        <label htmlFor="pricePerHour">{t('pricePerHour')}</label>
-        <input id="pricePerHour" type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} placeholder="OMR 20 / hour" required />
-    </div>
-) : (
-    <div className="form-group">
-        <label htmlFor="pricePerPerson">{t('pricePerPerson')}</label>
-        <input id="pricePerPerson" type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} placeholder="OMR 2 / person" required />
-    </div>
-)}
+<div className="form-group">
+    <label htmlFor="pricePerPerson">{t('pricePerPerson')}</label>
+    <input id="pricePerPerson" type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} placeholder="OMR 2 / person" />
+</div>
 <div className="form-group">
     <label htmlFor="description">{t('descriptionLabel')}</label>
     <textarea id="description" name="description" value={formData.description} onChange={handleChange} required />
@@ -535,6 +518,16 @@ const AddService = () => {
 <div className="form-group">
     <label htmlFor="features">{t('featuresLabel')}</label>
     <input id="features" type="text" name="features" value={formData.features} onChange={handleChange} placeholder={t('featuresPlaceholder')} />
+</div>
+<div className="form-group">
+    <label htmlFor="cancellationPolicy">{t('cancellationPolicy')}</label>
+    <textarea 
+        id="cancellationPolicy" 
+        name="cancellationPolicy" 
+        value={formData.cancellationPolicy} 
+        onChange={handleChange} 
+        placeholder={t('cancellationPolicyPlaceholder')} 
+    />
 </div>
               <div className="form-group">
                 <label htmlFor="image-upload-input">{t('serviceImage', 'Service Images')}</label>

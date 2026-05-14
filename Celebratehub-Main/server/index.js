@@ -90,8 +90,10 @@ const otpRoutes = require("./routes/otp");
 const bookingRoutes = require("./routes/bookings");
 const reviewRoutes = require("./routes/reviews");
 const reportRoutes = require("./routes/reports");
+const chatbotRoutes = require("./routes/chatbot");
 
 app.use("/api", authRoutes);
+app.use("/api/chatbot", chatbotRoutes);
 app.use("/api", otpRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/bookings", bookingRoutes);

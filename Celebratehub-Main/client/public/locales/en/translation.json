@@ -497,6 +497,10 @@
     "reportDetails": "Report Details",
     "close": "Close",
     "filterByStatus": "Filter by Status",
-    "filterByReason": "Filter by Reason"
+    "filterByReason": "Filter by Reason",
+    "cancellationPolicy": "Cancellation Policy",
+    "cancellationPolicyPlaceholder": "Enter your cancellation terms (e.g., 'Free cancellation up to 48 hours before the event.')",
+    "noCancellationPolicy": "No cancellation policy provided.",
+    "priceRequiredError": "Please provide at least one pricing option (per hour or per person)."
   }
   

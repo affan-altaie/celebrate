@@ -1,15 +1,15 @@
 import { createChatBotMessage } from 'react-chatbot-kit';
-import SocialLinks from './SocialLinks'; // Import the new component
+import SocialLinks from './SocialLinks';
 
-const config = {
-  initialMessages: [createChatBotMessage(`Hi! How can I help you today?`)],
+const getConfig = (t, theme) => ({
+  initialMessages: [createChatBotMessage(t('chatbotInitialGreeting'))],
   botName: "CelebrateBot",
   customStyles: {
     botMessageBox: {
-      backgroundColor: '#007bff',
+      backgroundColor: theme === 'dark' ? '#bb86fc' : '#6a5af9',
     },
     chatButton: {
-      backgroundColor: '#007bff',
+      backgroundColor: theme === 'dark' ? '#bb86fc' : '#6a5af9',
     },
   },
   widgets: [
@@ -18,6 +18,6 @@ const config = {
       widgetFunc: (props) => <SocialLinks {...props} />,
     },
   ],
-};
+});
 
-export default config;
+export default getConfig;

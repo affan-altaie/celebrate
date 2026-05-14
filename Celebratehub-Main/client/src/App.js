@@ -12,7 +12,6 @@ import Register from './components/access/Register';
 import OtpVerification from './components/access/OtpVerification';
 import ForgotPassword from './components/access/ForgotPassword';
 import About from './components/About';
-import Contact from './components/Contact';
 import Terms from './components/Terms';
 import CustomerDashboard from './components/dashboards/CustomerDashboard';
 import CustomerProfile from './components/dashboards/CustomerProfile';
@@ -128,7 +127,6 @@ const AppContent = () => {
         <Route path="/otp-verification" element={<OtpVerification />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
         <Route path="/terms" element={<Terms />} />
       </Routes>
       </main>

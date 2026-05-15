@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 import './Admin.css';
 
 const ProviderApprovals = () => {
@@ -35,8 +36,10 @@ const ProviderApprovals = () => {
         try {
             await axios.put(`/api/providers/${id}/approve`);
             setRequests(requests.filter(req => req._id !== id));
+            toast.success(t('providerApprovedSuccess'));
         } catch (error) {
             console.error('Error approving provider:', error);
+            toast.error(t('providerApprovedError'));
         }
     };
 
@@ -58,7 +61,7 @@ const ProviderApprovals = () => {
 
         if (reason === 'other') {
             if (!otherRejectionReason) {
-                alert('Please specify the reason for rejection.');
+                toast.error(t('specifyRejectionReason'));
                 return;
             }
             finalReason = otherRejectionReason;
@@ -67,15 +70,17 @@ const ProviderApprovals = () => {
         }
 
         if (!finalReason) {
-            alert(t('selectRejectionReason'));
+            toast.error(t('selectRejectionReasonPrompt'));
             return;
         }
         try {
             await axios.put(`/api/providers/${selectedRequestId}/reject`, { reason: finalReason });
             setRequests(requests.filter(req => req._id !== selectedRequestId));
             closeRejectionModal();
+            toast.success(t('providerRejectedSuccess'));
         } catch (error) {
             console.error('Error rejecting provider:', error);
+            toast.error(t('providerRejectedError'));
         }
     };
 

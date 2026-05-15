@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 import { toast } from 'react-toastify';
 import './Dashboard.css';
 import './dark-dropdown.css';
 import logo1 from '../../assets/logo1.png'; // Fallback image
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaCreditCard } from 'react-icons/fa';
 
 const EditProviderProfile = () => {
   const { t } = useTranslation();
@@ -39,6 +40,16 @@ const EditProviderProfile = () => {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const [isEditingCard, setIsEditingCard] = useState(false);
+  const [originalCardData, setOriginalCardData] = useState(null);
+  const [cardData, setCardData] = useState({
+    cardHolderName: "",
+    cardNumber: "",
+    expiryDate: "",
+    cvv: ""
+  });
+  const [cardError, setCardError] = useState("");
+
   const locations = [
     "Muscat", "Seeb", "Bawshar", "Muttrah", "Al Amerat", "Qurayyat",
     "Sohar", "Shinas", "Liwa", "Saham", "Al Khaburah", "As Suwayq",
@@ -54,14 +65,30 @@ const EditProviderProfile = () => {
   ];
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
       setFormData({
-        username: storedUser.username || '',
-        location: storedUser.location || '',
-        phoneNumber: storedUser.phoneNumber || ''
+        username: storedUser.username || "",
+        location: storedUser.location || "",
+        phoneNumber: storedUser.phoneNumber || ""
       });
+
+      const userId = storedUser.id || storedUser._id;
+      if (userId) {
+        axios.get(`/api/payments/balance/${userId}`)
+          .then(res => {
+            if (res.data.savedCard) {
+                setCardData({
+                  cardHolderName: res.data.savedCard.cardHolderName || "",
+                  cardNumber: res.data.savedCard.cardNumber || "",
+                  expiryDate: res.data.savedCard.expiryDate || "",
+                  cvv: res.data.savedCard.cvv || ""
+                });
+            }
+          })
+          .catch(err => console.error("Error fetching card details:", err));
+      }
     }
   }, []);
 
@@ -148,6 +175,74 @@ const EditProviderProfile = () => {
     } catch (err) {
       console.error(err);
       toast.error(t('genericError'));
+    }
+  };
+
+  const handleDeleteCard = async () => {
+    if (!window.confirm(t("confirmDeleteCard") || "Are you sure you want to delete your saved card?")) {
+      return;
+    }
+    const userId = user?.id || user?._id;
+    try {
+      const response = await axios.delete(`/api/payments/delete-card/${userId}`);
+      if (response.data.success) {
+        toast.success(t("cardDeleted") || "Card details deleted successfully.");
+        setCardData({ cardHolderName: "", cardNumber: "", expiryDate: "", cvv: "" });
+      } else {
+        toast.error(response.data.message || t("cardDeletionFailed") || "Failed to delete card details.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(t("genericError"));
+    }
+  };
+
+  const handleCardUpdate = async (e) => {
+    e.preventDefault();
+    setCardError("");
+    const userId = user?.id || user?._id;
+  
+    const cardNumberDigits = cardData.cardNumber.replace(/\D/g, "");
+    if (cardNumberDigits.length !== 16) {
+      setCardError(t("invalidCardNumber") || "Card number must be 16 digits.");
+      return;
+    }
+  
+    if (cardData.cvv.length < 3) {
+      setCardError(t("invalidCvv") || "CVV must be at least 3 digits.");
+      return;
+    }
+
+    const [month, year] = cardData.expiryDate.split("/");
+    const currentYear = new Date().getFullYear() % 100;
+    const currentMonth = new Date().getMonth() + 1;
+  
+    if (!month || !year || parseInt(month, 10) < 1 || parseInt(month, 10) > 12) {
+      setCardError(t("invalidExpiryDate") || "Invalid expiry date format. Please use MM/YY.");
+      return;
+    }
+  
+    if (parseInt(year, 10) < currentYear || (parseInt(year, 10) === currentYear && parseInt(month, 10) < currentMonth)) {
+      setCardError(t("expiredCardError") || "Card has expired. Please enter a valid expiry date.");
+      return;
+    }
+  
+    try {
+      const response = await axios.put(`/api/payments/update-card/${userId}`, {
+        ...cardData,
+        cardNumber: cardNumberDigits
+      });
+  
+      if (response.data.success) {
+        toast.success(t("cardUpdated") || "Card details updated successfully");
+        setIsEditingCard(false);
+        setCardData(prev => ({ ...prev, cardNumber: cardData.cardNumber }));
+      } else {
+        setCardError(response.data.message || t("cardUpdateFailed") || "Failed to update card details");
+      }
+    } catch (err) {
+      console.error("Card update failed:", err.response?.data?.message || err.message || err);
+      setCardError(err.response?.data?.message || t("genericError") || "An error occurred");
     }
   };
 
@@ -277,7 +372,7 @@ const EditProviderProfile = () => {
   };
 
   if (!user) {
-    return <div>{t('loading')}</div>
+    return <div>{t('loading')}</div>;
   }
 
   return (
@@ -296,7 +391,7 @@ const EditProviderProfile = () => {
         <div className="dashboard-card" style={{ maxWidth: '600px', margin: '0 auto', marginBottom: '2rem' }}>
           <h3>{t('profileInformation')}</h3>
           
-          <div style={{ marginBottom: '2rem' }}>
+          <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
             <img 
               src={user.profilePicture ? user.profilePicture : logo1} 
               alt="Profile" 
@@ -372,48 +467,219 @@ const EditProviderProfile = () => {
 
           <hr />
 
+          <h3 style={{ textAlign: 'center' }}><FaCreditCard /> {t('paymentInformation')}</h3>
+          
+          <div className="payment-section-container">
+            {(cardData.cardNumber || cardData.cardHolderName) && !isEditingCard && (
+              <div className="card-visualization" style={{ marginBottom: '1rem' }}>
+                <div className="card-chip"></div>
+                <div className="card-number">
+                  {cardData.cardNumber ? cardData.cardNumber.replace(/\D/g, '').replace(/(\d{4})/g, '$1 ').trim() : '**** **** **** ****'}
+                </div>
+                <div className="card-info-row">
+                  <div className="card-holder">
+                    <div className="card-holder-label">{t('cardHolderName')}</div>
+                    <div className="card-holder-name">{cardData.cardHolderName || 'Your Name'}</div>
+                  </div>
+                  <div className="card-expiry">
+                    <div className="card-expiry-label">{t('expiryDate')}</div>
+                    <div className="card-expiry-date">{cardData.expiryDate || 'MM/YY'}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!isEditingCard ? (
+              <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
+                <button 
+                  onClick={() => {
+                    setOriginalCardData(cardData);
+                    setIsEditingCard(true);
+                  }} 
+                  className="action-btn" 
+                  style={{ flex: 1, borderRadius: '10px' }}
+                >
+                  {cardData.cardNumber ? t('edit') : t('addNewCard')}
+                </button>
+                {cardData.cardNumber && (
+                  <button 
+                    onClick={handleDeleteCard} 
+                    className="logout-btn" 
+                    style={{ flex: 1, borderRadius: '10px' }}
+                  >
+                    {t('deleteCard') || "Delete Card"}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <form onSubmit={handleCardUpdate} style={{ textAlign: 'left' }}>
+                <div className="card-visualization" style={{ marginBottom: '2rem' }}>
+                    <div className="card-chip"></div>
+                    <div className="card-number">
+                    {cardData.cardNumber ? cardData.cardNumber.replace(/\D/g, '').replace(/(\d{4})/g, '$1 ').trim() : '**** **** **** ****'}
+                    </div>
+                    <div className="card-info-row">
+                    <div className="card-holder">
+                        <div className="card-holder-label">{t('cardHolderName')}</div>
+                        <div className="card-holder-name">{cardData.cardHolderName || 'Your Name'}</div>
+                    </div>
+                    <div className="card-expiry">
+                        <div className="card-expiry-label">{t('expiryDate')}</div>
+                        <div className="card-expiry-date">{cardData.expiryDate || 'MM/YY'}</div>
+                    </div>
+                    </div>
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '1.2rem' }}>
+                  <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
+                    {t('cardHolderName')}
+                  </label>
+                  <input
+                    type="text"
+                    value={cardData.cardHolderName.toUpperCase()}
+                    onChange={(e) => {
+                        const formattedValue = e.target.value.replace(/[^a-zA-Z ]/g, "");
+                        setCardData({...cardData, cardHolderName: formattedValue.toUpperCase()});
+                    }}
+                    placeholder="e.g. John Doe"
+                    maxLength="20"
+                    style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)', textTransform: 'uppercase' }}
+                  />
+                </div>
+                <div className="form-row" style={{ marginBottom: '1.5rem', alignItems: 'flex-end' }}>
+                  <div className="form-group" style={{ flex: 2 }}>
+                    <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
+                      {t('cardNumber')}
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength="19"
+                      value={cardData.cardNumber.replace(/\D/g, '').replace(/(\d{4})(?=\d)/g, '$1 ').trim()}
+                      onChange={(e) => {
+                        const formattedValue = e.target.value.replace(/\D/g, '');
+                        setCardData({...cardData, cardNumber: formattedValue});
+                      }}
+                      placeholder="0000 0000 0000 0000"
+                      style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
+                    />
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
+                      {t('expiryDate')}
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength="5"
+                      value={cardData.expiryDate}
+                      onChange={(e) => {
+                        const input = e.target.value.replace(/\D/g, '');
+                        let formattedValue = input;
+                        if (input.length > 2) {
+                          formattedValue = input.substring(0, 2) + '/' + input.substring(2, 4);
+                        }
+                        setCardData({...cardData, expiryDate: formattedValue});
+                      }}
+                      placeholder="MM/YY"
+                      style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
+                    />
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
+                      {t('cvc')}
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength="4"
+                      value={cardData.cvv}
+                      onChange={(e) => {
+                        const formattedValue = e.target.value.replace(/\D/g, '');
+                        setCardData({...cardData, cvv: formattedValue});
+                      }}
+                      placeholder="CVV"
+                      style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
+                    />
+                  </div>
+                </div>
+
+                {cardError && <div className="error-message" style={{ textAlign: 'center', marginBottom: '1rem' }}>{cardError}</div>}
+                
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button type="submit" className="action-btn" style={{ flex: 2, borderRadius: '10px', padding: '12px' }}>
+                    {t('saveChanges')}
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      if (originalCardData) {
+                        setCardData(originalCardData);
+                      }
+                      setIsEditingCard(false); 
+                    }} 
+                    className="logout-btn" 
+                    style={{ flex: 1, borderRadius: '10px', padding: '12px', background: '#ccc', color: '#333' }}
+                  >
+                    {t('cancel')}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+
+          <hr />
+
           <h3>{t('changePassword')}</h3>
           <form onSubmit={handlePasswordChange} style={{ textAlign: 'left' }}>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('currentPassword')}</label>
-              <div style={{ position: 'relative' }}>
+              <div className="password-input-wrapper">
                 <input
-                  type={showCurrentPassword ? 'text' : 'password'}
+                  type={showCurrentPassword ? "text" : "password"}
                   value={passwordData.currentPassword}
                   onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
                   required
                   style={{ width: '100%', padding: '8px', marginTop: '5px' }}
                 />
-                <button 
-                  type="button" 
-                  onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                  style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
+                <button
+                    type="button"
+                    onClick={() => setShowCurrentPassword((prev) => !prev)}
+                    className="password-toggle-btn"
                 >
-                  {showCurrentPassword ? <FaEye /> : <FaEyeSlash />}
+                    {showCurrentPassword ? (
+                        <i className="fa-solid fa-eye"></i>
+                    ) : (
+                        <i className="fa-solid fa-eye-slash"></i>
+                    )}
                 </button>
               </div>
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('newPassword')}</label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type={showNewPassword ? 'text' : 'password'}
-                  name="newPassword"
-                  value={passwordData.newPassword}
-                  onChange={handlePasswordDataChange}
-                  onFocus={() => setPasswordRequirementsVisible(true)}
-                  onBlur={() => setPasswordRequirementsVisible(false)}
-                  required
-                  style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-                />
-                <button 
-                  type="button" 
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
+              <div className="password-input-wrapper">
+              <input
+                type={showNewPassword ? "text" : "password"}
+                value={passwordData.newPassword}
+                onChange={handlePasswordDataChange}
+                onFocus={() => setPasswordRequirementsVisible(true)}
+                onBlur={() => setPasswordRequirementsVisible(false)}
+                name="newPassword"
+                required
+                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+              />
+              <button
+                    type="button"
+                    onClick={() => setShowNewPassword((prev) => !prev)}
+                    className="password-toggle-btn"
                 >
-                  {showNewPassword ? <FaEye /> : <FaEyeSlash />}
+                    {showNewPassword ? (
+                        <i className="fa-solid fa-eye"></i>
+                    ) : (
+                        <i className="fa-solid fa-eye-slash"></i>
+                    )}
                 </button>
-              </div>
+                </div>
               {passwordRequirementsVisible && (
                 <div className="password-requirements">
                   <ul>
@@ -439,22 +705,26 @@ const EditProviderProfile = () => {
             </div>
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>{t('confirmNewPassword')}</label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  value={passwordData.confirmPassword}
-                  onChange={handlePasswordDataChange}
-                  required
-                  style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-                />
-                <button 
-                  type="button" 
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer' }}
-                >
-                  {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
-                </button>
+              <div className="password-input-wrapper">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordDataChange}
+                name="confirmPassword"
+                required
+                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className="password-toggle-btn"
+              >
+                {showConfirmPassword ? (
+                  <i className="fa-solid fa-eye"></i>
+                ) : (
+                  <i className="fa-solid fa-eye-slash"></i>
+                )}
+              </button>
               </div>
               {passwordErrors.confirmPassword && <div className="error-message">{passwordErrors.confirmPassword}</div>}
             </div>
@@ -476,7 +746,7 @@ const EditProviderProfile = () => {
           <hr style={{ margin: '2rem 0' }} />
 
           <h3>{t('deleteAccount')}</h3>
-          <p style={{ color: 'red' }}>{t('deleteAccountWarning')}</p>
+          <p style={{ color: 'red', textAlign: 'center' }}>{t('deleteAccountWarning')}</p>
           <button onClick={handleDeleteAccount} className="logout-btn" style={{ width: '100%' }}>
             {t('deleteAccountBtn')}
           </button>

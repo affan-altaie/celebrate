@@ -23,21 +23,18 @@ const sendSubscriptionBalanceEmail = async (user, amount, newBalance, tier) => {
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: user.email,
-        subject: "Subscription Payment Confirmation - CelebrateHub",
+        subject: "Transaction Notification",
         html: `
         <div style="background-color: #f4f7fc; padding: 20px; font-family: Arial, sans-serif;">
           <div style="background-color: #ffffff; color: #333; padding: 30px; border-radius: 12px; max-width: 600px; margin: auto; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <div style="text-align: center; margin-bottom: 20px;">
               <img src="cid:logo" alt="CelebrateHub" style="max-width: 200px;"/>
             </div>
-            <h2 style="text-align: center; color: #6a5af9;">Subscription Payment Successful</h2>
-            <p>Dear ${user.username || "Valued Provider"},</p>
-            <p>Your payment for the <strong>${tier}</strong> subscription plan has been processed successfully on ${date}.</p>
-            <div style="background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 5px 0;"><strong>Amount Paid:</strong> OMR ${amount.toFixed(2)}</p>
-                <p style="margin: 5px 0;"><strong>Remaining Balance:</strong> OMR ${newBalance.toFixed(2)}</p>
-            </div>
-            <p style="text-align: center; margin-top: 20px; color: #555;">Thank you for being a part of CelebrateHub!</p>
+            <h2 style="text-align: center; color: #6a5af9;">Transaction Notification</h2>
+            <p>Dear ${user.username || user.name || "Valued Customer"},</p>
+            <p>A transaction of OMR ${amount.toFixed(2)} was processed successfully at CelebrateHub on ${date}.</p>
+            <p>Your current balance is OMR ${newBalance.toFixed(2)}.</p>
+            <p style="text-align: center; margin-top: 20px; color: #555;">Thank you for using CelebrateHub!</p>
           </div>
         </div>
         `,
@@ -94,7 +91,7 @@ router.get("/user-bookings/:userId", async (req, res) => {
 });
 
 // Update saved card details
-router.put("/update-card/:userId", validate, async (req, res) => {
+router.put("/update-card/:userId", paymentCardValidation, validate, async (req, res) => {
   try {
     const { cardHolderName, cardNumber, expiryDate, cvv } = req.body;
     const user = await User.findById(req.params.userId);
@@ -135,7 +132,7 @@ router.delete("/delete-card/:userId", async (req, res) => {
 // Process subscription purchase
 router.post("/subscribe", async (req, res) => {
   try {
-    const { userId, tier, billingCycle, cardDetails, agreedToTerms } = req.body;
+    const { userId, tier, billingCycle, cardDetails, agreedToTerms, saveCard } = req.body;
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -173,8 +170,8 @@ router.post("/subscribe", async (req, res) => {
         return res.status(400).json({ success: false, message: "You must agree to the terms and conditions." });
       }
       // In a real scenario, we would call a payment gateway here
-      // For simulation, we'll just update the user's saved card if it was empty
-      if (!user.savedCard || !user.savedCard.cardNumber) {
+      // For simulation, we'll just update the user's saved card if chosen
+      if (saveCard) {
         user.savedCard = {
           cardHolderName: cardDetails.cardHolderName,
           cardNumber: encrypt(cardDetails.cardNumber),
@@ -215,8 +212,8 @@ router.post("/subscribe", async (req, res) => {
     });
     await payment.save();
 
-    // Send email notification if paid with wallet
-    if (paidWithWallet && amount > 0) {
+    // Send email notification for any paid subscription (if amount > 0)
+    if (amount > 0) {
         await sendSubscriptionBalanceEmail(user, amount, user.walletBalance, tier);
     }
 

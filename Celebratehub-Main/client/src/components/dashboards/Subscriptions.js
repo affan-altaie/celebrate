@@ -25,6 +25,9 @@ const Subscriptions = () => {
     cvv: ''
   });
 
+  const [savedCard, setSavedCard] = useState(null);
+  const [useSavedCard, setUseSavedCard] = useState(false);
+
   // Plan hierarchy
   const planRank = { 'Standard': 0, 'Pro': 1, 'Pro Plus': 2 };
 
@@ -33,6 +36,32 @@ const Subscriptions = () => {
       navigate('/login');
       return;
     }
+    // Fetch saved card details when component mounts
+    const fetchSavedCard = async () => {
+      try {
+        const response = await axios.get(`/api/payments/balance/${user.id || user._id}`);
+        if (response.data.savedCard && response.data.savedCard.cardNumber) {
+          setSavedCard(response.data.savedCard);
+          setUseSavedCard(true);
+          // Pre-fill paymentData with saved card details for display if not editing
+          setPaymentData({
+            cardHolderName: response.data.savedCard.cardHolderName,
+            cardNumber: response.data.savedCard.cardNumber,
+            expiryDate: response.data.savedCard.expiryDate,
+            cvv: "" // CVV is never stored, so it's always empty
+          });
+        } else {
+          setSavedCard(null);
+          setUseSavedCard(false);
+        }
+      } catch (error) {
+        console.error("Error fetching saved card:", error);
+        setSavedCard(null);
+      }
+    };
+
+    fetchSavedCard();
+
   }, [user, navigate]);
 
   const plans = [
@@ -96,15 +125,16 @@ const Subscriptions = () => {
     }
   };
 
-  const processSubscription = async (planId, cardData = null) => {
+  const processSubscription = async (planId, cardDetails = null) => {
     setLoading(true);
     try {
       const response = await axios.post('/api/payments/subscribe', {
         userId: user.id || user._id,
         tier: planId,
         billingCycle: planId === 'Standard' ? null : billingCycle,
-        cardDetails: cardData,
-        agreedToTerms: agreedToTerms
+        cardDetails: cardDetails,
+        agreedToTerms: agreedToTerms,
+        saveCard: user.role === 'provider' ? true : false, // Always save card for providers on subscription
       });
 
       if (response.data.success) {
@@ -123,7 +153,7 @@ const Subscriptions = () => {
     }
   };
 
-  const handlePaymentSubmit = (e) => {
+  const handlePaymentSubmit = async (e) => {
     e.preventDefault();
     
     if (!agreedToTerms) {
@@ -131,27 +161,49 @@ const Subscriptions = () => {
       return;
     }
 
-    // Basic card validation
-    const cardNumberDigits = paymentData.cardNumber.replace(/\D/g, '');
-    if (cardNumberDigits.length !== 16) {
-      toast.error(t('invalidCardNumber'));
-      return;
+    let cardDetailsToSend = null;
+
+    if (useSavedCard && savedCard) {
+      cardDetailsToSend = {
+        cardHolderName: savedCard.cardHolderName,
+        cardNumber: savedCard.cardNumber,
+        expiryDate: savedCard.expiryDate,
+        cvv: paymentData.cvv, // CVV always re-entered
+      };
+    } else {
+      // Basic card validation for new card
+      const cardNumberDigits = paymentData.cardNumber.replace(/\D/g, '');
+      if (cardNumberDigits.length !== 16) {
+        toast.error(t('invalidCardNumber'));
+        return;
+      }
+
+      const [month, year] = paymentData.expiryDate.split('/');
+      const currentYear = new Date().getFullYear() % 100;
+      const currentMonth = new Date().getMonth() + 1;
+    
+      if (!month || !year || parseInt(month, 10) < 1 || parseInt(month, 10) > 12) {
+        toast.error(t('invalidExpiryDate') || "Invalid expiry date format. Please use MM/YY.");
+        return;
+      }
+    
+      if (parseInt(year, 10) < currentYear || (parseInt(year, 10) === currentYear && parseInt(month, 10) < currentMonth)) {
+        toast.error(t('expiredCardError') || "Card has expired. Please enter a valid expiry date.");
+        return;
+      }
+
+      if (paymentData.cvv.length < 3) {
+        toast.error(t('invalidCvv'));
+        return;
+      }
+      cardDetailsToSend = {
+        ...paymentData,
+        cardNumber: cardNumberDigits
+      };
     }
 
-    if (!/^\d{2}\/\d{2}$/.test(paymentData.expiryDate)) {
-      toast.error(t('invalidExpiryDate'));
-      return;
-    }
-
-    if (paymentData.cvv.length < 3) {
-      toast.error(t('invalidCvv'));
-      return;
-    }
-
-    processSubscription(selectedPlan.id, {
-      ...paymentData,
-      cardNumber: cardNumberDigits
-    });
+    // Send subscription request with card details and saveCard flag
+    processSubscription(selectedPlan.id, cardDetailsToSend);
   };
 
   return (
@@ -226,42 +278,70 @@ const Subscriptions = () => {
                 <p className="price">{t('omr')} {billingCycle === 'monthly' ? selectedPlan.priceMonthly : selectedPlan.priceAnnually}</p>
               </div>
               <form onSubmit={handlePaymentSubmit}>
-                <div className="form-group">
-                  <label>{t('cardHolderName')}</label>
-                  <input 
-                    type="text" 
-                    required 
-                    value={paymentData.cardHolderName}
-                    onChange={(e) => setPaymentData({...paymentData, cardHolderName: e.target.value})}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>{t('cardNumber')}</label>
-                  <input 
-                    type="text" 
-                    maxLength="19"
-                    required 
-                    value={paymentData.cardNumber.replace(/\D/g, '').replace(/(\d{4})(?=\d)/g, '$1 ').trim()}
-                    onChange={(e) => setPaymentData({...paymentData, cardNumber: e.target.value.replace(/\D/g, '')})}
-                    placeholder="0000 0000 0000 0000"
-                  />
-                </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>{t('expiryDate')}</label>
-                    <input 
-                      type="text" 
-                      required 
-                      placeholder="MM/YY"
-                      maxLength="5"
-                      value={paymentData.expiryDate}
-                      onChange={(e) => {
-                        let value = e.target.value.replace(/\D/g, '');
-                        if (value.length > 2) value = value.slice(0, 2) + '/' + value.slice(2, 4);
-                        setPaymentData({...paymentData, expiryDate: value});
-                      }}
-                    />
+                {savedCard && (
+                  <div className="payment-choice">
+                    <div className="choice-option">
+                      <input type="radio" id="useSavedCard" name="paymentMethod" checked={useSavedCard} onChange={() => setUseSavedCard(true)} />
+                      <label htmlFor="useSavedCard">{t('useSavedCard')} (.... .... .... {savedCard.cardNumber.slice(-4)})</label>
+                    </div>
+                    <div className="choice-option">
+                      <input type="radio" id="useNewCard" name="paymentMethod" checked={!useSavedCard} onChange={() => setUseSavedCard(false)} />
+                      <label htmlFor="useNewCard">{t('useNewCard')}</label>
+                    </div>
                   </div>
+                )}
+
+                {!useSavedCard ? (
+                  <div id="new-card-form">
+                    <div className="form-group">
+                      <label>{t('cardHolderName')}</label>
+                      <input 
+                        type="text" 
+                        required 
+                        value={paymentData.cardHolderName}
+                        onChange={(e) => setPaymentData({...paymentData, cardHolderName: e.target.value})}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>{t('cardNumber')}</label>
+                      <input 
+                        type="text" 
+                        maxLength="19"
+                        required 
+                        value={paymentData.cardNumber.replace(/\D/g, '').replace(/(\d{4})(?=\d)/g, '$1 ').trim()}
+                        onChange={(e) => setPaymentData({...paymentData, cardNumber: e.target.value.replace(/\D/g, '')})}
+                        placeholder="0000 0000 0000 0000"
+                      />
+                    </div>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label>{t('expiryDate')}</label>
+                        <input 
+                          type="text" 
+                          required 
+                          placeholder="MM/YY"
+                          maxLength="5"
+                          value={paymentData.expiryDate}
+                          onChange={(e) => {
+                            let value = e.target.value.replace(/\D/g, '');
+                            if (value.length > 2) value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                            setPaymentData({...paymentData, expiryDate: value});
+                          }}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>{t('cvc')}</label>
+                        <input 
+                          type="password" 
+                          required 
+                          maxLength="4"
+                          value={paymentData.cvv}
+                          onChange={(e) => setPaymentData({...paymentData, cvv: e.target.value.replace(/\D/g, '')})}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ) : (
                   <div className="form-group">
                     <label>{t('cvc')}</label>
                     <input 
@@ -272,7 +352,8 @@ const Subscriptions = () => {
                       onChange={(e) => setPaymentData({...paymentData, cvv: e.target.value.replace(/\D/g, '')})}
                     />
                   </div>
-                </div>
+                )}
+                
                 <div className="terms-checkbox">
                   <input 
                     type="checkbox" 

@@ -88,6 +88,18 @@ const UserManagement = () => {
     }
   };
 
+  const approveProvider = async (userId) => {
+    try {
+      await axios.put(`/api/providers/${userId}/approve`);
+      fetchUsers();
+      alert('Provider approved successfully');
+    } catch (err) {
+      setError('Failed to approve provider.');
+      console.error(err);
+      alert('Failed to approve provider');
+    }
+  };
+
   const deleteUser = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
@@ -267,9 +279,10 @@ const UserManagement = () => {
                   <td>{getStatusBadge(user)}</td>
                   <td>
                     <div className="actions-container">
-                      <button className="action-btn">{t('edit')}</button>
                       {user.status === 'suspended' ? (
                         <button className="reactivate-btn" onClick={() => reactivateUser(user._id)}>{t('reactivate')}</button>
+                      ) : (user.status === 'rejected' || user.status === 'pending') ? (
+                        <button className="reactivate-btn" onClick={() => reactivateUser(user._id)}>{t('approve')}</button>
                       ) : (
                         <button className="suspend-btn" onClick={() => openSuspendModal(user._id)}>{t('suspend')}</button>
                       )}
@@ -282,9 +295,9 @@ const UserManagement = () => {
           </table>
         </div>
         <div className="pagination-controls">
-          <button onClick={() => setCustomerCurrentPage(customerCurrentPage - 1)} disabled={customerCurrentPage === 1}>Previous</button>
-          <span>Page {customerCurrentPage} of {totalCustomerPages || 1}</span>
-          <button onClick={() => setCustomerCurrentPage(customerCurrentPage + 1)} disabled={customerCurrentPage === totalCustomerPages || totalCustomerPages === 0}>Next</button>
+          <button onClick={() => setCustomerCurrentPage(customerCurrentPage - 1)} disabled={customerCurrentPage === 1}>{t('previous')}</button>
+          <span>{t('page')} {customerCurrentPage} {t('of')} {totalCustomerPages || 1}</span>
+          <button onClick={() => setCustomerCurrentPage(customerCurrentPage + 1)} disabled={customerCurrentPage === totalCustomerPages || totalCustomerPages === 0}>{t('next')}</button>
         </div>
       </div>
 
@@ -325,9 +338,13 @@ const UserManagement = () => {
                   <td>{getStatusBadge(user)}</td>
                   <td>
                     <div className="actions-container">
-                      <Link to={`/admin/edit-user/${user._id}`} className="action-btn">{t('edit')}</Link>
+                      {user.status !== 'rejected' && (
+                        <Link to={`/admin/edit-user/${user._id}`} className="action-btn">{t('edit')}</Link>
+                      )}
                       {user.status === 'suspended' ? (
                         <button className="reactivate-btn" onClick={() => reactivateUser(user._id)}>{t('reactivate')}</button>
+                      ) : (user.status === 'rejected' || user.status === 'pending') ? (
+                        <button className="reactivate-btn" onClick={() => approveProvider(user._id)}>{t('approve')}</button>
                       ) : (
                         <button className="suspend-btn" onClick={() => openSuspendModal(user._id)}>{t('suspend')}</button>
                       )}
@@ -340,9 +357,9 @@ const UserManagement = () => {
           </table>
         </div>
         <div className="pagination-controls">
-          <button onClick={() => setProviderCurrentPage(providerCurrentPage - 1)} disabled={providerCurrentPage === 1}>Previous</button>
-          <span>Page {providerCurrentPage} of {totalProviderPages || 1}</span>
-          <button onClick={() => setProviderCurrentPage(providerCurrentPage + 1)} disabled={providerCurrentPage === totalProviderPages || totalProviderPages === 0}>Next</button>
+          <button onClick={() => setProviderCurrentPage(providerCurrentPage - 1)} disabled={providerCurrentPage === 1}>{t('previous')}</button>
+          <span>{t('page')} {providerCurrentPage} {t('of')} {totalProviderPages || 1}</span>
+          <button onClick={() => setProviderCurrentPage(providerCurrentPage + 1)} disabled={providerCurrentPage === totalProviderPages || totalProviderPages === 0}>{t('next')}</button>
         </div>
       </div>
 

@@ -211,6 +211,8 @@
     "providerCompanyName": "Provider/Company Name",
     "approve": "Approve",
     "reject": "Reject",
+    "suspend": "Suspend",
+    "reactivate": "Reactivate",
     "userID": "User ID",
     "usernameLabel": "Username",
     "categoryLabel": "Category",
@@ -577,6 +579,13 @@
     "totalReviews": "Total Reviews",
     "searchReviews": "Search reviews...",
     "stars": "stars",
-    "startCelebrating": "No bookings yet — start celebrating!"
+    "startCelebrating": "No bookings yet — start celebrating!",
+    "allCategories": "All Categories",
+    "noServicesFound": "No services found matching your criteria.",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of",
+    "services": "Services"
   }
   

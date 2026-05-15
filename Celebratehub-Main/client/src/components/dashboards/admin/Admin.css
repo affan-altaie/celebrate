@@ -55,17 +55,27 @@
     margin-bottom: 20px;
   }
   
+  .admin-table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+
   .admin-table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 800px;
   }
   
   .admin-table th {
     padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 2px solid var(--border-color);
     vertical-align: middle;
     background-color: var(--secondary-color);
+    color: var(--text-color);
+    font-weight: 600;
+    white-space: nowrap;
   }
   
   .admin-table td {

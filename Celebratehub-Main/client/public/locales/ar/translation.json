@@ -209,6 +209,9 @@
     "providerCompanyName": "اسم المزود/الشركة",
     "approve": "موافقة",
     "reject": "رفض",
+    "suspend": "تعليق",
+    "reactivate": "إعادة تفعيل",
+    "userID": "معرف المستخدم",
     "userIdLabel": "معرف المستخدم",
     "usernameLabel": "اسم المستخدم",
     "roleLabel": "الدور",
@@ -555,7 +558,6 @@
     "category": "الفئة",
     "imageLabel": "تسمية الصورة",
     "cancellationPolicy": "سياسة الإلغاء",
-    "userID": "معرّف المستخدم",
     "scheduleConflict": "تعارض في الجدول",
     "resourceUnavailable": "الخدمة غير متوفرة",
     "locationOutOfRange": "الموقع خارج النطاق",
@@ -572,5 +574,12 @@
     "totalReviews": "إجمالي التقييمات",
     "searchReviews": "البحث في التقييمات...",
     "stars": "نجوم",
-    "startCelebrating": "لا توجد حجوزات بعد - ابدأ الاحتفال!"
+    "startCelebrating": "لا توجد حجوزات بعد - ابدأ الاحتفال!",
+    "allCategories": "جميع الفئات",
+    "noServicesFound": "لم يتم العثور على خدمات تطابق معاييرك.",
+    "previous": "السابق",
+    "next": "التالي",
+    "page": "صفحة",
+    "of": "من",
+    "services": "الخدمات"
   }

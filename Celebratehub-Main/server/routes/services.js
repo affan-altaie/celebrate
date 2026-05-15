@@ -318,8 +318,13 @@ router.delete("/:id", async (req, res) => {
     }
     
     const { reason } = req.body;
+    console.log(`Deleting service: ${service.name}, Reason: ${reason}`);
+
     if (service.providerId && service.providerId.email) {
-      sendDeletionEmail(service.providerId.email, reason, service.name);
+      console.log(`Sending deletion email to: ${service.providerId.email}`);
+      sendDeletionEmail(service.providerId.email, reason || "No reason provided", service.name);
+    } else {
+      console.warn(`Could not send deletion email for service ${service.name}: Provider email not found.`);
     }
 
     await Service.findByIdAndDelete(req.params.id);

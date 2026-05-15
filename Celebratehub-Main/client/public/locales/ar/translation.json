@@ -546,5 +546,12 @@
     "iAgreeToThe": "أوافق على",
     "termsAndConditions": "الشروط والأحكام",
     "useNewCard": "استخدام بطاقة جديدة",
-    "noReviewsYet": "لا توجد مراجعات بعد"
+    "noReviewsYet": "لا توجد مراجعات بعد",
+    "contactEmail": "البريد الإلكتروني",
+    "document": "مستند",
+    "requestID": "معرّف الطلب",
+    "category": "الفئة",
+    "imageLabel": "تسمية الصورة",
+    "cancellationPolicy": "سياسة الإلغاء",
+    "userID": "معرّف المستخدم"
   }

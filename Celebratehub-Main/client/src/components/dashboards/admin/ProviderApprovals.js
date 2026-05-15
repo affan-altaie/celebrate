@@ -54,20 +54,24 @@ const ProviderApprovals = () => {
 
     const handleReject = async () => {
         let reason = rejectionReason;
-        if (rejectionReason === 'other') {
+        let finalReason = '';
+
+        if (reason === 'other') {
             if (!otherRejectionReason) {
                 alert('Please specify the reason for rejection.');
                 return;
             }
-            reason = otherRejectionReason;
+            finalReason = otherRejectionReason;
+        } else if (reason) {
+            finalReason = t(reason);
         }
 
-        if (!reason) {
+        if (!finalReason) {
             alert(t('selectRejectionReason'));
             return;
         }
         try {
-            await axios.put(`/api/providers/${selectedRequestId}/reject`, { reason: reason });
+            await axios.put(`/api/providers/${selectedRequestId}/reject`, { reason: finalReason });
             setRequests(requests.filter(req => req._id !== selectedRequestId));
             closeRejectionModal();
         } catch (error) {
@@ -137,8 +141,8 @@ const ProviderApprovals = () => {
                             onChange={(e) => setRejectionReason(e.target.value)}
                         >
                             <option value="">{t('selectReasonPrompt')}</option>
-                            <option value="incompleteProfile">{t('incompleteProfile')}</option>
-                            <option value="invalidDocument">{t('invalidDocument')}</option>
+                            <option value="incompleteDocuments">{t('incompleteDocuments')}</option>
+                            <option value="invalidInformation">{t('invalidInformation')}</option>
                             <option value="other">{t('other')}</option>
                         </select>
                         {rejectionReason === 'other' && (

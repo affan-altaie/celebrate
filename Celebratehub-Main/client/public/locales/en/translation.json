@@ -553,6 +553,12 @@
     "iAgreeToThe": "I agree to the",
     "termsAndConditions": "Terms and Conditions",
     "useNewCard": "Use New Card",
-    "noReviewsYet": "No Reviews Yet"
+    "noReviewsYet": "No Reviews Yet",
+    "contactEmail":" email",
+    "document": "document",
+    "requestID": "request ID",
+    "category": "category",
+    "imageLabel": "image"
+    
   }
   

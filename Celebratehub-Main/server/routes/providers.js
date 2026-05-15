@@ -96,17 +96,26 @@ router.put("/:id/reject", async (req, res) => {
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"CelebrateHub" <${process.env.EMAIL_USER}>`,
       to: user.email,
-      subject: "Your Service Provider Account has been Rejected",
+      subject: "Update on Your Service Provider Account",
       html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6;">
-          <h2>Account Rejection Notice</h2>
-          <p>Dear ${user.username},</p>
-          <p>We regret to inform you that your service provider account on CelebrateHub has been rejected.</p>
-          <p><b>Reason for rejection:</b> ${reason}</p>
-          <p>If you believe this is a mistake or would like more information, please contact our support team for further assistance.</p>
-          <p>Best regards,<br>The CelebrateHub Team</p>
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eee; border-radius: 10px; padding: 20px;">
+          <h2 style="color: #dc3545; text-align: center;">Account Registration Update</h2>
+          <p>Dear <strong>${user.username}</strong>,</p>
+          <p>Thank you for your interest in joining CelebrateHub as a service provider.</p>
+          <p>After reviewing your application, we regret to inform you that your account has not been approved at this time.</p>
+          <div style="background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px; padding: 15px; margin: 20px 0;">
+            <p style="margin: 0;"><strong>Reason for rejection:</strong></p>
+            <p style="margin: 10px 0 0 0; color: #721c24;">${reason}</p>
+          </div>
+          <p>If you believe this decision was made in error or if you have addressed the reason(s) mentioned above, you are welcome to submit a new registration with the updated information.</p>
+          <p>Should you have any questions, please feel free to reach out to our support team.</p>
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="font-size: 0.9em; color: #777; text-align: center;">
+            Best regards,<br>
+            <strong>The CelebrateHub Team</strong>
+          </p>
         </div>
       `,
     };

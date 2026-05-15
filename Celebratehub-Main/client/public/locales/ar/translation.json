@@ -36,6 +36,7 @@
     "createYourAccount": "أنشئ حسابك",
     "username": "اسم المستخدم",
     "chooseAUsername": "اختر اسم مستخدم",
+    "fillAllFields": "يرجى ملء جميع الحقول المطلوبة.",
     "iWantToRegisterAsA": "أرغب في التسجيل كـ:",
     "customer": "زبون",
     "serviceProvider": "مزود الخدمة",
@@ -106,6 +107,7 @@
     "loginPending": "حسابك قيد انتظار الموافقة. ستتلقى بريدًا إلكترونيًا بمجرد مراجعته.",
     "accountRejected": "تم رفض حسابك. يرجى التسجيل مرة أخرى.",
     "loginFailed": "فشل تسجيل الدخول",
+    "accountSuspended": "تم تعليق حسابك. يرجى التواصل مع الدعم.",
     "genericError": "حدث خطأ",
     "welcomeProvider": "أهلاً بك يا {{username}}! (مزود الخدمة)",
     "welcomeCustomer": "أهلاً بك يا {{username}}! (العميل)",
@@ -160,6 +162,8 @@
     "totalPrice": "السعر الإجمالي",
     "selectAvailableDate": "اختر تاريخًا متاحًا",
     "selectAvailableTime": "اختر وقتًا متاحًا لـ {{date}}",
+    "pleaseSelectDate": "يرجى اختيار تاريخ متاح.",
+    "pleaseSelectTime": "يرجى اختيار وقت متاح.",
     "paymentInformation": "معلومات الدفع",
     "cardNumber": "رقم البطاقة",
     "expiryDate": "تاريخ الانتهاء",
@@ -308,6 +312,8 @@
     "dragDrop": "قم بالسحب والإفلات أو انقر للتحميل",
     "submitReview": "إرسال المراجعة",
     "max4Images": "يمكنك فقط تحميل 4 صور كحد أقصى.",
+    "remove": "إزالة",
+    "replace": "استبدال",
     "manageServicesTitle": "إدارة خدماتك",
     "yourServices": "خدماتك",
     "addNewServiceButton": "إضافة خدمة جديدة",
@@ -533,5 +539,8 @@
     "chatbotInitialGreeting": "أهلاً! كيف يمكنني مساعدتك اليوم؟",
     "chatbotToggle": "تبديل روبوت الدردشة",
     "currentlyUnavailable": "غير متاح حاليا",
-    "noAvailableDates": "لا يوجد تواريخ حجز متاحة لهذا المزود في الوقت الحالي."
+    "noAvailableDates": "لا يوجد تواريخ حجز متاحة لهذا المزود في الوقت الحالي.",
+    "agreeToTermsRequired": "يجب أن توافق على الشروط والأحكام",
+    "iAgreeToThe": "أوافق على",
+    "termsAndConditions": "الشروط والأحكام"
   }

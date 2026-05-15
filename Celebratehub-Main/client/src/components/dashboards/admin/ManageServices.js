@@ -77,6 +77,7 @@ const ManageServices = () => {
               <th>{t('category')}</th>
               <th>{t('location')}</th>
               <th>{t('pricePerHour')}</th>
+              <th>{t('pricePerPerson')}</th>
               <th>{t('providerNameLabel')}</th>
               <th>{t('actionsLabel')}</th>
             </tr>
@@ -102,6 +103,7 @@ const ManageServices = () => {
                   <td>{service.category}</td>
                   <td>{service.location}</td>
                   <td>{service.pricePerHour}</td>
+                  <td>{service.pricePerPerson}</td>
                   <td 
                     onClick={() => navigate(`/provider/${service.providerId._id}`)} 
                     style={{ cursor: 'pointer', color: 'blue' }} // Make it look like a link

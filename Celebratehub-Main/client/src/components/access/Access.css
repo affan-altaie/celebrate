@@ -271,6 +271,22 @@
     color: var(--primary-color);
   }
 
+  .terms-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 10px; /* Adjust as needed for spacing */
+  }
+
+  .terms-checkbox input[type="checkbox"] {
+    margin-right: 8px; /* Space between checkbox and label */
+    width: auto;
+  }
+  
+  .terms-checkbox .terms-link {
+      margin-left: 5px;
+  }
+
 [data-theme='dark'] .access-logo {
     filter: invert(1) brightness(2);
 }

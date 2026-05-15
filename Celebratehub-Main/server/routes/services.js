@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const { upload } = require("../middleware/multer");
 const Service = require("../modals/Service");
+const Review = require("../modals/Review");
+const Booking = require("../modals/Booking");
 const supabase = require("../supabase");
 const User = require("../modals/User");
 const { sendDeletionEmail } = require("../email");
@@ -19,6 +21,7 @@ router.post("/", upload.array("images", 8), async (req, res) => {
       features,
       availability,
       mainImageIndex,
+      cancellationPolicy,
       email
     } = req.body;
 
@@ -81,6 +84,7 @@ router.post("/", upload.array("images", 8), async (req, res) => {
       images,
       mainImageIndex: parseInt(mainImageIndex) || 0,
       availability: parsedAvailability,
+      cancellationPolicy,
       providerId: provider._id
     });
 
@@ -94,7 +98,24 @@ router.post("/", upload.array("images", 8), async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const services = await Service.find().populate("providerId");
-    res.json(services);
+    const servicesWithRatings = await Promise.all(services.map(async (service) => {
+      const reviews = await Review.find({ service: service._id });
+      const reviewsCount = reviews.length;
+      const averageRating = reviewsCount > 0 
+        ? parseFloat((reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviewsCount).toFixed(1))
+        : 0;
+      
+      const bookings = await Booking.find({ serviceId: service._id }, '_id');
+      
+      const serviceObj = service.toObject();
+      return { 
+        ...serviceObj, 
+        rating: averageRating,
+        reviewsCount: reviewsCount,
+        bookings: bookings
+      };
+    }));
+    res.json(servicesWithRatings);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -113,7 +134,24 @@ router.get("/all", async (req, res) => {
 router.get("/provider/:providerId", async (req, res) => {
   try {
     const services = await Service.find({ providerId: req.params.providerId }).populate("providerId");
-    res.json(services);
+    const servicesWithRatings = await Promise.all(services.map(async (service) => {
+      const reviews = await Review.find({ service: service._id });
+      const reviewsCount = reviews.length;
+      const averageRating = reviewsCount > 0 
+        ? parseFloat((reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviewsCount).toFixed(1))
+        : 0;
+      
+      const bookings = await Booking.find({ serviceId: service._id }, '_id');
+      
+      const serviceObj = service.toObject();
+      return { 
+        ...serviceObj, 
+        rating: averageRating,
+        reviewsCount: reviewsCount,
+        bookings: bookings
+      };
+    }));
+    res.json(servicesWithRatings);
   } catch (error){
     res.status(500).json({ message: error.message });
   }
@@ -122,7 +160,23 @@ router.get("/provider/:providerId", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const service = await Service.findById(req.params.id).populate("providerId");
-    res.json(service);
+    if (!service) return res.status(404).json({ message: "Service not found" });
+
+    const reviews = await Review.find({ service: service._id });
+    const reviewsCount = reviews.length;
+    const averageRating = reviewsCount > 0 
+      ? parseFloat((reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviewsCount).toFixed(1))
+      : 0;
+
+    const bookings = await Booking.find({ serviceId: service._id }, '_id');
+
+    const serviceObj = service.toObject();
+    res.json({
+      ...serviceObj,
+      rating: averageRating,
+      reviewsCount: reviewsCount,
+      bookings: bookings
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -157,6 +211,7 @@ router.put("/:id", upload.array("images", 8), async (req, res) => {
       features,
       availability,
       mainImageIndex,
+      cancellationPolicy,
       existingImages
     } = req.body;
 
@@ -220,6 +275,7 @@ router.put("/:id", upload.array("images", 8), async (req, res) => {
       images,
       mainImageIndex: parseInt(mainImageIndex) || 0,
       availability: parsedAvailability,
+      cancellationPolicy,
     };
 
     const updatedService = await Service.findByIdAndUpdate(req.params.id, updatedData, { new: true });

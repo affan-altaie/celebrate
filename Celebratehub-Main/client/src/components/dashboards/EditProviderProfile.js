@@ -268,6 +268,13 @@ const EditProviderProfile = () => {
     }
   };
   
+  const handleImageError = (e) => {
+    if (e.target.src !== logo1) {
+      e.target.onerror = null;
+      e.target.src = logo1;
+    }
+  };
+
   if (!user) {
     return <div>{t('loading')}</div>
   }
@@ -293,6 +300,7 @@ const EditProviderProfile = () => {
               src={user.profilePicture ? user.profilePicture : logo1} 
               alt="Profile" 
               style={{ width: '150px', height: '150px', borderRadius: '50%', objectFit: 'cover', marginBottom: '1rem' }}
+              onError={handleImageError}
             />
             <div>
               <label htmlFor="profile-upload" className="action-btn" style={{ display: 'inline-block', width: 'auto', cursor: 'pointer' }}>

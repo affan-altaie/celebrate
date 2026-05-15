@@ -12,6 +12,8 @@ const EditService = () => {
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
   const [pricePerHour, setPricePerHour] = useState('');
+  const [pricePerPerson, setPricePerPerson] = useState('');
+  const [cancellationPolicy, setCancellationPolicy] = useState('');
   const [images, setImages] = useState([]);
 
   useEffect(() => {
@@ -23,6 +25,8 @@ const EditService = () => {
         setCategory(response.data.category);
         setLocation(response.data.location);
         setPricePerHour(response.data.pricePerHour);
+        setPricePerPerson(response.data.pricePerPerson || '');
+        setCancellationPolicy(response.data.cancellationPolicy || '');
         setImages(response.data.images || []);
       } catch (error) {
         console.error('Error fetching service:', error);
@@ -42,6 +46,8 @@ const EditService = () => {
     formData.append('category', category);
     formData.append('location', location);
     formData.append('pricePerHour', pricePerHour);
+    formData.append('pricePerPerson', pricePerPerson);
+    formData.append('cancellationPolicy', cancellationPolicy);
     if (images.length > 0) {
         images.forEach(image => {
             formData.append('images', image);
@@ -84,7 +90,19 @@ const EditService = () => {
         </div>
         <div className="form-group">
           <label>{t('pricePerHour')}</label>
-          <input type="number" value={pricePerHour} onChange={(e) => setPricePerHour(e.target.value)} required />
+          <input type="text" value={pricePerHour} onChange={(e) => setPricePerHour(e.target.value)} />
+        </div>
+        <div className="form-group">
+          <label>{t('pricePerPerson')}</label>
+          <input type="text" value={pricePerPerson} onChange={(e) => setPricePerPerson(e.target.value)} />
+        </div>
+        <div className="form-group">
+          <label>{t('cancellationPolicy')}</label>
+          <textarea
+            value={cancellationPolicy}
+            onChange={(e) => setCancellationPolicy(e.target.value)}
+            placeholder={t('cancellationPolicyPlaceholder')}
+          />
         </div>
         <div className="form-group">
           <label>{t('imageLabel')}</label>

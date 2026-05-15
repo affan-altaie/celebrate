@@ -314,7 +314,10 @@ const CustomerProfile = () => {
   };
 
   const handleImageError = (e) => {
-    e.target.src = logo1;
+    if (e.target.src !== logo1) {
+      e.target.onerror = null;
+      e.target.src = logo1;
+    }
   };
 
   if (!user) {

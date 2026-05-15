@@ -423,7 +423,7 @@ const handleRemoveFromHistory = (itemToRemove) => {
                   <img src={provider.images[provider.mainImageIndex]} alt={provider.name} className="result-image" />
                   {!available && isCustomer && <div className="unavailable-banner">{t('currentlyUnavailable')}</div>}
                   <div className="rating-badge">
-                    <FaStar /> {provider.rating}
+                    <FaStar /> {provider.rating > 0 ? provider.rating : t("N/A")}
                   </div>
                 </div>
                 <div className="result-details">
@@ -431,10 +431,16 @@ const handleRemoveFromHistory = (itemToRemove) => {
                   src={provider.providerId && provider.providerId.profilePicture ? provider.providerId.profilePicture : defaultProfilePic}
                   alt={provider.providerId ? provider.providerId.username : 'Default'}
                   className="provider-logo" 
+                  onError={(e) => {
+                    if (e.target.src !== defaultProfilePic) {
+                      e.target.onerror = null;
+                      e.target.src = defaultProfilePic;
+                    }
+                  }}
                 />
                   <div className="service-tag">{provider.type}</div>
                   <h3>{provider.name}</h3>
-                  <p className="reviews">{t('reviewsCount', { count: provider.reviews ? provider.reviews.length : 0 })}</p>
+                  <p className="reviews">{t('reviewsCount', { count: provider.reviewsCount || 0 })}</p>
                 </div>
               </div>
             );
@@ -467,7 +473,7 @@ const handleRemoveFromHistory = (itemToRemove) => {
                   <img src={result.images[result.mainImageIndex]} alt={result.name} className="result-image" />
                   {!available && isCustomer && <div className="unavailable-banner">{t('currentlyUnavailable')}</div>}
                   <div className="rating-badge">
-                      <FaStar /> {result.rating}
+                      <FaStar /> {result.rating > 0 ? result.rating : t("N/A")}
                     </div>
                   </div>
                   <div className="result-details">
@@ -475,11 +481,17 @@ const handleRemoveFromHistory = (itemToRemove) => {
                     src={result.providerId && result.providerId.profilePicture ? result.providerId.profilePicture : defaultProfilePic}
                     alt={result.providerId ? result.providerId.username : 'Default'}
                     className="provider-logo" 
+                    onError={(e) => {
+                      if (e.target.src !== defaultProfilePic) {
+                        e.target.onerror = null;
+                        e.target.src = defaultProfilePic;
+                      }
+                    }}
                   />
                     <div className="service-tag">{result.type}</div>
                     <h3>{result.name}</h3>
                     {result.location && <p className="location"><FaMapMarkerAlt className="icon" /> {result.location}</p>}
-                    <p className="reviews">{t('reviewsCount', { count: result.reviews ? result.reviews.length : 0 })}</p>
+                    <p className="reviews">{t('reviewsCount', { count: result.reviewsCount || 0 })}</p>
                     <p className="description">{result.description}</p>
                     <ul className="features-list">
                       {result.features.map((feature, i) => (

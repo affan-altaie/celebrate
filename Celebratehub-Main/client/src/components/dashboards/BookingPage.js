@@ -14,6 +14,7 @@ const BookingPage = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState(null);
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const [hours, setHours] = useState(1);
   const [numberOfPersons, setNumberOfPersons] = useState(1);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -159,12 +160,14 @@ const BookingPage = () => {
   useEffect(() => {
     if (service) {
       let total = 0;
-      const numHours = parseInt(hours, 10);
-      const numPersons = parseInt(numberOfPersons, 10);
-      if (service.pricePerHour && !isNaN(numHours)) {
-        total = parseFloat(service.pricePerHour) * numHours;
-      } else if (service.pricePerPerson && !isNaN(numPersons)) {
-        total = parseFloat(service.pricePerPerson) * numPersons;
+      const numHours = parseInt(hours, 10) || 0;
+      const numPersons = parseInt(numberOfPersons, 10) || 0;
+
+      if (service.pricePerHour) {
+        total += parseFloat(service.pricePerHour) * numHours;
+      }
+      if (service.pricePerPerson) {
+        total += parseFloat(service.pricePerPerson) * numPersons;
       }
       setTotalPrice(total);
     }
@@ -177,9 +180,20 @@ const BookingPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormSubmitted(true);
     
-    if (!formData.location || !formData.phone || !formData.email || !selectedDate || !selectedTime) {
+    if (!formData.location || !formData.phone || !formData.email) {
       toast.error(t("fillAllFields"));
+      return;
+    }
+
+    if (!selectedDate) {
+      toast.error(t("pleaseSelectDate"));
+      return;
+    }
+
+    if (!selectedTime) {
+      toast.error(t("pleaseSelectTime"));
       return;
     }
 
@@ -297,6 +311,10 @@ const BookingPage = () => {
 
   const available = isServiceAvailable(service.availability);
 
+  const averageRating = service.reviews && service.reviews.length > 0
+    ? (service.reviews.reduce((acc, curr) => acc + curr.rating, 0) / service.reviews.length).toFixed(1)
+    : t("N/A");
+
   if (!available) {
     return (
       <div className="booking-page-container-wrapper">
@@ -317,7 +335,7 @@ const BookingPage = () => {
         <div className="booking-details-column">
             <img src={service.images[service.mainImageIndex]} alt={service.name} className="service-image" />
             <h2>{service.name}</h2>
-            <div className="service-meta"><span><FaStar /> {service.rating}</span> <span><FaUserFriends /> {t('reviewsCount', { count: service.reviews ? service.reviews.length : 0 })}</span></div>
+            <div className="service-meta"><span><FaStar /> {averageRating}</span> <span><FaUserFriends /> {t('reviewsCount', { count: service.reviews ? service.reviews.length : 0 })}</span></div>
             <p className="service-info"><FaMapMarkerAlt /> {service.location}</p>
             {service.pricePerHour && <p className="service-info">OMR {service.pricePerHour} / hour</p>}
             {service.pricePerPerson && <p className="service-info">OMR {service.pricePerPerson} / {t('personLabel')}</p>}
@@ -333,8 +351,29 @@ const BookingPage = () => {
             {service.pricePerHour && <div className="form-group"><label><FaClock /> {t('numberOfHours')}</label><input type="number" name="hours" value={hours} onChange={(e) => setHours(e.target.value)} min="1" required /></div>}
             {service.pricePerPerson && <div className="form-group"><label><FaUserFriends /> {t('numberOfPersons')}</label><input type="number" name="persons" value={numberOfPersons} onChange={(e) => setNumberOfPersons(e.target.value)} min="1" required /></div>}
             {totalPrice > 0 && <div className="form-group"><label>{t('totalPrice')}</label><p className="total-price">OMR {totalPrice.toFixed(2)}</p></div>}
-            <div className="form-group"><label><FaCalendarAlt /> {t('selectAvailableDate')}</label>{renderCalendar()}</div>
-            {selectedDate && <div className="form-group"><label>{t('selectAvailableTime', { date: selectedDate })}</label><div className="time-slots-container">{service.availability[selectedDate]?.map((time, index) => <button key={index} type="button" className={`time-slot-button ${selectedTime === time ? 'selected' : ''}`} onClick={() => setSelectedTime(time)}>{time}</button>)}</div></div>}
+            <div className={`form-group ${formSubmitted && !selectedDate ? 'validation-error' : ''}`}>
+              <label><FaCalendarAlt /> {t('selectAvailableDate')}</label>
+              {renderCalendar()}
+              {formSubmitted && !selectedDate && <span className="error-text">{t('pleaseSelectDate')}</span>}
+            </div>
+            {selectedDate && (
+              <div className={`form-group ${formSubmitted && !selectedTime ? 'validation-error' : ''}`}>
+                <label>{t('selectAvailableTime', { date: selectedDate })}</label>
+                <div className="time-slots-container">
+                  {service.availability[selectedDate]?.map((time, index) => (
+                    <button 
+                      key={index} 
+                      type="button" 
+                      className={`time-slot-button ${selectedTime === time ? 'selected' : ''}`} 
+                      onClick={() => setSelectedTime(time)}
+                    >
+                      {time}
+                    </button>
+                  ))}
+                </div>
+                {formSubmitted && !selectedTime && <span className="error-text">{t('pleaseSelectTime')}</span>}
+              </div>
+            )}
             
             <div className="payment-section-container">
               <h3 style={{ textAlign: 'center' }}><FaCreditCard /> {t('paymentInformation')}</h3>

@@ -36,6 +36,7 @@
     "createYourAccount": "Create your account",
     "username": "Company Name or Business Name",
     "chooseAUsername": "Enter your company or business name",
+    "fillAllFields": "Please fill all required fields.",
     "iWantToRegisterAsA": "I want to register as a:",
     "customer": "Customer",
     "serviceProvider": "Service Provider",
@@ -106,6 +107,7 @@
     "loginPending": "Your account is pending approval. You will receive an email once it has been reviewed.",
     "accountRejected": "Your account has been rejected. Please register again.",
     "loginFailed": "Login failed",
+    "accountSuspended": "Your account has been suspended. Please contact support.",
     "genericError": "An error occurred",
     "welcomeProvider": "Welcome, {{username}}! (Provider)",
     "welcomeCustomer": "Welcome, {{username}}! (Customer)",
@@ -162,6 +164,8 @@
     "totalPrice": "Total Price",
     "selectAvailableDate": "Select an Available Date",
     "selectAvailableTime": "Select an Available Time for {{date}}",
+    "pleaseSelectDate": "Please select an available date.",
+    "pleaseSelectTime": "Please select an available time.",
     "paymentInformation": "Payment Information",
     "cardNumber": "Card Number",
     "expiryDate": "Expiry Date",
@@ -310,6 +314,8 @@
     "dragDrop": "Drag & drop or click to upload",
     "submitReview": "Submit Review",
     "max4Images": "You can only upload a maximum of 4 images.",
+    "remove": "Remove",
+    "replace": "Replace",
     "manageServicesTitle": "Manage Your Services",
     "yourServices": "Your Services",
     "addNewServiceButton": "Add New Service",
@@ -462,7 +468,7 @@
     "priceOption": "Price Option",
     "perHour": "Per Hour",
     "perPerson": "Per Person",
-    "pricePerPerson": "Price Per Person",
+    "pricePerPerson": "Price (per person)",
     "bookedOnLabel": "booked on",
     "cancelBooking": "Cancel Booking",
     "noUpcomingBookings": "No upcoming bookings.",
@@ -540,6 +546,9 @@
     "chatbotInitialGreeting": "Hi! How can I help you today?",
     "chatbotToggle": "Toggle Chatbot",
     "currentlyUnavailable": "Currently Unavailable",
-    "noAvailableDates": "This service provider has no available booking dates at the moment."
+    "noAvailableDates": "This service provider has no available booking dates at the moment.",
+    "agreeToTermsRequired": "You must agree to the terms and conditions",
+    "iAgreeToThe": "I agree to the",
+    "termsAndConditions": "Terms and Conditions"
   }
   

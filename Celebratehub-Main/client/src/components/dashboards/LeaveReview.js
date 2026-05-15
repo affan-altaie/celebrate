@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import { FaStar, FaCamera, FaTimes } from 'react-icons/fa';
+import { FaStar, FaCamera, FaTimes, FaSyncAlt } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import './LeaveReview.css';
 
@@ -62,6 +62,26 @@ const LeaveReview = () => {
     URL.revokeObjectURL(newPreviews[index]);
     newPreviews.splice(index, 1);
     setImagePreviews(newPreviews);
+  };
+
+  const handleReplaceImage = (index) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const newImages = [...images];
+        newImages[index] = file;
+        setImages(newImages);
+
+        const newPreviews = [...imagePreviews];
+        URL.revokeObjectURL(newPreviews[index]);
+        newPreviews[index] = URL.createObjectURL(file);
+        setImagePreviews(newPreviews);
+      }
+    };
+    input.click();
   };
 
   const handleSubmit = async (e) => {
@@ -174,9 +194,24 @@ const LeaveReview = () => {
               {imagePreviews.map((preview, index) => (
                 <div key={index} className="image-preview-item">
                   <img src={preview} alt={`preview ${index}`} className="image-preview" />
-                  <button type="button" onClick={() => removeImage(index)} className="remove-image-btn">
-                    <FaTimes />
-                  </button>
+                  <div className="image-actions">
+                    <button 
+                      type="button" 
+                      onClick={() => removeImage(index)} 
+                      className="remove-image-btn"
+                      title={t('remove')}
+                    >
+                      <FaTimes />
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => handleReplaceImage(index)} 
+                      className="replace-image-btn"
+                      title={t('replace')}
+                    >
+                      <FaSyncAlt />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

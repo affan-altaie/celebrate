@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const User = require("../modals/User");
+const Service = require("../modals/Service");
 const { upload } = require("../middleware/multer");
 const supabase = require("../supabase");
 const sendEmail = require("../utils/email");
@@ -9,8 +10,25 @@ const sendEmail = require("../utils/email");
 // Get all users
 router.get("/", async (req, res) => {
   try {
-    const users = await User.find({}, '-password'); // Exclude passwords from the result
-    res.json(users);
+    const users = await User.find({}, '-password').lean(); // Use .lean() to allow adding properties
+
+    // Calculate ratings for providers
+    const usersWithRatings = await Promise.all(users.map(async (user) => {
+      if (user.role === 'provider') {
+        const services = await Service.find({ providerId: user._id });
+        const ratedServices = services.filter(s => s.rating && s.rating > 0);
+        
+        if (ratedServices.length > 0) {
+          const totalRating = ratedServices.reduce((acc, s) => acc + s.rating, 0);
+          user.rating = totalRating / ratedServices.length;
+        } else {
+          user.rating = 0;
+        }
+      }
+      return user;
+    }));
+
+    res.json(usersWithRatings);
   } catch (error) {
     console.error("Error fetching users:", error);
     res.status(500).json({ message: "Server error" });
@@ -20,10 +38,23 @@ router.get("/", async (req, res) => {
 // Get a single user by ID
 router.get("/:id", async (req, res) => {
   try {
-    const user = await User.findById(req.params.id, '-password'); // Exclude password
+    const user = await User.findById(req.params.id, '-password').lean(); // Exclude password
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    if (user.role === 'provider') {
+      const services = await Service.find({ providerId: user._id });
+      const ratedServices = services.filter(s => s.rating && s.rating > 0);
+      
+      if (ratedServices.length > 0) {
+        const totalRating = ratedServices.reduce((acc, s) => acc + s.rating, 0);
+        user.rating = totalRating / ratedServices.length;
+      } else {
+        user.rating = 0;
+      }
+    }
+
     res.json(user);
   } catch (error) {
     console.error("Error fetching user:", error);

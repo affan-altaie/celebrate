@@ -5,6 +5,7 @@ import axios from 'axios';
 import './Dashboard.css';
 import './CustomerReviews.css';
 import { FaStar } from 'react-icons/fa';
+import logo1 from '../../assets/logo1.png';
 
 const CustomerReviews = () => {
   const { t } = useTranslation();
@@ -88,7 +89,17 @@ const CustomerReviews = () => {
                   service.reviews.map((review) => (
                     <div key={review._id} className="review-card">
                       <div className="review-header">
-                        <img src={review.user?.profilePicture || '/default-avatar.png'} alt={review.user?.username} className="reviewer-avatar" />
+                        <img 
+                          src={review.user?.profilePicture || logo1} 
+                          alt={review.user?.username} 
+                          className="reviewer-avatar" 
+                          onError={(e) => {
+                            if (e.target.src !== logo1) {
+                              e.target.onerror = null;
+                              e.target.src = logo1;
+                            }
+                          }}
+                        />
                         <div className="review-info">
                           <strong>{review.user?.username || 'Anonymous'}</strong>
                           {renderStars(review.rating)}

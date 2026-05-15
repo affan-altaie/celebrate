@@ -116,6 +116,12 @@ router.post("/forgot-password", async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
 
+    if (user.status === "suspended") {
+      return res.status(403).json({
+        message: "Your account has been suspended. Please contact support for assistance.",
+      });
+    }
+
     // Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.otp = otp;
@@ -199,12 +205,17 @@ router.post("/login", async (req, res) => {
 
     if (user.status === "pending") {
       if (user.role === "customer") {
-        return res.status(401).json({ message: "Your account is pending email verification. Please check your email for an OTP." });
+        return res.status(401).json({
+          message:
+            "Your account is pending email verification. Please check your email for an OTP.",
+        });
       } else if (user.role === "provider") {
         return res.status(401).json({ message: "Your account is pending admin approval." });
       }
     } else if (user.status === "suspended") {
-      return res.status(401).json({ message: "Your account has been suspended. Please contact support for assistance." });
+      return res.status(403).json({
+        message: "Your account has been suspended. Please contact support for assistance.",
+      });
     }
 
     if (user.role === "provider" && user.status === "rejected") {

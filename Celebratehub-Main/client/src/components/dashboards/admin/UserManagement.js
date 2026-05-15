@@ -34,7 +34,10 @@ const UserManagement = () => {
   };
 
   const handleImageError = (e) => {
-    e.target.src = logo1;
+    if (e.target.src !== logo1) {
+      e.target.onerror = null;
+      e.target.src = logo1;
+    }
   };
 
   const truncateId = (id) => {
@@ -195,7 +198,6 @@ const UserManagement = () => {
     <div className="admin-container">
       <div className="admin-header">
         <h1>{t('userManagement')}</h1>
-        <Link to="/admin/create-user" className="create-user-btn">{t('createUser')}</Link>
       </div>
       <p>{t('userManagementDescription')}</p>
 

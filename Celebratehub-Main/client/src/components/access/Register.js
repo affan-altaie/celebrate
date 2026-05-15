@@ -16,6 +16,7 @@ const Register = () => {
     role: "customer",
     location: "",
     document: null,
+    agreedToTerms: false,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -117,6 +118,9 @@ const Register = () => {
     if (formData.password !== formData.confirmPassword) {
       errors.confirmPassword = t("passwordsDoNotMatch");
     }
+    if (!formData.agreedToTerms) {
+      errors.agreedToTerms = t("agreeToTermsRequired");
+    }
     if (formData.role === "provider") {
       if (!formData.location) {
         errors.location = t("locationRequired");
@@ -147,7 +151,7 @@ const Register = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value, type, checked, files } = e.target;
     if (name === "document") {
       const file = files[0];
       if (file) {
@@ -170,7 +174,7 @@ const Register = () => {
     } else {
       setFormData((prevState) => ({
         ...prevState,
-        [name]: value,
+        [name]: type === "checkbox" ? checked : value,
       }));
 
       if (name === "password") {
@@ -201,10 +205,16 @@ const Register = () => {
       confirmPassword: true,
       location: true,
       document: true,
+      agreedToTerms: true,
     });
 
     if (Object.keys(errors).length > 0) {
       console.log("Validation errors:", errors);
+      return;
+    }
+
+    if (!formData.agreedToTerms) {
+      setError(t("agreeToTermsRequired"));
       return;
     }
 
@@ -506,6 +516,26 @@ const Register = () => {
               <small className="form-hint">{t("documentHint")}</small>
             </div>
           )}
+
+          <div className="form-group terms-checkbox">
+            <input
+              type="checkbox"
+              id="agreedToTerms"
+              name="agreedToTerms"
+              checked={formData.agreedToTerms}
+              onChange={(e) => handleChange({ target: { name: e.target.name, value: e.target.checked } })}
+              onBlur={handleBlur}
+            />
+            <label htmlFor="agreedToTerms">
+              {t("iAgreeToThe")}
+              <Link to="/terms" className="terms-link">
+                {t("termsAndConditions")}
+              </Link>
+            </label>
+            {touched.agreedToTerms && formErrors.agreedToTerms && (
+              <div className="error-message">{formErrors.agreedToTerms}</div>
+            )}
+          </div>
 
           <button type="submit" className="submit-btn" disabled={uploading} onClick={() => console.log("Button clicked!")}>
             {t("createAccount")}

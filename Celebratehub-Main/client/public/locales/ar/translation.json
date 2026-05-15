@@ -240,6 +240,7 @@
     "phoneNumberUpdateFailed": "فشل تحديث رقم الهاتف",
     "passwordUpdateFailed": "فشل تحديث كلمة المرور",
     "cardUpdateFailed": "فشل تحديث تفاصيل البطاقة",
+    "invalidCvv": "يجب أن يتكون رمز التحقق من 3 أرقام على الأقل.",
     "saveCardForFuture": "احفظ هذه البطاقة للمدفوعات المستقبلية",
     "addNewCard": "إضافة بطاقة جديدة",
     "useSavedCard": "استخدم البطاقة المحفوظة",
@@ -352,6 +353,7 @@
     "categoryLabel": "الفئة",
     "selectCategory": "اختر الفئة",
     "weddingHalls": "قاعات الأفراح",
+    "wedding-halls": "قاعات الأفراح",
     "catering": "تموين",
     "photography": "تصوير",
     "birthdays": "أعياد الميلاد",
@@ -542,5 +544,7 @@
     "noAvailableDates": "لا يوجد تواريخ حجز متاحة لهذا المزود في الوقت الحالي.",
     "agreeToTermsRequired": "يجب أن توافق على الشروط والأحكام",
     "iAgreeToThe": "أوافق على",
-    "termsAndConditions": "الشروط والأحكام"
+    "termsAndConditions": "الشروط والأحكام",
+    "useNewCard": "استخدام بطاقة جديدة",
+    "noReviewsYet": "لا توجد مراجعات بعد"
   }

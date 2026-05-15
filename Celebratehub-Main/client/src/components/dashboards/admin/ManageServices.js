@@ -16,7 +16,7 @@ const ManageServices = () => {
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await axios.get('/api/services');
+        const response = await axios.get('/api/services/all');
         setServices(response.data);
       } catch (error) {
         console.error('Error fetching services:', error);

@@ -97,7 +97,7 @@ router.post("/", upload.array("images", 8), async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const services = await Service.find().populate("providerId");
+    const services = await Service.find({ status: "Active" }).populate("providerId");
     const servicesWithRatings = await Promise.all(services.map(async (service) => {
       const reviews = await Review.find({ service: service._id });
       const reviewsCount = reviews.length;
@@ -133,7 +133,11 @@ router.get("/all", async (req, res) => {
 
 router.get("/provider/:providerId", async (req, res) => {
   try {
-    const services = await Service.find({ providerId: req.params.providerId }).populate("providerId");
+    const filter = { providerId: req.params.providerId };
+    if (req.query.all !== "true") {
+      filter.status = "Active";
+    }
+    const services = await Service.find(filter).populate("providerId");
     const servicesWithRatings = await Promise.all(services.map(async (service) => {
       const reviews = await Review.find({ service: service._id });
       const reviewsCount = reviews.length;
@@ -161,6 +165,10 @@ router.get("/:id", async (req, res) => {
   try {
     const service = await Service.findById(req.params.id).populate("providerId");
     if (!service) return res.status(404).json({ message: "Service not found" });
+
+    if (service.status !== "Active" && req.query.all !== "true") {
+      return res.status(404).json({ message: "Service is currently inactive" });
+    }
 
     const reviews = await Review.find({ service: service._id });
     const reviewsCount = reviews.length;

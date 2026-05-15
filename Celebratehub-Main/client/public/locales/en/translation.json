@@ -242,6 +242,7 @@
     "phoneNumberUpdateFailed": "Failed to update phone number",
     "passwordUpdateFailed": "Failed to update password",
     "cardUpdateFailed": "Failed to update card details",
+    "invalidCvv": "CVV must be at least 3 digits.",
     "saveCardForFuture": "Save this card for future payments",
     "addNewCard": "Add New Card",
     "useSavedCard": "Use Saved Card",
@@ -351,6 +352,7 @@
     "invalidInformation": "Invalid Information",
     "selectCategory": "Select a category",
     "weddingHalls": "Wedding Halls",
+    "wedding-halls": "Wedding Halls",
     "catering": "Catering",
     "photography": "Photography",
     "birthdays": "Birthdays",
@@ -549,6 +551,8 @@
     "noAvailableDates": "This service provider has no available booking dates at the moment.",
     "agreeToTermsRequired": "You must agree to the terms and conditions",
     "iAgreeToThe": "I agree to the",
-    "termsAndConditions": "Terms and Conditions"
+    "termsAndConditions": "Terms and Conditions",
+    "useNewCard": "Use New Card",
+    "noReviewsYet": "No Reviews Yet"
   }
   

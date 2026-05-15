@@ -132,8 +132,8 @@ const NewBooking = () => {
       if (service.name && service.name.toLowerCase().includes(lowerTerm) && !suggestions.includes(service.name)) {
         suggestions.push(service.name);
       }
-      if (service.type && service.type.toLowerCase().includes(lowerTerm) && !suggestions.includes(service.type)) {
-        suggestions.push(service.type);
+      if (service.category && service.category.toLowerCase().includes(lowerTerm) && !suggestions.includes(service.category)) {
+        suggestions.push(service.category);
       }
     });
 
@@ -211,10 +211,13 @@ const NewBooking = () => {
     setSearchHistory(newHistory);
 
     setTimeout(() => {
+      const lowerTerm = termToSearch.toLowerCase();
+      const hyphenatedTerm = lowerTerm.replace(/\s+/g, '-');
+
       let results = services.filter(service =>
-        (service.name && service.name.toLowerCase().includes(termToSearch.toLowerCase())) ||
-        (service.type && service.type.toLowerCase().includes(termToSearch.toLowerCase())) ||
-        (service.category && service.category.toLowerCase().includes(termToSearch.toLowerCase()))
+        (service.name && service.name.toLowerCase().includes(lowerTerm)) ||
+        (service.category && service.category.toLowerCase().includes(lowerTerm)) ||
+        (service.category && service.category.toLowerCase().includes(hyphenatedTerm))
       );
 
       if (locationToSearch) {
@@ -254,12 +257,12 @@ const NewBooking = () => {
     }, 300);
   };
 
-  const handleServiceClick = (serviceType) => {
-    setSearchTerm(serviceType);
+  const handleServiceClick = (categoryKey, displayName) => {
+    setSearchTerm(displayName);
     setLocation('');
     setPriceSort('');
     setRatingSort('');
-    handleSearch({ term: serviceType, location: '' });
+    handleSearch({ term: categoryKey, location: '' });
   };
 const handleRemoveFromHistory = (itemToRemove) => {
     const newHistory = searchHistory.filter(item => item.timestamp !== itemToRemove.timestamp);
@@ -268,10 +271,10 @@ const handleRemoveFromHistory = (itemToRemove) => {
   const backgroundImageUrl = 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80';
 
   const popularServices = [
-    { name: t('weddingHalls'), icon: <FaMapMarkedAlt />, description: t('findPerfectHall') },
-    { name: t('catering'), icon: <FaUtensils />, description: t('deliciousFoodOptions') },
-    { name: t('photography'), icon: <FaCameraRetro />, description: t('captureEveryMoment') },
-    { name: t('birthdays'), icon: <FaMusic />, description: t('celebrateSpecialDays') },
+    { key: 'wedding-halls', name: t('weddingHalls'), icon: <FaMapMarkedAlt />, description: t('findPerfectHall') },
+    { key: 'catering', name: t('catering'), icon: <FaUtensils />, description: t('deliciousFoodOptions') },
+    { key: 'photography', name: t('photography'), icon: <FaCameraRetro />, description: t('captureEveryMoment') },
+    { key: 'birthdays', name: t('birthdays'), icon: <FaMusic />, description: t('celebrateSpecialDays') },
   ];
 
   const topProviders = services
@@ -438,7 +441,7 @@ const handleRemoveFromHistory = (itemToRemove) => {
                     }
                   }}
                 />
-                  <div className="service-tag">{provider.type}</div>
+                  <div className="service-tag">{t(provider.category === 'wedding-halls' ? 'weddingHalls' : provider.category)}</div>
                   <h3>{provider.name}</h3>
                   <p className="reviews">{t('reviewsCount', { count: provider.reviewsCount || 0 })}</p>
                 </div>
@@ -452,10 +455,10 @@ const handleRemoveFromHistory = (itemToRemove) => {
         <h2>{t('popularServicesTitle')}</h2>
         <div className="services-grid">
           {popularServices.map((service, index) => (
-            <div key={index} className="service-card" onClick={() => handleServiceClick(service.name)}>
+            <div key={index} className="service-card" onClick={() => handleServiceClick(service.key, service.name)}>
               <div className="service-icon">{service.icon}</div>
-              <h3>{t(service.name)}</h3>
-              <p>{t(service.description)}</p>
+              <h3>{service.name}</h3>
+              <p>{service.description}</p>
             </div>
           ))}
         </div>
@@ -488,7 +491,7 @@ const handleRemoveFromHistory = (itemToRemove) => {
                       }
                     }}
                   />
-                    <div className="service-tag">{result.type}</div>
+                    <div className="service-tag">{t(result.category === 'wedding-halls' ? 'weddingHalls' : result.category)}</div>
                     <h3>{result.name}</h3>
                     {result.location && <p className="location"><FaMapMarkerAlt className="icon" /> {result.location}</p>}
                     <p className="reviews">{t('reviewsCount', { count: result.reviewsCount || 0 })}</p>

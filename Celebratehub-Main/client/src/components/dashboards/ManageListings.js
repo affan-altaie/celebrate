@@ -17,7 +17,7 @@ const ManageListings = () => {
         if (!userString) return;
         const user = JSON.parse(userString);
         const providerId = user.id || user._id;
-        const response = await axios.get(`/api/services/provider/${providerId}`);
+        const response = await axios.get(`/api/services/provider/${providerId}?all=true`);
         setServices(response.data);
       } catch (error) {
         console.error('Failed to fetch services', error);
@@ -34,10 +34,10 @@ const ManageListings = () => {
       setServices(services.map(service => 
         (service._id === id || service.id === id) ? { ...service, status: newStatus } : service
       ));
-      toast.success(t('statusUpdatedSuccess', { status: newStatus }));
+      toast.success(t('statusUpdatedSuccessfully'));
     } catch (error) {
       console.error('Failed to update status', error);
-      toast.error(t('statusUpdateError'));
+      toast.error(t('failedToUpdateStatus'));
     }
   };
 

@@ -19,7 +19,8 @@ const CustomerProfile = () => {
   const [cardData, setCardData] = useState({
     cardHolderName: '',
     cardNumber: '',
-    expiryDate: ''
+    expiryDate: '',
+    cvv: ''
   });
   const [cardError, setCardError] = useState('');
   
@@ -38,11 +39,12 @@ const CustomerProfile = () => {
       axios.get(`/api/payments/balance/${userId}`)
         .then(res => {
           if (res.data.savedCard) {
-            setCardData({
-              cardHolderName: res.data.savedCard.cardHolderName || '',
-              cardNumber: res.data.savedCard.cardNumber || '',
-              expiryDate: res.data.savedCard.expiryDate || ''
-            });
+              setCardData({
+                cardHolderName: res.data.savedCard.cardHolderName || '',
+                cardNumber: res.data.savedCard.cardNumber || '',
+                expiryDate: res.data.savedCard.expiryDate || '',
+                cvv: res.data.savedCard.cvv || ''
+              });
           }
         })
         .catch(err => console.error("Error fetching card details:", err));
@@ -58,7 +60,7 @@ const CustomerProfile = () => {
       const response = await axios.delete(`/api/payments/delete-card/${userId}`);
       if (response.data.success) {
         toast.success(t("cardDeleted") || "Card details deleted successfully.");
-        setCardData({ cardHolderName: "", cardNumber: "", expiryDate: "" });
+        setCardData({ cardHolderName: "", cardNumber: "", expiryDate: "", cvv: "" });
       } else {
         toast.error(response.data.message || t("cardDeletionFailed") || "Failed to delete card details.");
       }
@@ -256,6 +258,11 @@ const CustomerProfile = () => {
       return;
     }
   
+    if (cardData.cvv.length < 3) {
+      setCardError(t("invalidCvv") || "CVV must be at least 3 digits.");
+      return;
+    }
+
     const [month, year] = cardData.expiryDate.split('/');
     const currentYear = new Date().getFullYear() % 100;
     const currentMonth = new Date().getMonth() + 1;
@@ -520,6 +527,23 @@ const CustomerProfile = () => {
                         setCardData({...cardData, expiryDate: formattedValue});
                       }}
                       placeholder="MM/YY"
+                      style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
+                    />
+                  </div>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
+                      {t('cvc')}
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength="4"
+                      value={cardData.cvv}
+                      onChange={(e) => {
+                        const formattedValue = e.target.value.replace(/\D/g, '');
+                        setCardData({...cardData, cvv: formattedValue});
+                      }}
+                      placeholder="CVV"
                       style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--background-color)', color: 'var(--text-color)' }}
                     />
                   </div>

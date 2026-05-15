@@ -165,7 +165,7 @@ const EditListing = () => {
   useEffect(() => {
     const fetchService = async () => {
       try {
-        const response = await axios.get(`/api/services/${id}`);
+        const response = await axios.get(`/api/services/${id}?all=true`);
         const data = response.data;
         if (!data) {
            toast.error('Service not found.');

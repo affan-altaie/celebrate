@@ -5,6 +5,7 @@ const Payment = require("../modals/Payment");
 const User = require("../modals/User");
 const Booking = require("../modals/Booking");
 const { validate, paymentCardValidation } = require("../middleware/validation");
+const { encrypt, decrypt } = require("../utils/cryptoUtils");
 const nodemailer = require("nodemailer");
 
 // Nodemailer transporter setup
@@ -26,9 +27,19 @@ router.get("/balance/:userId", async (req, res) => {
     }
     // Return default 1000 if walletBalance is missing (for older accounts)
     const balance = typeof user.walletBalance === "number" ? user.walletBalance : 1000;
+    
+    let savedCard = null;
+    if (user.savedCard && user.savedCard.cardNumber) {
+      savedCard = {
+        ...user.savedCard.toObject(),
+        cardNumber: decrypt(user.savedCard.cardNumber),
+        cvv: decrypt(user.savedCard.cvv)
+      };
+    }
+
     res.json({
       balance,
-      savedCard: user.savedCard || null,
+      savedCard,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -48,7 +59,7 @@ router.get("/user-bookings/:userId", async (req, res) => {
 // Update saved card details
 router.put("/update-card/:userId", validate, async (req, res) => {
   try {
-    const { cardHolderName, cardNumber, expiryDate } = req.body;
+    const { cardHolderName, cardNumber, expiryDate, cvv } = req.body;
     const user = await User.findById(req.params.userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -56,8 +67,9 @@ router.put("/update-card/:userId", validate, async (req, res) => {
 
     user.savedCard = {
       cardHolderName,
-      cardNumber,
+      cardNumber: encrypt(cardNumber),
       expiryDate,
+      cvv: encrypt(cvv)
     };
 
     await user.save();

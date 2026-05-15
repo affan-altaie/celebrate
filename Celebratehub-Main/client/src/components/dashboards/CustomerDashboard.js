@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaWallet } from 'react-icons/fa';
 import './Dashboard.css';
 
 const CustomerDashboard = () => {
@@ -27,9 +26,6 @@ const CustomerDashboard = () => {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>{t('welcomeCustomer', { username: user?.username })}</h1>
-        <div className="wallet-display">
-          <FaWallet /> {t('walletBalance') || 'Wallet Balance'}: OMR {balance.toFixed(2)}
-        </div>
       </header>
       <main className="dashboard-content">
         <div className="dashboard-card">

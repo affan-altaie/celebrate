@@ -7,6 +7,7 @@ const Payment = require("../modals/Payment");
 const Service = require("../modals/Service");
 const Review = require("../modals/Review");
 const { validate, paymentCardValidation } = require("../middleware/validation");
+const { encrypt, decrypt } = require("../utils/cryptoUtils");
 const nodemailer = require("nodemailer");
 const path = require("path");
 
@@ -137,14 +138,23 @@ router.post("/", async (req, res) => {
 
     let cardDetails;
     if (useSavedCard && user.savedCard) {
-        cardDetails = user.savedCard;
+        cardDetails = {
+            ...user.savedCard.toObject(),
+            cardNumber: decrypt(user.savedCard.cardNumber),
+            cvv: decrypt(user.savedCard.cvv)
+        };
+        // Verify CVV for saved card
+        if (req.body.cvv !== cardDetails.cvv) {
+            return res.status(400).json({ message: "Invalid CVV for the saved card." });
+        }
     } else {
         cardDetails = payment;
         if (saveCard) {
             user.savedCard = { 
-                cardNumber: payment.cardNumber, 
+                cardNumber: encrypt(payment.cardNumber), 
                 expiryDate: payment.expiryDate, 
-                cardHolderName: payment.cardHolderName 
+                cardHolderName: payment.cardHolderName,
+                cvv: encrypt(payment.cvc || payment.cvv)
             };
         }
     }

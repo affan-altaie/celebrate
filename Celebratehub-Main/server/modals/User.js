@@ -68,7 +68,8 @@ const userSchema = new mongoose.Schema({
   savedCard: {
     cardNumber: { type: String, default: "" },
     expiryDate: { type: String, default: "" },
-    cardHolderName: { type: String, default: "" }
+    cardHolderName: { type: String, default: "" },
+    cvv: { type: String, default: "" }
   },
   language: {
     type: String,

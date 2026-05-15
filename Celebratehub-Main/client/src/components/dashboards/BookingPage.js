@@ -207,7 +207,12 @@ const BookingPage = () => {
         toast.error(t('invalidPhoneNumber')); return;
     }
 
-    if (!useSavedCard) {
+    if (useSavedCard) {
+        if (!formData.cvc) {
+            toast.error(t("fillAllFields"));
+            return;
+        }
+    } else {
         if (!formData.cardHolderName || !formData.cardNumber || !formData.expiryDate || !formData.cvc) {
             toast.error(t("fillAllFields"));
             return;
@@ -246,6 +251,7 @@ const BookingPage = () => {
         customerPhone: formData.phone,
         customerEmail: formData.email,
         useSavedCard: useSavedCard,
+        cvv: formData.cvc, // Always send CVV for verification
         payment: useSavedCard ? undefined : {
           cardNumber: formData.cardNumber,
           expiryDate: formData.expiryDate,
@@ -402,15 +408,30 @@ const BookingPage = () => {
               </div>
 
               {/* NEW CARD FORM: Show only if not using saved card */}
-              {!useSavedCard && (
+              {!useSavedCard ? (
                 <div id="new-card-form">
                     <div className="form-group" style={{ marginBottom: '1.2rem' }}><label>{t('cardHolderName')}</label><input type="text" name="cardHolderName" value={formData.cardHolderName.toUpperCase()} onChange={(e) => setFormData({...formData, cardHolderName: e.target.value.replace(/[^a-zA-Z ]/g, "").toUpperCase()})} placeholder="e.g. John Doe" maxLength="20" required style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px' }}/></div>
                     <div className="form-group" style={{ marginBottom: '1.2rem' }}><label>{t('cardNumber')}</label><input type="text" name="cardNumber" inputMode="numeric" maxLength="19" value={formData.cardNumber.replace(/\D/g, '').replace(/(\d{4})(?=\d)/g, '$1 ').trim()} onChange={(e) => setFormData({...formData, cardNumber: e.target.value.replace(/\D/g, '')})} placeholder="0000 0000 0000 0000" required style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px' }} /></div>
                     <div className="form-row" style={{ marginBottom: '1.5rem' }}>
                         <div className="form-group" style={{ flex: 1 }}><label>{t('expiryDate')}</label><input type="text" name="expiryDate" inputMode="numeric" maxLength="5" value={formData.expiryDate} onChange={(e) => { const input = e.target.value.replace(/\D/g, ''); setFormData({...formData, expiryDate: input.length > 2 ? input.substring(0, 2) + '/' + input.substring(2, 4) : input}); }} placeholder="MM/YY" required style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px' }}/></div>
-                        <div className="form-group" style={{ flex: 1 }}><label>{t('cvc')}</label><input type="text" name="cvc" inputMode="numeric" maxLength="4" value={formData.cvc.replace(/\D/g, '')} onChange={(e) => setFormData({...formData, cvc: e.target.value.replace(/\D/g, '')})} placeholder="CVC" required style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px' }}/></div>
+                        <div className="form-group" style={{ flex: 1 }}><label>{t('cvc')}</label><input type="text" name="cvc" inputMode="numeric" maxLength="4" value={formData.cvc.replace(/\D/g, '')} onChange={(e) => setFormData({...formData, cvc: e.target.value.replace(/\D/g, '')})} placeholder="CVV" required style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px' }}/></div>
                     </div>
                     <div className="form-group-checkbox"><input id="saveCard" type="checkbox" name="saveCard" checked={formData.saveCard} onChange={handleChange} /><label htmlFor="saveCard">{t('saveCardForFuture')}</label></div>
+                </div>
+              ) : (
+                <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                  <label>{t('cvc')}</label>
+                  <input 
+                    type="text" 
+                    name="cvc" 
+                    inputMode="numeric" 
+                    maxLength="4" 
+                    value={formData.cvc.replace(/\D/g, '')} 
+                    onChange={(e) => setFormData({...formData, cvc: e.target.value.replace(/\D/g, '')})} 
+                    placeholder="CVV" 
+                    required 
+                    style={{ width: '100%', padding: '12px', marginTop: '6px', borderRadius: '10px' }}
+                  />
                 </div>
               )}
             </div>

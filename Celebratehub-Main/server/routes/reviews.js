@@ -89,6 +89,23 @@ router.post("/", upload.array("images", 4), async (req, res) => {
   }
 });
 
+// @route   GET /api/reviews/provider/:providerId
+// @desc    Get all reviews for a provider's services
+// @access  Private
+router.get("/provider/:providerId", async (req, res) => {
+  try {
+    const services = await Service.find({ providerId: req.params.providerId });
+    const serviceIds = services.map(s => s._id);
+    const reviews = await Review.find({ service: { $in: serviceIds } })
+      .populate("user", "username profilePicture")
+      .populate("service", "name")
+      .sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch reviews", error: error.message });
+  }
+});
+
 // @route   GET /api/reviews/service/:serviceId
 // @desc    Get reviews for a service
 // @access  Public

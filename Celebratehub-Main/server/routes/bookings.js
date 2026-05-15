@@ -61,6 +61,26 @@ const sendBalanceUpdateEmail = async (user, lastFour, amount, newBalance) => {
     }
   };
 
+const sendBookingRejectionEmail = async (user, booking, reason) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: user.email,
+    subject: "Booking Rejected - CelebrateHub",
+    html: getEnglishRejectionEmail(user, booking, reason),
+    attachments: [{
+      filename: "logo2-cut.png",
+      path: path.join(__dirname, "../assets/logo2-cut.png"),
+      cid: "logo"
+    }]
+  };
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Booking rejection email sent.");
+  } catch (error) {
+    console.error("Error sending booking rejection email:", error);
+  }
+};
+
 // EMAIL TEMPLATES
 const getEnglishEmail = (user, booking, service) => {
     return `
@@ -102,10 +122,30 @@ const getEnglishEmail = (user, booking, service) => {
           <img src="cid:logo" alt="CelebrateHub" style="max-width: 200px;"/>
         </div>
         <h2 style="text-align: center; color: #6a5af9;">Transaction Notification</h2>
-        <p>Dear ${user.username || "Valued Customer"},</p>
-        <p>Your card ....${lastFour} was used successfully for OMR ${amount.toFixed(2)} at CelebrateHub on ${date}.</p>
+        <p>Dear ${user.username || user.name || "Valued Customer"},</p>
+        <p>A transaction of OMR ${amount.toFixed(2)} was processed successfully at CelebrateHub on ${date}.</p>
         <p>Your current balance is OMR ${newBalance.toFixed(2)}.</p>
         <p style="text-align: center; margin-top: 20px; color: #555;">Thank you for using CelebrateHub!</p>
+      </div>
+    </div>
+  `;
+  }
+
+  const getEnglishRejectionEmail = (user, booking, reason) => {
+    return `
+    <div style="background-color: #f4f7fc; padding: 20px; font-family: Arial, sans-serif;">
+      <div style="background-color: #ffffff; color: #333; padding: 30px; border-radius: 12px; max-width: 600px; margin: auto; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="cid:logo" alt="CelebrateHub" style="max-width: 200px;"/>
+        </div>
+        <h2 style="text-align: center; color: #f44336;">Booking Rejected</h2>
+        <p>Dear ${user.username || user.name || "Valued Customer"},</p>
+        <p>We regret to inform you that your booking for <strong>${booking.serviceName}</strong> has been rejected by the provider.</p>
+        <div style="background-color: #fff4f4; border-left: 4px solid #f44336; padding: 15px; margin: 20px 0;">
+          <p style="margin: 0;"><strong>Reason for Rejection:</strong> ${reason}</p>
+        </div>
+        <p>The total amount of <strong>OMR ${booking.totalPrice.toFixed(2)}</strong> has been refunded to your wallet balance.</p>
+        <p style="text-align: center; margin-top: 20px; color: #555;">Thank you for choosing CelebrateHub!</p>
       </div>
     </div>
   `;
@@ -234,13 +274,16 @@ router.get("/provider/:providerId", async (req, res) => {
 // UPDATE BOOKING STATUS
 router.patch("/:id/status", async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, reason } = req.body;
     const booking = await Booking.findById(req.params.id);
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }
 
     booking.status = status;
+    if (status === "rejected" && reason) {
+        booking.rejectionReason = reason;
+    }
     await booking.save();
 
     // If rejected or cancelled, refund the user and restore availability
@@ -249,6 +292,16 @@ router.patch("/:id/status", async (req, res) => {
       if (user) {
         user.walletBalance += booking.totalPrice;
         await user.save();
+
+        if (status === "rejected") {
+            // Send rejection email
+            await sendBookingRejectionEmail(user, booking, reason || "No reason provided");
+            
+            // Send balance update email
+            const payment = await Payment.findOne({ bookingId: booking._id });
+            const lastFour = payment ? payment.lastFourDigits : "XXXX";
+            await sendBalanceUpdateEmail(user, lastFour, booking.totalPrice, user.walletBalance);
+        }
       }
 
       const service = await Service.findById(booking.serviceId);
@@ -271,6 +324,7 @@ router.get("/user/:userId", async (req, res) => {
   try {
     const bookings = await Booking.find({ userId: req.params.userId })
       .populate("providerId", "username email phoneNumber")
+      .populate("serviceId", "images mainImageIndex")
       .sort({ createdAt: -1 });
     
     const bookingsWithReviewStatus = bookings.map(booking => ({

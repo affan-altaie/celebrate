@@ -33,6 +33,12 @@ const trainingData = [
   { text: 'list the services', label: 'services' },
   { text: 'can i see the services', label: 'services' },
   { text: 'available event categories', label: 'services' },
+  { text: 'what do you recommend', label: 'services' },
+  { text: 'suggest some services', label: 'services' },
+  { text: 'recommendations', label: 'services' },
+  { text: 'give me ideas', label: 'services' },
+  { text: 'what should i book', label: 'services' },
+  { text: 'best services', label: 'services' },
 
   // FAQ - Provider
   { text: 'how to become a provider', label: 'become_provider' },
@@ -147,6 +153,95 @@ const trainingData = [
   { text: 'when was celebratehub founded', label: 'history' },
   { text: 'company history', label: 'history' },
   { text: 'who founded celebratehub', label: 'history' },
+
+  // --- Arabic Phrases ---
+  // Greeting
+  { text: 'أهلا', label: 'greeting' },
+  { text: 'مرحبا', label: 'greeting' },
+  { text: 'سلام', label: 'greeting' },
+  { text: 'صباح الخير', label: 'greeting' },
+  { text: 'مساء الخير', label: 'greeting' },
+  { text: 'أهلا بك', label: 'greeting' },
+
+  // Booking
+  { text: 'كيف أحجز خدمة', label: 'booking' },
+  { text: 'أريد القيام بحجز', label: 'booking' },
+  { text: 'حجز قاعة', label: 'booking' },
+  { text: 'أريد حجز مصور', label: 'booking' },
+  { text: 'كيفية الحجز', label: 'booking' },
+  { text: 'أحجز الآن', label: 'booking' },
+
+  // Cancellation
+  { text: 'كيف ألغي حجزي', label: 'cancellation' },
+  { text: 'إلغاء الحجز', label: 'cancellation' },
+  { text: 'أريد الغاء الطلب', label: 'cancellation' },
+  { text: 'سياسة الإلغاء', label: 'cancellation' },
+  { text: 'هل يمكنني الإلغاء', label: 'cancellation' },
+
+  // Services
+  { text: 'ما هي الخدمات التي تقدمونها', label: 'services' },
+  { text: 'أرني الخدمات المتاحة', label: 'services' },
+  { text: 'قائمة المطاعم', label: 'services' },
+  { text: 'ابحث عن فرق موسيقية', label: 'services' },
+  { text: 'وش الخدمات عندكم', label: 'services' },
+  { text: 'عرض الكل', label: 'services' },
+  { text: 'بماذا تنصح', label: 'services' },
+  { text: 'اقتراحات', label: 'services' },
+  { text: 'ماذا أحجز', label: 'services' },
+  { text: 'أفضل الخدمات', label: 'services' },
+
+  // Provider
+  { text: 'كيف أصبح مزود خدمة', label: 'become_provider' },
+  { text: 'التسجيل كمزود', label: 'become_provider' },
+  { text: 'أريد بيع خدماتي', label: 'become_provider' },
+  { text: 'تسجيل بائع', label: 'become_provider' },
+
+  // Payment
+  { text: 'كيف أدفع', label: 'payment' },
+  { text: 'طرق الدفع', label: 'payment' },
+  { text: 'هل تقبلون بطاقات الائتمان', label: 'payment' },
+  { text: 'دفع أونلاين', label: 'payment' },
+  { text: 'سعر الخدمة', label: 'payment' },
+  { text: 'بكم الحجز', label: 'payment' },
+
+  // Help
+  { text: 'ساعدني', label: 'help' },
+  { text: 'الدعم الفني', label: 'help' },
+  { text: 'اتصل بنا', label: 'help' },
+  { text: 'عندي مشكلة', label: 'help' },
+  { text: 'أريد المساعدة', label: 'help' },
+
+  // Dashboard
+  { text: 'وين لوحة التحكم', label: 'dashboard' },
+  { text: 'ملفي الشخصي', label: 'dashboard' },
+  { text: 'حسابي', label: 'dashboard' },
+  { text: 'تعديل البيانات', label: 'dashboard' },
+
+  // Reviews
+  { text: 'كيف أقيم الخدمة', label: 'reviews' },
+  { text: 'أريد وضع تقييم', label: 'reviews' },
+  { text: 'آراء العملاء', label: 'reviews' },
+  { text: 'تقييم المزود', label: 'reviews' },
+
+  // Password
+  { text: 'نسيت كلمة السر', label: 'password_reset' },
+  { text: 'تغيير كلمة المرور', label: 'password_reset' },
+  { text: 'مشكلة في الدخول', label: 'login_help' },
+  { text: 'ما أقدر أدخل حسابي', label: 'login_help' },
+
+  // Birthday
+  { text: 'حفلة عيد ميلاد', label: 'birthday' },
+  { text: 'تجهيز حفلات', label: 'birthday' },
+  { text: 'عيد ميلاد أطفال', label: 'birthday' },
+  { text: 'باقة عيد ميلاد', label: 'birthday' },
+
+  // Info
+  { text: 'وش هو CelebrateHub', label: 'about_celebratehub' },
+  { text: 'من أنتم', label: 'about_celebratehub' },
+  { text: 'معلومات عن الموقع', label: 'about_celebratehub' },
+  { text: 'وين موقعكم', label: 'location_info' },
+  { text: 'هل أنتم في عمان', label: 'location_info' },
+  { text: 'موقعكم في مسقط', label: 'location_info' },
 ];
 
 // Add training data to classifier

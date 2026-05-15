@@ -13,6 +13,7 @@ const BookingSchema = new mongoose.Schema({
   customerPhone: { type: String },
   customerEmail: { type: String },
   status: { type: String, enum: ["pending", "confirmed", "completed", "rejected", "cancelled"], default: "pending" },
+  rejectionReason: { type: String },
   isReviewed: { type: Boolean, default: false }, // Added this line
   createdAt: { type: Date, default: Date.now },
 });

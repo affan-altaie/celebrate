@@ -257,6 +257,7 @@ const EditProviderProfile = () => {
 
       if (response.ok) {
         localStorage.removeItem('user');
+        localStorage.removeItem('token');
         navigate('/login');
       } else {
         const data = await response.json();

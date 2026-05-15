@@ -33,8 +33,15 @@ const FloatingChatbot = () => {
     };
   }, [showChatbot]);
 
+  const isLoggedIn = !!localStorage.getItem('token');
+  if (!isLoggedIn) return null;
+
   return (
-    <div ref={chatbotRef} className={`floating-chatbot-wrapper ${theme}`}>
+    <div 
+      ref={chatbotRef} 
+      className={`floating-chatbot-wrapper ${theme}`}
+      dir={i18n.language === 'ar' ? 'rtl' : 'ltr'}
+    >
       <div
         className="chatbot-container"
         style={{ display: showChatbot ? 'block' : 'none' }}
@@ -42,7 +49,7 @@ const FloatingChatbot = () => {
         {showChatbot && (
           <Chatbot
             key={`${i18n.language}-${theme}`}
-            config={getConfig(t, theme)}
+            config={getConfig(t, theme, () => toggleChatbot(false))}
             messageParser={MessageParser}
             actionProvider={ActionProvider}
           />

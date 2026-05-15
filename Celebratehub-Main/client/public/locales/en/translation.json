@@ -547,6 +547,8 @@
     "chatbotDefault": "I'm sorry, I don't understand. You can ask me about CelebrateHub, our services, or how to book. For other questions, please contact support at noreply.celebrate.hub@gmail.com.",
     "chatbotInitialGreeting": "Hi! How can I help you today?",
     "chatbotToggle": "Toggle Chatbot",
+    "chatbotOnline": "Online",
+    "chatbotSocial": "Social Media",
     "currentlyUnavailable": "Currently Unavailable",
     "noAvailableDates": "This service provider has no available booking dates at the moment.",
     "agreeToTermsRequired": "You must agree to the terms and conditions",
@@ -558,7 +560,23 @@
     "document": "document",
     "requestID": "request ID",
     "category": "category",
-    "imageLabel": "image"
-    
+    "imageLabel": "image",
+    "scheduleConflict": "Schedule Conflict",
+    "resourceUnavailable": "Resource Unavailable",
+    "locationOutOfRange": "Location Out of Range",
+    "totalBookings": "Total Bookings",
+    "totalEarnings": "Total Earnings",
+    "tryDifferentSearch": "Try a different search term",
+    "noBookingsInTab": "No bookings found in this category.",
+    "noBookingsFound": "No bookings found",
+    "allServices": "All Services",
+    "sortByDate": "Sort by Date",
+    "sortByRating": "Sort by Rating",
+    "ratingBreakdown": "Rating Breakdown",
+    "averageRating": "Average Rating",
+    "totalReviews": "Total Reviews",
+    "searchReviews": "Search reviews...",
+    "stars": "stars",
+    "startCelebrating": "No bookings yet — start celebrating!"
   }
   

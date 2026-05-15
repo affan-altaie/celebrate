@@ -310,6 +310,7 @@ const CustomerProfile = () => {
 
       if (response.ok) {
         localStorage.removeItem('user');
+        localStorage.removeItem('token');
         navigate('/login');
       } else {
         toast.error(data.message || t('accountDeletionFailed'));

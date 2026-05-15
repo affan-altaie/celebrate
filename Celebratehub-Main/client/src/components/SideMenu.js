@@ -47,6 +47,7 @@ const SideMenu = ({ isOpen, onClose }) => {
   const handleLogout = () => {
     toast.success(t('loggedOutSuccess'));
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     setUser(null);
     onClose();
     navigate('/login');

@@ -30,15 +30,30 @@ class SequenceModel {
 
   /**
    * Predict the next likely intent based on history
-   * @param {Array} history Array of intent labels
+   * @param {Array} history Array of message strings
    */
   async predictNext(history) {
     if (!this.model) await this.init();
     
-    // In a real scenario, we would convert history to one-hot encoded tensors
-    // For this implementation, we'll return a placeholder or simple logic
-    // as training a model on the fly is not feasible without data.
-    return 'booking'; // Default next likely intent for this demo
+    if (!history || history.length === 0) return 'greeting';
+
+    const lastMessage = history[history.length - 1].toLowerCase();
+
+    // Simple contextual logic to simulate sequence prediction
+    if (lastMessage.includes('service') || lastMessage.includes('خدمة')) {
+      return 'booking';
+    }
+    if (lastMessage.includes('book') || lastMessage.includes('حجز')) {
+      return 'payment';
+    }
+    if (lastMessage.includes('price') || lastMessage.includes('سعر') || lastMessage.includes('بكم')) {
+      return 'booking';
+    }
+    if (lastMessage.includes('problem') || lastMessage.includes('مشكلة')) {
+      return 'help';
+    }
+
+    return 'services'; 
   }
 }
 

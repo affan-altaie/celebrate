@@ -8,7 +8,9 @@ class ActionProvider {
   }
 
   greet() {
-    const greetingMessage = this.createChatBotMessage(i18n.t('chatbotGreet'));
+    const greetingMessage = this.createChatBotMessage(i18n.t('chatbotGreet'), {
+      widget: 'quickOptions',
+    });
     this.updateChatbotState(greetingMessage);
   }
 
@@ -44,15 +46,17 @@ class ActionProvider {
 
   handleServices(recommendations = []) {
     let messageText = i18n.t('chatbotServices');
+    let options = {};
     
     if (recommendations.length > 0) {
       messageText += `\n\n${i18n.t('chatbotRecommendations')}`;
-      recommendations.forEach(service => {
-        messageText += `\n- ${service.name} (${service.category})`;
-      });
+      options = {
+        widget: 'serviceRecommendations',
+        payload: recommendations,
+      };
     }
 
-    const message = this.createChatBotMessage(messageText);
+    const message = this.createChatBotMessage(messageText, options);
     this.updateChatbotState(message);
   }
 
@@ -116,14 +120,23 @@ class ActionProvider {
     this.updateChatbotState(message);
   }
 
-  handleServiceQuery(message) {
+  handleServiceQuery(message, recommendations = []) {
     const services = ["catering", "photographer", "venue", "music", "entertainer", "decoration", "flowers", "dj", "band"];
     const foundService = services.find(service => message.includes(service));
     const serviceToDisplay = foundService || "service";
 
-    const response = this.createChatBotMessage(
-      i18n.t('chatbotServiceQuery', { service: serviceToDisplay })
-    );
+    let messageText = i18n.t('chatbotServiceQuery', { service: serviceToDisplay });
+    let options = {};
+
+    if (recommendations.length > 0) {
+      messageText += `\n\n${i18n.t('chatbotRecommendations')}`;
+      options = {
+        widget: 'serviceRecommendations',
+        payload: recommendations,
+      };
+    }
+
+    const response = this.createChatBotMessage(messageText, options);
     this.updateChatbotState(response);
   }
 
@@ -188,12 +201,16 @@ class ActionProvider {
   }
 
   handleHelp() {
-    const message = this.createChatBotMessage(i18n.t('chatbotHelp'));
+    const message = this.createChatBotMessage(i18n.t('chatbotHelp'), {
+      widget: 'quickOptions',
+    });
     this.updateChatbotState(message);
   }
 
   handleDefault() {
-    const message = this.createChatBotMessage(i18n.t('chatbotDefault'));
+    const message = this.createChatBotMessage(i18n.t('chatbotDefault'), {
+      widget: 'quickOptions',
+    });
     this.updateChatbotState(message);
   }
 

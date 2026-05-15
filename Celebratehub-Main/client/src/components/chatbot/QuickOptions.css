@@ -1,0 +1,42 @@
+.quick-options-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+}
+
+[dir="rtl"] .quick-options-container {
+  justify-content: flex-start;
+}
+
+.quick-option-button {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: none;
+  border: 1px solid var(--primary-color, #6a5af9);
+  color: var(--primary-color, #6a5af9);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.quick-option-button:hover {
+  background-color: var(--primary-color, #6a5af9);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.dark .quick-option-button {
+  border-color: var(--accent-color, #bb86fc);
+  color: var(--accent-color, #bb86fc);
+}
+
+.dark .quick-option-button:hover {
+  background-color: var(--accent-color, #bb86fc);
+  color: #121212;
+}

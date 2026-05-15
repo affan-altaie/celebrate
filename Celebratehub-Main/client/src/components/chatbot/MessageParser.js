@@ -23,11 +23,24 @@ class MessageParser {
     .then(response => {
       try {
         console.log('ML Response received:', response.data);
-        const { intent, confidence, nlu, recommendations } = response.data;
+        const { intent, confidence, nlu, recommendations, nextLikelyIntent } = response.data;
+
+        // NEW: Prioritize recommendations if they were explicitly found
+        if (recommendations && recommendations.length > 0) {
+          console.log('Action: Recommendations Found');
+          this.actionProvider.handleServices(recommendations);
+          return;
+        }
 
         // Priority 1: High Confidence Intent Match
         if (confidence && confidence > 0.6) {
           this.executeIntent(intent, message, recommendations);
+          return;
+        }
+
+        // Suggest next likely intent if confidence is moderate
+        if (nextLikelyIntent && confidence > 0.3) {
+          this.executeIntent(nextLikelyIntent, message, recommendations);
           return;
         }
 
@@ -102,7 +115,7 @@ class MessageParser {
         this.actionProvider.handlePendingApproval();
         break;
       case 'service_query':
-        this.actionProvider.handleServiceQuery(originalMessage.toLowerCase());
+        this.actionProvider.handleServiceQuery(originalMessage.toLowerCase(), recommendations);
         break;
       case 'about_celebratehub':
         this.actionProvider.handleCelebrateHub();

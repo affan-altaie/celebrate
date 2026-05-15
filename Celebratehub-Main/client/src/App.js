@@ -131,6 +131,7 @@ const AppContent = () => {
       </Routes>
       </main>
       <Footer />
+      <FloatingChatbot />
     </div>
   );
 };
@@ -140,7 +141,6 @@ function App() {
     <ThemeProvider>
       <Router>
         <AppContent />
-        <FloatingChatbot />
       </Router>
     </ThemeProvider>
   );

@@ -1,0 +1,370 @@
+.subscriptions-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.billing-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 3rem;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.billing-toggle .active {
+    color: #007bff;
+}
+
+/* Switch styling */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #007bff;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.plan-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    position: relative;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+}
+
+.plan-card.current {
+    box-shadow: 0 10px 15px -3px rgba(0, 123, 255, 0.2);
+}
+
+.current-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #007bff;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.plan-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.plan-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #2d3748;
+}
+
+.plan-price {
+    margin-bottom: 2rem;
+}
+
+.plan-price .currency {
+    font-size: 1.25rem;
+    vertical-align: top;
+    margin-right: 0.25rem;
+    font-weight: 600;
+}
+
+.plan-price .amount {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #1a202c;
+}
+
+.plan-price .period {
+    color: #718096;
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+    text-align: left;
+    flex-grow: 1;
+}
+
+.plan-features li {
+    padding: 0.5rem 0;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.plan-features li svg {
+    color: #48bb78;
+}
+
+.subscribe-btn {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.subscribe-btn:hover:not(:disabled) {
+    opacity: 0.9;
+}
+
+.subscribe-btn:disabled {
+    cursor: not-allowed;
+    background-color: #cbd5e0 !important;
+    color: #718096;
+}
+
+.subscribe-btn.disabled {
+    background-color: #cbd5e0 !important;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Payment Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.payment-modal {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1a202c;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #a0aec0;
+}
+
+.plan-summary {
+    background: #f7fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.plan-summary p {
+    margin: 0;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.plan-summary .price {
+    font-size: 1.25rem;
+    color: #007bff;
+    margin-top: 0.25rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.terms-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.terms-checkbox input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.terms-checkbox label {
+    font-size: 0.9rem;
+    color: #4a5568;
+    cursor: pointer;
+}
+
+.terms-checkbox a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.pay-btn {
+    width: 100%;
+    padding: 1rem;
+    background-color: #48bb78;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.pay-btn:hover:not(:disabled) {
+    background-color: #38a169;
+}
+
+.pay-btn:disabled {
+    background-color: #cbd5e0;
+    cursor: not-allowed;
+}
+
+/* Dark mode support */
+[data-theme='dark'] .plan-card {
+    background-color: #2d3748;
+}
+
+[data-theme='dark'] .payment-modal {
+    background-color: #2d3748;
+}
+
+[data-theme='dark'] .modal-header h2,
+[data-theme='dark'] .form-group label,
+[data-theme='dark'] .terms-checkbox label {
+    color: #f7fafc;
+}
+
+[data-theme='dark'] .form-group input {
+    background-color: #1a202c;
+    border-color: #4a5568;
+    color: white;
+}
+
+[data-theme='dark'] .plan-summary {
+    background-color: #1a202c;
+    border-color: #4a5568;
+}
+
+[data-theme='dark'] .plan-card h3,
+[data-theme='dark'] .plan-price .amount,
+[data-theme='dark'] .plan-features li {
+    color: #f7fafc;
+}
+
+[data-theme='dark'] .billing-toggle {
+    color: #a0aec0;
+}

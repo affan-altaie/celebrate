@@ -80,6 +80,53 @@
   box-shadow: 0 15px 25px rgba(0, 0, 0, 0.08);
 }
 
+/* Subscription Tier Styles */
+.subscription-card.standard {
+  border-top: 5px solid #6c757d;
+}
+
+.subscription-card.pro {
+  border-top: 5px solid #007bff;
+}
+
+.subscription-card.pro-plus {
+  border-top: 5px solid #28a745;
+}
+
+.subscription-card.pro-plus .action-btn {
+  background-color: #28a745;
+}
+
+.subscription-card.pro-plus .action-btn:hover {
+  background-color: #218838;
+}
+
+/* Tier Badge Styles for Manage Services Page */
+.tier-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  margin-left: 10px;
+  color: white;
+  vertical-align: middle;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tier-badge.standard {
+  background-color: #6c757d;
+}
+
+.tier-badge.pro {
+  background-color: #007bff;
+}
+
+.tier-badge.pro-plus {
+  background-color: #28a745;
+}
+
 .dashboard-card h3 {
   margin-top: 0;
   color: var(--text-color);

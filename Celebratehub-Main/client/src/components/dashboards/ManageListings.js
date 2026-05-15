@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
@@ -9,13 +9,12 @@ const ManageListings = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [services, setServices] = useState([]);
+  const user = useMemo(() => JSON.parse(localStorage.getItem('user')), []);
 
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const userString = localStorage.getItem('user');
-        if (!userString) return;
-        const user = JSON.parse(userString);
+        if (!user) return;
         const providerId = user.id || user._id;
         const response = await axios.get(`/api/services/provider/${providerId}?all=true`);
         setServices(response.data);
@@ -25,7 +24,7 @@ const ManageListings = () => {
     };
 
     fetchServices();
-  }, []);
+  }, [user]);
 
   const handleStatusToggle = async (id, currentStatus) => {
     try {
@@ -69,7 +68,14 @@ const ManageListings = () => {
       <main className="dashboard-content">
         <div className="dashboard-card full-width">
           <div className="listing-header">
-            <h3>{t("yourServices")}</h3>
+            <h3>
+              {t("yourServices")}
+              {user?.subscriptionTier && (
+                <span className={`tier-badge ${user.subscriptionTier.toLowerCase().replace(/\s+/g, '-')}`}>
+                  {user.subscriptionTier}
+                </span>
+              )}
+            </h3>
             <button onClick={() => navigate("/add-service")} className="action-btn">{t("addNewServiceButton")}</button>
           </div>
           <table className="listing-table">

@@ -8,6 +8,12 @@ const supabase = require("../supabase");
 const User = require("../modals/User");
 const { sendDeletionEmail } = require("../email");
 
+const AD_LIMITS = {
+  'Standard': 1,
+  'Pro': 3,
+  'Pro Plus': Infinity
+};
+
 // Service Routes
 router.post("/", upload.array("images", 8), async (req, res) => {
   try {
@@ -28,6 +34,18 @@ router.post("/", upload.array("images", 8), async (req, res) => {
     const provider = await User.findOne({ email });
     if (!provider || provider.status !== "approved") {
       return res.status(403).json({ message: "Provider not approved to add services." });
+    }
+
+    // Check ad limit based on subscription tier
+    const currentServiceCount = await Service.countDocuments({ providerId: provider._id });
+    const tier = provider.subscriptionTier || 'Standard';
+    const limit = AD_LIMITS[tier];
+
+    if (currentServiceCount >= limit) {
+      return res.status(403).json({ 
+        message: `You have reached the limit of ${limit} ad(s) for the ${tier} tier. Please upgrade your subscription to add more.`,
+        limitReached: true
+      });
     }
 
     const images = [];

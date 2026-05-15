@@ -1,0 +1,300 @@
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { FaCheck, FaCrown, FaStar, FaRocket } from 'react-icons/fa';
+import './Dashboard.css';
+import './Subscriptions.css';
+
+const Subscriptions = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
+  const [billingCycle, setBillingCycle] = useState('monthly');
+  const [loading, setLoading] = useState(false);
+  
+  // Payment Modal State
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [paymentData, setPaymentData] = useState({
+    cardHolderName: '',
+    cardNumber: '',
+    expiryDate: '',
+    cvv: ''
+  });
+
+  // Plan hierarchy
+  const planRank = { 'Standard': 0, 'Pro': 1, 'Pro Plus': 2 };
+
+  useEffect(() => {
+    if (!user || user.role !== 'provider') {
+      navigate('/login');
+      return;
+    }
+  }, [user, navigate]);
+
+  const plans = [
+    {
+      id: 'Standard',
+      name: t('standard'),
+      icon: <FaStar />,
+      priceMonthly: 0,
+      priceAnnually: 0,
+      features: [
+        t('numAds', { count: 1 }),
+        t('basicSupport', 'Basic Support'),
+      ],
+      color: '#6c757d'
+    },
+    {
+      id: 'Pro',
+      name: t('pro'),
+      icon: <FaCrown />,
+      priceMonthly: 10,
+      priceAnnually: 100,
+      features: [
+        t('numAds', { count: 3 }),
+        t('prioritySupport', 'Priority Support'),
+        t('featuredListings', 'Featured Listings'),
+      ],
+      color: '#007bff'
+    },
+    {
+      id: 'Pro Plus',
+      name: t('proPlus'),
+      icon: <FaRocket />,
+      priceMonthly: 15,
+      priceAnnually: 125,
+      features: [
+        t('unlimitedAds'),
+        t('premiumSupport', '24/7 Premium Support'),
+        t('analyticsDashboard', 'Advanced Analytics'),
+        t('customBadges', 'Verified Pro Badge'),
+      ],
+      color: '#28a745'
+    }
+  ];
+
+  const handleSubscribeClick = (plan) => {
+    if (plan.id === user.subscriptionTier) {
+      toast.info(t('alreadyOnPlan', 'You are already on this plan.'));
+      return;
+    }
+
+    if (planRank[plan.id] < planRank[user.subscriptionTier || 'Standard']) {
+      toast.error(t('downgradeNotPermitted', 'Downgrading is not permitted.'));
+      return;
+    }
+
+    if (plan.id === 'Standard') {
+      processSubscription(plan.id);
+    } else {
+      setSelectedPlan(plan);
+      setShowPaymentModal(true);
+    }
+  };
+
+  const processSubscription = async (planId, cardData = null) => {
+    setLoading(true);
+    try {
+      const response = await axios.post('/api/payments/subscribe', {
+        userId: user.id || user._id,
+        tier: planId,
+        billingCycle: planId === 'Standard' ? null : billingCycle,
+        cardDetails: cardData,
+        agreedToTerms: agreedToTerms
+      });
+
+      if (response.data.success) {
+        toast.success(response.data.message);
+        const updatedUser = { ...user, ...response.data.user };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        setShowPaymentModal(false);
+        navigate('/provider-dashboard');
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+      toast.error(error.response?.data?.message || t('subscriptionFailed', 'Failed to update subscription.'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePaymentSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!agreedToTerms) {
+      toast.error(t('agreeToTermsRequired', 'You must agree to the terms and conditions'));
+      return;
+    }
+
+    // Basic card validation
+    const cardNumberDigits = paymentData.cardNumber.replace(/\D/g, '');
+    if (cardNumberDigits.length !== 16) {
+      toast.error(t('invalidCardNumber'));
+      return;
+    }
+
+    if (!/^\d{2}\/\d{2}$/.test(paymentData.expiryDate)) {
+      toast.error(t('invalidExpiryDate'));
+      return;
+    }
+
+    if (paymentData.cvv.length < 3) {
+      toast.error(t('invalidCvv'));
+      return;
+    }
+
+    processSubscription(selectedPlan.id, {
+      ...paymentData,
+      cardNumber: cardNumberDigits
+    });
+  };
+
+  return (
+    <div className="dashboard-container">
+      <header className="dashboard-header">
+        <h1>{t('subscriptions')}</h1>
+        <button onClick={() => navigate('/provider-dashboard')} className="action-btn">{t('backToDashboard')}</button>
+      </header>
+
+      <main className="subscriptions-content">
+        <div className="billing-toggle">
+          <span className={billingCycle === 'monthly' ? 'active' : ''}>{t('monthly')}</span>
+          <label className="switch">
+            <input 
+              type="checkbox" 
+              checked={billingCycle === 'annually'} 
+              onChange={() => setBillingCycle(billingCycle === 'monthly' ? 'annually' : 'monthly')}
+            />
+            <span className="slider round"></span>
+          </label>
+          <span className={billingCycle === 'annually' ? 'active' : ''}>{t('annually')}</span>
+        </div>
+
+        <div className="plans-grid">
+          {plans.map((plan) => (
+            <div 
+              key={plan.id} 
+              className={`plan-card ${user.subscriptionTier === plan.id ? 'current' : ''}`}
+              style={{ borderTop: `5px solid ${plan.color}` }}
+            >
+              {user.subscriptionTier === plan.id && (
+                <div className="current-badge">{t('currentPlan')}</div>
+              )}
+              <div className="plan-icon" style={{ color: plan.color }}>{plan.icon}</div>
+              <h3>{plan.name}</h3>
+              <div className="plan-price">
+                <span className="currency">{t('omr')}</span>
+                <span className="amount">
+                  {billingCycle === 'monthly' ? plan.priceMonthly : plan.priceAnnually}
+                </span>
+                <span className="period">
+                  / {billingCycle === 'monthly' ? t('perMonth') : t('perYear')}
+                </span>
+              </div>
+              <ul className="plan-features">
+                {plan.features.map((feature, index) => (
+                  <li key={index}><FaCheck /> {feature}</li>
+                ))}
+              </ul>
+              <button 
+                className={`subscribe-btn ${planRank[plan.id] < planRank[user.subscriptionTier || 'Standard'] ? 'disabled' : ''}`}
+                style={{ backgroundColor: plan.color }}
+                onClick={() => handleSubscribeClick(plan)}
+                disabled={loading || user.subscriptionTier === plan.id || planRank[plan.id] < planRank[user.subscriptionTier || 'Standard']}
+              >
+                {user.subscriptionTier === plan.id ? t('currentPlan') : 
+                 (planRank[plan.id] < planRank[user.subscriptionTier || 'Standard'] ? t('downgradeNotPermitted') : t('subscribe'))}
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {showPaymentModal && (
+          <div className="modal-overlay">
+            <div className="payment-modal">
+              <div className="modal-header">
+                <h2>{t('paymentModalTitle')}</h2>
+                <button className="close-btn" onClick={() => setShowPaymentModal(false)}>&times;</button>
+              </div>
+              <div className="plan-summary">
+                <p>{selectedPlan.name} - {billingCycle === 'monthly' ? t('monthly') : t('annually')}</p>
+                <p className="price">{t('omr')} {billingCycle === 'monthly' ? selectedPlan.priceMonthly : selectedPlan.priceAnnually}</p>
+              </div>
+              <form onSubmit={handlePaymentSubmit}>
+                <div className="form-group">
+                  <label>{t('cardHolderName')}</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={paymentData.cardHolderName}
+                    onChange={(e) => setPaymentData({...paymentData, cardHolderName: e.target.value})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>{t('cardNumber')}</label>
+                  <input 
+                    type="text" 
+                    maxLength="19"
+                    required 
+                    value={paymentData.cardNumber.replace(/\D/g, '').replace(/(\d{4})(?=\d)/g, '$1 ').trim()}
+                    onChange={(e) => setPaymentData({...paymentData, cardNumber: e.target.value.replace(/\D/g, '')})}
+                    placeholder="0000 0000 0000 0000"
+                  />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>{t('expiryDate')}</label>
+                    <input 
+                      type="text" 
+                      required 
+                      placeholder="MM/YY"
+                      maxLength="5"
+                      value={paymentData.expiryDate}
+                      onChange={(e) => {
+                        let value = e.target.value.replace(/\D/g, '');
+                        if (value.length > 2) value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                        setPaymentData({...paymentData, expiryDate: value});
+                      }}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>{t('cvc')}</label>
+                    <input 
+                      type="password" 
+                      required 
+                      maxLength="4"
+                      value={paymentData.cvv}
+                      onChange={(e) => setPaymentData({...paymentData, cvv: e.target.value.replace(/\D/g, '')})}
+                    />
+                  </div>
+                </div>
+                <div className="terms-checkbox">
+                  <input 
+                    type="checkbox" 
+                    id="terms" 
+                    required
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                  />
+                  <label htmlFor="terms">
+                    {t('iAgreeToThe')} <a href="/terms" target="_blank">{t('termsAndConditions')}</a>
+                  </label>
+                </div>
+                <button type="submit" className="pay-btn" disabled={loading}>
+                  {loading ? t('processing') : t('payAndSubscribe')}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default Subscriptions;

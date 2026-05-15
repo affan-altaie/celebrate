@@ -31,6 +31,7 @@ import EditProviderProfile from './components/dashboards/EditProviderProfile';
 import EditListing from './components/dashboards/EditListing';
 import CustomerReviews from './components/dashboards/CustomerReviews';
 import ServiceDetails from './components/dashboards/ServiceDetails';
+import Subscriptions from './components/dashboards/Subscriptions';
 import AddService from './components/dashboards/AddService';
 import LeaveReview from './components/dashboards/LeaveReview';
 import ReportService from './components/dashboards/ReportService';
@@ -113,6 +114,7 @@ const AppContent = () => {
         <Route path="/edit-listing/:id" element={<ProtectedRoute allowedRoles={['provider']}><EditListing /></ProtectedRoute>} />
         <Route path="/edit-provider-profile" element={<ProtectedRoute allowedRoles={['provider']}><EditProviderProfile /></ProtectedRoute>} />
         <Route path="/customer-reviews" element={<ProtectedRoute allowedRoles={['provider']}><CustomerReviews /></ProtectedRoute>} />
+        <Route path="/subscriptions" element={<ProtectedRoute allowedRoles={['provider']}><Subscriptions /></ProtectedRoute>} />
         <Route path="/provider/:providerId" element={<ProtectedRoute allowedRoles={['provider', 'customer', 'admin']}><ProviderProfile /></ProtectedRoute>} />
         <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
         <Route path="/admin/manage-services" element={<ProtectedRoute allowedRoles={['admin']}><ManageServices /></ProtectedRoute>} />

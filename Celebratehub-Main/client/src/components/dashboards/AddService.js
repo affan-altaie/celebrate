@@ -127,6 +127,8 @@ const AddService = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [providerName, setProviderName] = useState('');
   const [serviceName, setServiceName] = useState('');
+  const [limitReached, setLimitReached] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState('');
 
   const locations = [
     "Adam",
@@ -193,13 +195,30 @@ const AddService = () => {
   ].sort();
 
   useEffect(() => {
-    const userString = localStorage.getItem('user');
-    if (userString) {
-      const user = JSON.parse(userString);
-      if (user && user.username) {
-        setProviderName(user.username);
+    const checkLimit = async () => {
+      const userString = localStorage.getItem('user');
+      if (userString) {
+        const user = JSON.parse(userString);
+        if (user && user.username) {
+          setProviderName(user.username);
+          setCurrentPlan(user.subscriptionTier || 'Standard');
+          
+          try {
+            const response = await axios.get(`/api/services/provider/${user.id || user._id}?all=true`);
+            const count = response.data.length;
+            const tier = user.subscriptionTier || 'Standard';
+            const limits = { 'Standard': 1, 'Pro': 3, 'Pro Plus': Infinity };
+            
+            if (count >= (limits[tier] || 1)) {
+              setLimitReached(true);
+            }
+          } catch (error) {
+            console.error('Error checking service limit:', error);
+          }
+        }
       }
-    }
+    };
+    checkLimit();
   }, []);
 
   useEffect(() => {
@@ -383,8 +402,11 @@ const AddService = () => {
       if (error.response) {
         console.error('Error response data:', error.response.data);
         console.error('Error response status:', error.response.status);
+        if (error.response.data.limitReached) {
+          setLimitReached(true);
+        }
       }
-      toast.error('Failed to add service.');
+      toast.error(error.response?.data?.message || 'Failed to add service.');
     }
   };
 
@@ -422,9 +444,9 @@ const AddService = () => {
     return (
         <div className="availability-calendar">
             <div className="calendar-navigation">
-                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}>&lt;</button>
+                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}></button>
                 <h3>{currentMonth.toLocaleString(t('locale'), { month: 'long', year: 'numeric' })}</h3>
-                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}>&gt;</button>
+                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}></button>
             </div>
             <div className="calendar-grid">
                 <div className="calendar-header">{t('sun')}</div>
@@ -467,6 +489,24 @@ const AddService = () => {
                 </div>
             )}
         </div>
+    );
+  }
+
+  if (limitReached) {
+    return (
+      <div className="dashboard-container">
+        <header className="dashboard-header">
+          <h1>{t('limitReachedTitle')}</h1>
+          <button onClick={() => navigate('/manage-listings')} className="action-btn">{t('back')}</button>
+        </header>
+        <main className="dashboard-content">
+          <div className="dashboard-card limit-reached-card">
+            <h3>{t('limitReachedTitle')}</h3>
+            <p>{t('limitReachedDesc', { tier: currentPlan })}</p>
+            <button onClick={() => navigate('/subscriptions')} className="action-btn">{t('upgradeNow')}</button>
+          </div>
+        </main>
+      </div>
     );
   }
 

@@ -17,24 +17,27 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendSubscriptionBalanceEmail = async (user, amount, newBalance, tier) => {
+const sendSubscriptionBalanceEmail = async (user, amount, newBalance, tier, cardLast4) => {
     const today = new Date();
     const date = today.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
     const mailOptions = {
         from: process.env.EMAIL_USER,
         to: user.email,
-        subject: "Transaction Notification",
+        subject: "Payment Confirmation – CelebrateHub Subscription",
         html: `
         <div style="background-color: #f4f7fc; padding: 20px; font-family: Arial, sans-serif;">
           <div style="background-color: #ffffff; color: #333; padding: 30px; border-radius: 12px; max-width: 600px; margin: auto; border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <div style="text-align: center; margin-bottom: 20px;">
               <img src="cid:logo" alt="CelebrateHub" style="max-width: 200px;"/>
             </div>
-            <h2 style="text-align: center; color: #6a5af9;">Transaction Notification</h2>
-            <p>Dear ${user.username || user.name || "Valued Customer"},</p>
-            <p>A transaction of OMR ${amount.toFixed(2)} was processed successfully at CelebrateHub on ${date}.</p>
-            <p>Your current balance is OMR ${newBalance.toFixed(2)}.</p>
-            <p style="text-align: center; margin-top: 20px; color: #555;">Thank you for using CelebrateHub!</p>
+            <p>Hello ${user.username || user.name || "Valued Customer"},</p>
+            ${cardLast4 ?
+              `<p>Your card ending in ${cardLast4} was successfully charged OMR ${amount.toFixed(2)} for your CelebrateHub ${tier} subscription on ${date}.</p>` :
+              `<p>A transaction of OMR ${amount.toFixed(2)} was processed successfully at CelebrateHub on ${date}.</p>`
+            }
+            <p>Your current account balance is OMR ${newBalance.toFixed(2)}.</p>
+            <p>Thank you for being part of CelebrateHub!<br>If you have any questions, our support team is available 24/7 to assist you.</p>
+            <p>Best regards,<br>CelebrateHub Billing Team</p>
           </div>
         </div>
         `,
@@ -67,7 +70,7 @@ router.get("/balance/:userId", async (req, res) => {
       savedCard = {
         ...user.savedCard.toObject(),
         cardNumber: decrypt(user.savedCard.cardNumber),
-        cvv: decrypt(user.savedCard.cvv)
+        cvv: ""
       };
     }
 
@@ -93,17 +96,19 @@ router.get("/user-bookings/:userId", async (req, res) => {
 // Update saved card details
 router.put("/update-card/:userId", paymentCardValidation, validate, async (req, res) => {
   try {
-    const { cardHolderName, cardNumber, expiryDate, cvv } = req.body;
+    const { cardHolderName, cardNumber, expiryDate } = req.body; // Removed cvv and oldCvv
     const user = await User.findById(req.params.userId);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
+    // Removed oldCvv validation block
+
     user.savedCard = {
       cardHolderName,
       cardNumber: encrypt(cardNumber),
       expiryDate,
-      cvv: encrypt(cvv)
+      cvv: user.savedCard ? user.savedCard.cvv : undefined // Preserve existing encrypted CVV
     };
 
     await user.save();
@@ -156,6 +161,7 @@ router.post("/subscribe", async (req, res) => {
       amount = 0;
     }
 
+    let cardLast4 = null;
     // If card details are provided, simulate a successful transaction
     // Otherwise, check wallet balance
     let paidWithWallet = false;
@@ -179,6 +185,7 @@ router.post("/subscribe", async (req, res) => {
           cvv: encrypt(cardDetails.cvv)
         };
       }
+      cardLast4 = cardDetails.cardNumber.slice(-4);
     }
 
     // Update subscription details
@@ -214,7 +221,7 @@ router.post("/subscribe", async (req, res) => {
 
     // Send email notification for any paid subscription (if amount > 0)
     if (amount > 0) {
-        await sendSubscriptionBalanceEmail(user, amount, user.walletBalance, tier);
+        await sendSubscriptionBalanceEmail(user, amount, user.walletBalance, tier, cardLast4);
     }
 
     res.status(200).json({ 

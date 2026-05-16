@@ -37,8 +37,8 @@ module.exports = {
         }
         return true;
       }),
-    body("cvc")
-      .notEmpty().withMessage("CVC is required")
+    body("cvv")
+      .optional() // Make CVV optional for updates
       .isLength({ min: 3, max: 4 }).withMessage("CVC must be 3 or 4 digits")
       .isNumeric().withMessage("CVC must be numeric"),
   ],

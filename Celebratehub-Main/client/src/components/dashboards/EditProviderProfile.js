@@ -83,7 +83,7 @@ const EditProviderProfile = () => {
                   cardHolderName: res.data.savedCard.cardHolderName || "",
                   cardNumber: res.data.savedCard.cardNumber || "",
                   expiryDate: res.data.savedCard.expiryDate || "",
-                  cvv: res.data.savedCard.cvv || ""
+                  cvv: ""
                 });
             }
           })
@@ -207,6 +207,9 @@ const EditProviderProfile = () => {
       setCardError(t("invalidCardNumber") || "Card number must be 16 digits.");
       return;
     }
+
+
+
   
     if (cardData.cvv.length < 3) {
       setCardError(t("invalidCvv") || "CVV must be at least 3 digits.");
@@ -228,15 +231,17 @@ const EditProviderProfile = () => {
     }
   
     try {
+      const { cvv, ...cardDataWithoutCvv } = cardData; // Exclude cvv from the payload
       const response = await axios.put(`/api/payments/update-card/${userId}`, {
-        ...cardData,
-        cardNumber: cardNumberDigits
+        ...cardDataWithoutCvv,
+        cardNumber: cardNumberDigits,
+        // oldCvv is no longer required for verification, so it's not sent
       });
   
       if (response.data.success) {
         toast.success(t("cardUpdated") || "Card details updated successfully");
         setIsEditingCard(false);
-        setCardData(prev => ({ ...prev, cardNumber: cardData.cardNumber }));
+        setCardData(prev => ({ ...prev, cardNumber: cardData.cardNumber, cvv: "" }));
       } else {
         setCardError(response.data.message || t("cardUpdateFailed") || "Failed to update card details");
       }
@@ -495,6 +500,7 @@ const EditProviderProfile = () => {
                   onClick={() => {
                     setOriginalCardData(cardData);
                     setIsEditingCard(true);
+                    setCardData(prev => ({ ...prev, cvv: '' }));
                   }} 
                   className="action-btn" 
                   style={{ flex: 1, borderRadius: '10px' }}
@@ -587,10 +593,10 @@ const EditProviderProfile = () => {
                   </div>
                   <div className="form-group" style={{ flex: 1 }}>
                     <label style={{ fontSize: '0.9rem', fontWeight: '500', color: 'var(--text-color)', opacity: 0.8 }}>
-                      {t('cvc')}
+                      {t('newCvv', 'New CVV')}
                     </label>
                     <input
-                      type="text"
+                      type="password"
                       inputMode="numeric"
                       maxLength="4"
                       value={cardData.cvv}
@@ -616,7 +622,7 @@ const EditProviderProfile = () => {
                       if (originalCardData) {
                         setCardData(originalCardData);
                       }
-                      setIsEditingCard(false); 
+                      setIsEditingCard(false);
                     }} 
                     className="logout-btn" 
                     style={{ flex: 1, borderRadius: '10px', padding: '12px', background: '#ccc', color: '#333' }}

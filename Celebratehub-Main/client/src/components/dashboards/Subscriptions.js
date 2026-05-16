@@ -18,6 +18,7 @@ const Subscriptions = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [saveCard, setSaveCard] = useState(false);
   const [paymentData, setPaymentData] = useState({
     cardHolderName: '',
     cardNumber: '',
@@ -125,7 +126,7 @@ const Subscriptions = () => {
     }
   };
 
-  const processSubscription = async (planId, cardDetails = null) => {
+  const processSubscription = async (planId, cardDetails = null, saveCardFlag = false) => {
     setLoading(true);
     try {
       const response = await axios.post('/api/payments/subscribe', {
@@ -134,7 +135,7 @@ const Subscriptions = () => {
         billingCycle: planId === 'Standard' ? null : billingCycle,
         cardDetails: cardDetails,
         agreedToTerms: agreedToTerms,
-        saveCard: user.role === 'provider' ? true : false, // Always save card for providers on subscription
+        saveCard: saveCardFlag,
       });
 
       if (response.data.success) {
@@ -162,6 +163,7 @@ const Subscriptions = () => {
     }
 
     let cardDetailsToSend = null;
+    let shouldSaveCard = false;
 
     if (useSavedCard && savedCard) {
       cardDetailsToSend = {
@@ -200,10 +202,11 @@ const Subscriptions = () => {
         ...paymentData,
         cardNumber: cardNumberDigits
       };
+      shouldSaveCard = saveCard;
     }
 
     // Send subscription request with card details and saveCard flag
-    processSubscription(selectedPlan.id, cardDetailsToSend);
+    processSubscription(selectedPlan.id, cardDetailsToSend, shouldSaveCard);
   };
 
   return (
@@ -345,6 +348,15 @@ const Subscriptions = () => {
                           onChange={(e) => setPaymentData({...paymentData, cvv: e.target.value.replace(/\D/g, '')})}
                         />
                       </div>
+                    </div>
+                    <div className="terms-checkbox">
+                        <input
+                            type="checkbox"
+                            id="saveCard"
+                            checked={saveCard}
+                            onChange={(e) => setSaveCard(e.target.checked)}
+                        />
+                        <label htmlFor="saveCard">{t('saveCardForFuture', 'Save card for future payments')}</label>
                     </div>
                   </div>
                 ) : (

@@ -467,7 +467,7 @@
     "min2Images": "Please upload at least 2 images.",
     "availableTimesFor": "Available times for",
     "addTime": "Add Time",
-    "imagePreview": "Image Preview",
+    "imagePreview": "Preview",
     "serviceNameExample": "service Name Example",
     "sortByPriceLabel": "Sort by Price",
     "priceLowToHigh": "Price: Low to High",
@@ -545,7 +545,7 @@
     "chatbotMoreBookings": "To get more bookings, make sure your profile is complete and up-to-date. High-quality photos, detailed descriptions, and positive reviews can help you stand out. You can also promote your services on social media and other platforms.",
     "chatbotCalendar": "You can manage your availability by updating the calendar on your provider dashboard. This will prevent you from being booked on days when you are not available.",
     "chatbotMobileApp": "We do not have a mobile app at the moment, but our website is fully responsive and can be used on any device. We are working on developing a mobile app in the future.",
-    "chatbotDataSecurity": "We take data security very seriously. All personal information is encrypted and stored securely. We do not share your data with third parties without your consent. For more information, please see our Privacy Policy.",
+    "chatbotDataSecurity": "We take data security very seriously. All personal information is encrypted and stored securely. We do not share your data with third parties without your consent. for more information, please see our Privacy Policy.",
     "chatbotFreeToUse": "Yes, CelebrateHub is free to use for customers. Service providers pay a small commission on each booking.",
     "chatbotSupport": "For any support inquiries, please contact our team at noreply.celebrate.hub@gmail.com.",
     "chatbotThanks": "You're welcome! Is there anything else I can help you with?",
@@ -630,4 +630,3 @@
     "verifyYourEmail": "verify Your Email",
     "otpVerificationSuccess": "otp Verification Success"
 }
-  

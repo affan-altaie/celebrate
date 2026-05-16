@@ -17,7 +17,7 @@ const ImagePreviewer = ({ file, alt, className }) => {
             setImageUrl(url);
 
             return () => {
-                URL.revokeObjectURL(url);
+                URL(url);
             };
         }
     }, [file]);
@@ -66,7 +66,7 @@ const ServicePreview = ({ service, mainImageIndex }) => {
     <div className="service-preview-card">
       <div className="service-image-container">
         {imageURL ? (
-          <img src={imageURL} alt="Service Preview" />
+          <img src={imageURL} alt="Service Preview" className="service-main-image"/>
         ) : (
           <div className="image-placeholder">
             <FaCamera />
@@ -144,7 +144,7 @@ const AddService = () => {
     "Al Musannah",
     "Al Qabil",
     "As Sunaynah",
-    "As Suwaiq",
+    "As Suwayq",
     "Bahla",
     "Barka",
     "Bawshar",

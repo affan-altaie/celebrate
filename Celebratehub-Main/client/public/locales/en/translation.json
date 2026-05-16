@@ -625,6 +625,7 @@
     "walletBalance": "Wallet Balance",
     "payWithCredits": "Pay with Credits",
     "insufficientBalance": "Insufficient balance",
-    "confirmWalletPayment": "Are you sure you want to use your wallet credits to pay for this subscription?"
+    "confirmWalletPayment": "Are you sure you want to use your wallet credits to pay for this subscription?",
+    "latestServices": "latest services"
 }
   

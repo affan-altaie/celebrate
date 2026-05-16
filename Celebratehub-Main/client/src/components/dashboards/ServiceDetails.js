@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { FaStar, FaMapMarkerAlt, FaCalendarAlt, FaCamera, FaShareAlt, FaHeart, FaRegHeart, FaTimes, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaStar, FaMapMarkerAlt, FaCalendarAlt, FaCamera, FaTimes, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import axios from "axios";
 import "./ServiceDetails.css";
 import logo1 from '../../assets/logo1.png';
@@ -14,7 +14,6 @@ const ServiceDetails = () => {
   const [reviews, setReviews] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isFavorited, setIsFavorited] = useState(false);
   const [sortBy, setSortBy] = useState("newest");
 
   useEffect(() => {
@@ -110,19 +109,6 @@ const ServiceDetails = () => {
     ? (reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviews.length).toFixed(1)
     : t("N/A");
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: service.name,
-        text: service.description,
-        url: window.location.href,
-      }).catch(console.error);
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert(t("linkCopied"));
-    }
-  };
-
   return (
     <div className="service-details-container animate-fade-in">
       <div className="service-details-content">
@@ -130,14 +116,6 @@ const ServiceDetails = () => {
           <button onClick={() => navigate(-1)} className="back-button-new">
             <FaChevronLeft /> {t("back")}
           </button>
-          <div className="header-action-buttons">
-            <button className="action-icon-btn" onClick={handleShare} title={t("share")}>
-              <FaShareAlt />
-            </button>
-            <button className={`action-icon-btn ${isFavorited ? 'active' : ''}`} onClick={() => setIsFavorited(!isFavorited)} title={t("favorite")}>
-              {isFavorited ? <FaHeart color="#e91e63" /> : <FaRegHeart />}
-            </button>
-          </div>
         </div>
         
         <div className="service-header">

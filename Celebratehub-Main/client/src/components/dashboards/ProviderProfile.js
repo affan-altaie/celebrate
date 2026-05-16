@@ -66,7 +66,7 @@ const ProviderProfile = () => {
       <div className="provider-header">
         <img src={provider.profilePicture || logo1} alt={`${provider.username} logo`} className="provider-logo" onError={handleImageError} />
         <div className="provider-info">
-          <h1>{provider.username}{t('profileSuffix')}</h1>
+          <h1>{provider.username}</h1>
           <div className="provider-meta">
             <span><FaMapMarkerAlt /> {provider.location}</span>
             <span><FaPhone /> {provider.phoneNumber}</span>

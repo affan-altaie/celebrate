@@ -614,5 +614,6 @@
     "walletBalance": "رصيد المحفظة",
     "payWithCredits": "الدفع عن طريق الرصيد",
     "insufficientBalance": "رصيد غير كافٍ",
-    "confirmWalletPayment": "هل أنت متأكد من رغبتك في استخدام رصيد محفظتك لدفع هذا الاشتراك؟"
+    "confirmWalletPayment": "هل أنت متأكد من رغبتك في استخدام رصيد محفظتك لدفع هذا الاشتراك؟",
+    "latestServices": "أحدث الخدمات"
 }

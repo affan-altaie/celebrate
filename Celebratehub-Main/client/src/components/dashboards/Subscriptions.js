@@ -228,42 +228,48 @@ const Subscriptions = () => {
         </div>
 
         <div className="plans-grid">
-          {plans.map((plan) => (
-            <div 
-              key={plan.id} 
-              className={`plan-card ${user.subscriptionTier === plan.id ? 'current' : ''}`}
-              style={{ borderTop: `5px solid ${plan.color}` }}
-            >
-              {user.subscriptionTier === plan.id && (
-                <div className="current-badge">{t('currentPlan')}</div>
-              )}
-              <div className="plan-icon" style={{ color: plan.color }}>{plan.icon}</div>
-              <h3>{plan.name}</h3>
-              <div className="plan-price">
-                <span className="currency">{t('omr')}</span>
-                <span className="amount">
-                  {billingCycle === 'monthly' ? plan.priceMonthly : plan.priceAnnually}
-                </span>
-                <span className="period">
-                  / {billingCycle === 'monthly' ? t('perMonth') : t('perYear')}
-                </span>
-              </div>
-              <ul className="plan-features">
-                {plan.features.map((feature, index) => (
-                  <li key={index}><FaCheck /> {feature}</li>
-                ))}
-              </ul>
-              <button 
-                className={`subscribe-btn ${planRank[plan.id] < planRank[user.subscriptionTier || 'Standard'] ? 'disabled' : ''}`}
-                style={{ backgroundColor: plan.color }}
-                onClick={() => handleSubscribeClick(plan)}
-                disabled={loading || user.subscriptionTier === plan.id || planRank[plan.id] < planRank[user.subscriptionTier || 'Standard']}
+          {plans.map((plan) => {
+            const savings = (plan.priceMonthly * 12) - plan.priceAnnually;
+            return (
+              <div 
+                key={plan.id} 
+                className={`plan-card ${user.subscriptionTier === plan.id ? 'current' : ''}`}
+                style={{ borderTop: `5px solid ${plan.color}` }}
               >
-                {user.subscriptionTier === plan.id ? t('currentPlan') : 
-                 (planRank[plan.id] < planRank[user.subscriptionTier || 'Standard'] ? t('downgradeNotPermitted') : t('subscribe'))}
-              </button>
-            </div>
-          ))}
+                {user.subscriptionTier === plan.id && (
+                  <div className="current-badge">{t('currentPlan')}</div>
+                )}
+                <div className="plan-icon" style={{ color: plan.color }}>{plan.icon}</div>
+                <h3>{plan.name}</h3>
+                <div className="plan-price">
+                  <span className="currency">{t('omr')}</span>
+                  <span className="amount">
+                    {billingCycle === 'monthly' ? plan.priceMonthly : plan.priceAnnually}
+                  </span>
+                  <span className="period">
+                    / {billingCycle === 'monthly' ? t('perMonth') : t('perYear')}
+                  </span>
+                </div>
+                {billingCycle === 'annually' && savings > 0 && (
+                  <div className="savings-tag">Save OMR {savings}</div>
+                )}
+                <ul className="plan-features">
+                  {plan.features.map((feature, index) => (
+                    <li key={index}><FaCheck /> {feature}</li>
+                  ))}
+                </ul>
+                <button 
+                  className={`subscribe-btn ${planRank[plan.id] < planRank[user.subscriptionTier || 'Standard'] ? 'disabled' : ''}`}
+                  style={{ backgroundColor: plan.color }}
+                  onClick={() => handleSubscribeClick(plan)}
+                  disabled={loading || user.subscriptionTier === plan.id || planRank[plan.id] < planRank[user.subscriptionTier || 'Standard']}
+                >
+                  {user.subscriptionTier === plan.id ? t('currentPlan') : 
+                   (planRank[plan.id] < planRank[user.subscriptionTier || 'Standard'] ? t('downgradeNotPermitted') : t('subscribe'))}
+                </button>
+              </div>
+            )
+          })}
         </div>
 
         {showPaymentModal && (

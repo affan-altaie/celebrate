@@ -626,6 +626,8 @@
     "payWithCredits": "Pay with Credits",
     "insufficientBalance": "Insufficient balance",
     "confirmWalletPayment": "Are you sure you want to use your wallet credits to pay for this subscription?",
-    "latestServices": "latest services"
+    "latestServices": "latest services",
+    "verifyYourEmail": "verify Your Email",
+    "otpVerificationSuccess": "otp Verification Success"
 }
   

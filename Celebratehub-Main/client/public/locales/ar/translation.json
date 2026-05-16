@@ -615,5 +615,8 @@
     "payWithCredits": "الدفع عن طريق الرصيد",
     "insufficientBalance": "رصيد غير كافٍ",
     "confirmWalletPayment": "هل أنت متأكد من رغبتك في استخدام رصيد محفظتك لدفع هذا الاشتراك؟",
-    "latestServices": "أحدث الخدمات"
+    "latestServices": "أحدث الخدمات",
+    "verifyYourEmail": "تحقق من بريدك الإلكتروني",
+    "otpVerificationSuccess": "تم التحقق من رمز OTP بنجاح"
+
 }

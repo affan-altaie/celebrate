@@ -496,7 +496,42 @@
 
 .result-card:hover {
   transform: translateY(-8px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.result-card.featured-card {
+  border: 2px solid #ffc107;
+  box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+  position: relative;
+  animation: featured-glow 3s infinite alternate;
+}
+
+@keyframes featured-glow {
+  from {
+    box-shadow: 0 0 10px rgba(255, 193, 7, 0.2);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+  }
+}
+
+.result-card.featured-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  border-radius: 12px;
+  background: linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.1) 50%, transparent 60%);
+  background-size: 200% 200%;
+  animation: shine 4s infinite linear;
+}
+
+@keyframes shine {
+  from { background-position: -200% -200%; }
+  to { background-position: 200% 200%; }
 }
 
 .result-image {

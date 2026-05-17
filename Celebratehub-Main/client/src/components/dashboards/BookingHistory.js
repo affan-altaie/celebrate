@@ -39,9 +39,11 @@ const BookingHistory = () => {
   const handleCancelBooking = async (bookingId) => {
     if (window.confirm(t("confirmCancelBooking") || "Are you sure you want to cancel this booking?")) {
       try {
-        await axios.delete(`/api/bookings/${bookingId}`);
+        await axios.patch(`/api/bookings/${bookingId}/status`, { status: "cancelled" });
         toast.success(t("bookingCancelledSuccessfully"));
-        setBookings(bookings.filter(booking => booking._id !== bookingId));
+        setBookings(bookings.map(booking => 
+          booking._id === bookingId ? { ...booking, status: "cancelled" } : booking
+        ));
       } catch (error) {
         console.error("Error cancelling booking:", error);
         toast.error(t("failedToCancelBooking"));

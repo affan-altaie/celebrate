@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhone, FaCheckCircle } from 'react-icons/fa';
 import './ProviderProfile.css';
 import logo1 from '../../assets/logo1.png'; // Fallback image
 
@@ -66,7 +66,12 @@ const ProviderProfile = () => {
       <div className="provider-header">
         <img src={provider.profilePicture || logo1} alt={`${provider.username} logo`} className="provider-logo" onError={handleImageError} />
         <div className="provider-info">
-          <h1>{provider.username}</h1>
+          <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {provider.username}
+            {provider.subscriptionTier === 'Pro Plus' && (
+              <FaCheckCircle className="verified-badge" title={t('verifiedPro')} style={{ fontSize: '1.5rem', color: '#28a745' }} />
+            )}
+          </h1>
           <div className="provider-meta">
             <span><FaMapMarkerAlt /> {provider.location}</span>
             <span><FaPhone /> {provider.phoneNumber}</span>

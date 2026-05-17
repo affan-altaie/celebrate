@@ -124,7 +124,6 @@ const getEnglishEmail = (user, booking, service) => {
         <h2 style="text-align: center; color: #6a5af9;">Transaction Notification</h2>
         <p>Dear ${user.username || user.name || "Valued Customer"},</p>
         <p>A transaction of OMR ${amount.toFixed(2)} was processed successfully at CelebrateHub on ${date}.</p>
-        <p>Your current balance is OMR ${newBalance.toFixed(2)}.</p>
         <p style="text-align: center; margin-top: 20px; color: #555;">Thank you for using CelebrateHub!</p>
       </div>
     </div>
@@ -173,7 +172,7 @@ router.post("/", async (req, res) => {
     }
 
     if (user.walletBalance < totalPrice) {
-        return res.status(400).json({ message: `Insufficient funds. Your balance is OMR ${user.walletBalance.toFixed(2)}` });
+        return res.status(400).json({ message: `Insufficient funds. Please contact support.` });
     }
 
     let cardDetails;
@@ -204,6 +203,13 @@ router.post("/", async (req, res) => {
     await user.save();
 
     const service = await Service.findById(serviceId);
+    if (service) {
+        const provider = await User.findById(service.providerId);
+        if (provider) {
+            provider.walletBalance += totalPrice;
+            await provider.save();
+        }
+    }
     if (!service) {
       return res.status(404).json({ message: "Service not found" });
     }
@@ -280,6 +286,7 @@ router.patch("/:id/status", async (req, res) => {
       return res.status(404).json({ message: "Booking not found" });
     }
 
+    const oldStatus = booking.status;
     booking.status = status;
     if (status === "rejected" && reason) {
         booking.rejectionReason = reason;
@@ -287,11 +294,19 @@ router.patch("/:id/status", async (req, res) => {
     await booking.save();
 
     // If rejected or cancelled, refund the user and restore availability
-    if (status === "rejected" || status === "cancelled") {
+    // Only if it wasn't already rejected or cancelled
+    if ((status === "rejected" || status === "cancelled") && (oldStatus !== "rejected" && oldStatus !== "cancelled")) {
       const user = await User.findById(booking.userId);
       if (user) {
         user.walletBalance += booking.totalPrice;
         await user.save();
+
+        // Reverse provider credit
+        const provider = await User.findById(booking.providerId);
+        if (provider) {
+            provider.walletBalance -= booking.totalPrice;
+            await provider.save();
+        }
 
         if (status === "rejected") {
             // Send rejection email
@@ -351,6 +366,13 @@ router.delete("/:id", async (req, res) => {
     if (user) {
       user.walletBalance += booking.totalPrice;
       await user.save();
+    }
+
+    // Reverse provider credit
+    const provider = await User.findById(booking.providerId);
+    if (provider) {
+      provider.walletBalance -= booking.totalPrice;
+      await provider.save();
     }
 
     // Restore service availability

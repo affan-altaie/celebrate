@@ -1,26 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import './Dashboard.css';
 
 const CustomerDashboard = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [balance, setBalance] = useState(0);
   const user = JSON.parse(localStorage.getItem('user'));
-  const userId = user?.id || user?._id; // Handle both id and _id
-
-  useEffect(() => {
-    if (userId) {
-      axios.get(`/api/payments/balance/${userId}`)
-        .then(res => {
-          console.log("Fetched balance:", res.data.balance);
-          setBalance(res.data.balance);
-        })
-        .catch(err => console.error("Error fetching balance:", err));
-    }
-  }, [userId]);
 
   return (
     <div className="dashboard-container">

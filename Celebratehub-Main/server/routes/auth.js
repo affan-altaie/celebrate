@@ -244,7 +244,11 @@ router.post("/login", async (req, res) => {
         role: user.role,
         profilePicture: user.profilePicture,
         phoneNumber: user.phoneNumber,
-        location: user.location
+        location: user.location,
+        subscriptionTier: user.subscriptionTier,
+        subscriptionExpiry: user.subscriptionExpiry,
+        subscriptionBillingCycle: user.subscriptionBillingCycle,
+        walletBalance: user.walletBalance
       }
     });
   } catch (error) {

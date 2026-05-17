@@ -23,6 +23,10 @@ const serviceSchema = new mongoose.Schema({
   providerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   reviews: [reviewSchema], 
   rating: { type: Number, default: 0 },
+  isFeatured: { type: Boolean, default: false },
+  featuredUntil: { type: Date, default: null },
+  isPromotionPaused: { type: Boolean, default: false },
+  promotionRemainingTime: { type: Number, default: null },
   status: { type: String, default: "Active" } 
 }, { timestamps: true });
 

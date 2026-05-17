@@ -182,6 +182,15 @@ router.delete("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const { username, email, location, contact, phoneNumber } = req.body;
+
+    const existingUser = await User.findById(req.params.id);
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (existingUser.status === "pending") {
+      return res.status(400).json({ message: "Pending users cannot be edited" });
+    }
     
     const user = await User.findByIdAndUpdate(
       req.params.id,
@@ -203,7 +212,11 @@ router.put("/:id", async (req, res) => {
         profilePicture: user.profilePicture,
         location: user.location,
         contact: user.contact,
-        phoneNumber: user.phoneNumber
+        phoneNumber: user.phoneNumber,
+        subscriptionTier: user.subscriptionTier,
+        subscriptionExpiry: user.subscriptionExpiry,
+        subscriptionBillingCycle: user.subscriptionBillingCycle,
+        walletBalance: user.walletBalance
       }
     });
   } catch (error) {

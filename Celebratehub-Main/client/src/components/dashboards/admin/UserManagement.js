@@ -338,7 +338,7 @@ const UserManagement = () => {
                   <td>{getStatusBadge(user)}</td>
                   <td>
                     <div className="actions-container">
-                      {user.status !== 'rejected' && (
+                      {user.status !== 'rejected' && user.status !== 'pending' && (
                         <Link to={`/admin/edit-user/${user._id}`} className="action-btn">{t('edit')}</Link>
                       )}
                       {user.status === 'suspended' ? (

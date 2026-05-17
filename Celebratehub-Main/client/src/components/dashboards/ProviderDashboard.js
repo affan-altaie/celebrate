@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { FaCheck, FaCrown, FaStar, FaRocket } from 'react-icons/fa';
+import { FaCheck, FaCrown, FaStar, FaRocket, FaChartLine } from 'react-icons/fa';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import axios from 'axios';
 import './Dashboard.css';
 import './Subscriptions.css';
 
@@ -9,7 +11,55 @@ const ProviderDashboard = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showPerksModal, setShowPerksModal] = useState(false);
+  const [stats, setStats] = useState({ totalBookings: 0, totalEarnings: 0 });
+  const [chartData, setChartData] = useState([]);
   const user = JSON.parse(localStorage.getItem('user'));
+
+  useEffect(() => {
+    if (user?.subscriptionTier === 'Pro Plus') {
+      const fetchStats = async () => {
+        try {
+          const bookingsRes = await axios.get(`/api/bookings/provider/${user.id || user._id}`);
+          const confirmedBookings = bookingsRes.data.filter(b => b.status === 'confirmed' || b.status === 'completed');
+          
+          // Fetch provider's own payments (expenses like promotions/subscriptions)
+          const paymentsRes = await axios.get(`/api/payments/user/${user.id || user._id}`);
+          const providerPayments = paymentsRes.data || [];
+
+          // Process data for chart
+          const earningsByDate = confirmedBookings.reduce((acc, curr) => {
+            const date = new Date(curr.createdAt).toLocaleDateString();
+            acc[date] = (acc[date] || 0) + (parseFloat(curr.totalPrice) || 0);
+            return acc;
+          }, {});
+
+          const expensesByDate = providerPayments.reduce((acc, curr) => {
+            const date = new Date(curr.createdAt).toLocaleDateString();
+            acc[date] = (acc[date] || 0) + (parseFloat(curr.amount) || 0);
+            return acc;
+          }, {});
+
+          const allDates = new Set([...Object.keys(earningsByDate), ...Object.keys(expensesByDate)]);
+          const processedChartData = Array.from(allDates).map(date => ({
+            date,
+            earnings: (earningsByDate[date] || 0) - (expensesByDate[date] || 0)
+          })).sort((a, b) => new Date(a.date) - new Date(b.date));
+
+          const totalBookingRevenue = confirmedBookings.reduce((acc, curr) => acc + (parseFloat(curr.totalPrice) || 0), 0);
+          const totalExpenses = providerPayments.reduce((acc, curr) => acc + (parseFloat(curr.amount) || 0), 0);
+          
+          setStats({
+            totalBookings: confirmedBookings.length,
+            totalEarnings: totalBookingRevenue - totalExpenses
+          });
+          setChartData(processedChartData);
+        } catch (error) {
+          console.error("Error fetching analytics stats:", error);
+        }
+      };
+      fetchStats();
+    }
+  }, [user]);
 
   const plans = {
     'Standard': {
@@ -93,6 +143,68 @@ const ProviderDashboard = () => {
             {user?.subscriptionTier === 'Pro Plus' ? t('viewPerks') : t('upgrade')}
           </button>
         </div>
+
+        {user?.subscriptionTier === 'Pro Plus' && (
+          <div className="dashboard-card analytics-card full-width">
+            <div className="card-header-with-icon">
+              <h3>{t('advancedAnalytics')}</h3>
+              <FaChartLine className="analytics-icon" />
+            </div>
+            <p>{t('performanceOverview')}</p>
+            
+            <div className="analytics-layout">
+              <div className="stats-grid-mini">
+                <div className="stat-item-mini">
+                  <span className="stat-label-mini">{t('totalBookings')}</span>
+                  <span className="stat-value-mini">{stats.totalBookings}</span>
+                </div>
+                <div className="stat-item-mini">
+                  <span className="stat-label-mini">{t('totalEarnings')}</span>
+                  <span className="stat-value-mini">{stats.totalEarnings.toFixed(2)} OMR</span>
+                </div>
+              </div>
+
+              <div className="chart-container">
+                {chartData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis 
+                        dataKey="date" 
+                        tick={{ fontSize: 12 }}
+                        tickMargin={10}
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12 }}
+                        tickFormatter={(value) => `${value} OMR`}
+                      />
+                      <Tooltip 
+                        formatter={(value) => [`${value.toFixed(2)} OMR`, t('totalEarnings')]}
+                        contentStyle={{ 
+                          borderRadius: '8px', 
+                          border: 'none', 
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)' 
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="earnings" 
+                        stroke="#28a745" 
+                        strokeWidth={3}
+                        dot={{ r: 4, fill: '#28a745' }}
+                        activeDot={{ r: 6 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="no-data-message">
+                    <p>{t('noBookingsFound')}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       {showPerksModal && (

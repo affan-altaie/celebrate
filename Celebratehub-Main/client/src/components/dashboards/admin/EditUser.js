@@ -13,6 +13,7 @@ const EditUser = () => {
     email: '',
     phoneNumber: '',
   });
+  const [userStatus, setUserStatus] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
@@ -20,6 +21,10 @@ const EditUser = () => {
     const fetchUser = async () => {
       try {
         const response = await axios.get(`/api/users/${id}`);
+        if (response.data.status === 'pending') {
+          setError('Pending users cannot be edited.');
+        }
+        setUserStatus(response.data.status);
         setFormData({
           username: response.data.username,
           email: response.data.email,
@@ -94,7 +99,7 @@ const EditUser = () => {
           />
         </div>
 
-        <button type="submit" className="btn-submit">{t('updateUser')}</button>
+        <button type="submit" className="btn-submit" disabled={userStatus === 'pending'}>{t('updateUser')}</button>
       </form>
     </div>
   );

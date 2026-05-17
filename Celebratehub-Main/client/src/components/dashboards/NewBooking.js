@@ -421,10 +421,11 @@ const handleRemoveFromHistory = (itemToRemove) => {
           {topProviders.map((provider, index) => {
             const available = isServiceAvailable(provider.availability);
             return (
-              <div key={index} className={`result-card ${!available ? 'unavailable' : ''}`} onClick={() => navigate(`/service/${provider._id}`)}>
+              <div key={index} className={`result-card ${!available ? 'unavailable' : ''} ${provider.isFeatured ? 'featured-card' : ''}`} onClick={() => navigate(`/service/${provider._id}`)}>
                 <div className="card-image-container">
                   <img src={provider.images[provider.mainImageIndex]} alt={provider.name} className="result-image" />
                   {!available && isCustomer && <div className="unavailable-banner">{t('currentlyUnavailable')}</div>}
+                  {provider.isFeatured && <div className="featured-badge"><FaStar /> {t('featured')}</div>}
                   <div className="rating-badge">
                     <FaStar /> {provider.rating > 0 ? provider.rating : t("N/A")}
                   </div>
@@ -471,10 +472,11 @@ const handleRemoveFromHistory = (itemToRemove) => {
           {searchResults.map((result, index) => {
             const available = isServiceAvailable(result.availability);
             return (
-              <div key={index} className={`result-card ${!available ? 'unavailable' : ''}`}>
+              <div key={index} className={`result-card ${!available ? 'unavailable' : ''} ${result.isFeatured ? 'featured-card' : ''}`}>
                 <div className="card-image-container" onClick={() => navigate(`/service/${result._id}`)} style={{ cursor: 'pointer' }}>
                   <img src={result.images[result.mainImageIndex]} alt={result.name} className="result-image" />
                   {!available && isCustomer && <div className="unavailable-banner">{t('currentlyUnavailable')}</div>}
+                  {result.isFeatured && <div className="featured-badge" style={{ position: 'absolute', top: '10px', right: '10px', backgroundColor: '#ffc107', color: '#000', padding: '4px 10px', borderRadius: '4px', fontWeight: '700', fontSize: '0.75rem', zIndex: 1, display: 'flex', alignItems: 'center', gap: '5px' }}><FaStar /> {t('featured')}</div>}
                   <div className="rating-badge">
                       <FaStar /> {result.rating > 0 ? result.rating : t("N/A")}
                     </div>

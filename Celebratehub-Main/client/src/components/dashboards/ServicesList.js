@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { FaCheckCircle, FaStar } from 'react-icons/fa';
 import axios from 'axios';
 import './ServicesList.css'; // Make sure to create this CSS file
 import logo1 from '../../assets/logo1.png'; // Fallback image
@@ -57,13 +58,21 @@ const ServicesList = () => {
       <div className="services-grid">
         {services.map(service => {
           const available = isServiceAvailable(service.availability);
+          const isVerifiedPro = service.providerId?.subscriptionTier === 'Pro Plus';
           return (
-            <div key={service._id} className={`service-card ${!available ? 'unavailable' : ''}`} onClick={() => navigate(`/service/${service._id}`)}>
+            <div key={service._id} className={`service-card ${!available ? 'unavailable' : ''} ${service.isFeatured && !service.isPromotionPaused ? 'featured-card' : ''}`} onClick={() => navigate(`/service/${service._id}`)}>
               <div className="image-container">
                 <img src={service.images[0] || logo1} alt={service.name} className="service-image" onError={handleImageError} />
                 {!available && isCustomer && <div className="unavailable-banner">{t('currentlyUnavailable')}</div>}
+                {service.isFeatured && !service.isPromotionPaused && <div className="featured-badge"><FaStar /> {t('featured')}</div>}
               </div>
-              <h3>{service.name.split(': ')[1] || service.name}</h3>
+              <h3>
+                {service.name.split(': ')[1] || service.name}
+              </h3>
+              <div className="provider-name-container">
+                <span className="provider-name-mini">{service.name.split(': ')[0]}</span>
+                {isVerifiedPro && <FaCheckCircle className="verified-badge" title={t('verifiedPro')} />}
+              </div>
               <p>{service.location}</p>
               <p>{service.pricePerHour} OMR</p>
             </div>

@@ -28,6 +28,10 @@
   margin-bottom: 1rem;
 }
 
+.verified-badge {
+  color: #28a745;
+}
+
 .provider-meta {
   display: flex;
   align-items: center;

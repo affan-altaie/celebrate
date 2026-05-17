@@ -104,7 +104,8 @@ router.post("/", upload.array("images", 8), async (req, res) => {
       mainImageIndex: parseInt(mainImageIndex) || 0,
       availability: parsedAvailability,
       cancellationPolicy,
-      providerId: provider._id
+      providerId: provider._id,
+      isFeatured: false
     });
 
     await newService.save();
@@ -116,7 +117,27 @@ router.post("/", upload.array("images", 8), async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const services = await Service.find({ status: "Active" }).populate("providerId");
+    // Lazy cleanup of expired promotions
+    const now = new Date();
+    const expiredPromotions = await Service.find({
+      isFeatured: true,
+      isPromotionPaused: { $ne: true },
+      featuredUntil: { $lt: now }
+    }).populate('providerId');
+
+    for (const service of expiredPromotions) {
+      const tier = service.providerId?.subscriptionTier;
+      // Only set isFeatured to false if they don't have a Pro/Pro Plus subscription
+      if (tier !== 'Pro' && tier !== 'Pro Plus') {
+        service.isFeatured = false;
+      }
+      service.featuredUntil = null;
+      await service.save();
+    }
+
+    const services = await Service.find({ status: "Active" })
+      .sort({ isFeatured: -1, isPromotionPaused: 1, createdAt: -1 })
+      .populate("providerId");
     const servicesWithRatings = await Promise.all(services.map(async (service) => {
       const reviews = await Review.find({ service: service._id });
       const reviewsCount = reviews.length;
@@ -152,11 +173,31 @@ router.get("/all", async (req, res) => {
 
 router.get("/provider/:providerId", async (req, res) => {
   try {
+    // Lazy cleanup of expired promotions for this provider
+    const now = new Date();
+    const expiredPromotions = await Service.find({
+      providerId: req.params.providerId,
+      isFeatured: true,
+      isPromotionPaused: { $ne: true },
+      featuredUntil: { $lt: now }
+    }).populate('providerId');
+
+    for (const service of expiredPromotions) {
+      const tier = service.providerId?.subscriptionTier;
+      if (tier !== 'Pro' && tier !== 'Pro Plus') {
+        service.isFeatured = false;
+      }
+      service.featuredUntil = null;
+      await service.save();
+    }
+
     const filter = { providerId: req.params.providerId };
     if (req.query.all !== "true") {
       filter.status = "Active";
     }
-    const services = await Service.find(filter).populate("providerId");
+    const services = await Service.find(filter)
+      .sort({ isFeatured: -1, isPromotionPaused: 1, createdAt: -1 })
+      .populate("providerId");
     const servicesWithRatings = await Promise.all(services.map(async (service) => {
       const reviews = await Review.find({ service: service._id });
       const reviewsCount = reviews.length;
@@ -310,6 +351,65 @@ router.put("/:id", upload.array("images", 8), async (req, res) => {
   } catch (error) {
     console.error("Error updating service:", error);
     res.status(400).json({ message: "Failed to update service", error: error.message });
+  }
+});
+
+router.put("/:id/pause-promotion", isAuthenticated, async (req, res) => {
+  try {
+    const service = await Service.findById(req.params.id);
+    if (!service) return res.status(404).json({ message: "Service not found" });
+
+    if (service.providerId.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    if (!service.isFeatured || !service.featuredUntil) {
+      return res.status(400).json({ message: "Service is not promoted" });
+    }
+
+    if (service.isPromotionPaused) {
+      return res.status(400).json({ message: "Promotion is already paused" });
+    }
+
+    const now = new Date();
+    const remainingTime = service.featuredUntil.getTime() - now.getTime();
+
+    if (remainingTime <= 0) {
+      return res.status(400).json({ message: "Promotion has already expired" });
+    }
+
+    service.isPromotionPaused = true;
+    service.promotionRemainingTime = remainingTime;
+    
+    await service.save();
+    res.json({ message: "Promotion paused successfully", service });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.put("/:id/resume-promotion", isAuthenticated, async (req, res) => {
+  try {
+    const service = await Service.findById(req.params.id);
+    if (!service) return res.status(404).json({ message: "Service not found" });
+
+    if (service.providerId.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    if (!service.isPromotionPaused) {
+      return res.status(400).json({ message: "Promotion is not paused" });
+    }
+
+    const now = new Date();
+    service.featuredUntil = new Date(now.getTime() + service.promotionRemainingTime);
+    service.isPromotionPaused = false;
+    service.promotionRemainingTime = null;
+
+    await service.save();
+    res.json({ message: "Promotion resumed successfully", service });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

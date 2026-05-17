@@ -4,6 +4,7 @@ const path = require("path");
 const Payment = require("../modals/Payment");
 const User = require("../modals/User");
 const Booking = require("../modals/Booking");
+const Service = require("../modals/Service");
 const { validate, paymentCardValidation } = require("../middleware/validation");
 const { encrypt, decrypt } = require("../utils/cryptoUtils");
 const nodemailer = require("nodemailer");
@@ -35,7 +36,6 @@ const sendSubscriptionBalanceEmail = async (user, amount, newBalance, tier, card
               `<p>Your card ending in ${cardLast4} was successfully charged OMR ${amount.toFixed(2)} for your CelebrateHub ${tier} subscription on ${date}.</p>` :
               `<p>A transaction of OMR ${amount.toFixed(2)} was processed successfully at CelebrateHub on ${date}.</p>`
             }
-            <p>Your current account balance is OMR ${newBalance.toFixed(2)}.</p>
             <p>Thank you for being part of CelebrateHub!<br>If you have any questions, our support team is available 24/7 to assist you.</p>
             <p>Best regards,<br>CelebrateHub Billing Team</p>
           </div>
@@ -165,27 +165,30 @@ router.post("/subscribe", async (req, res) => {
     // If card details are provided, simulate a successful transaction
     // Otherwise, check wallet balance
     let paidWithWallet = false;
-    if (amount > 0 && !cardDetails) {
+    if (amount > 0) {
       if (user.walletBalance < amount) {
         return res.status(400).json({ success: false, message: "Insufficient balance" });
       }
       user.walletBalance -= amount;
-      paidWithWallet = true;
-    } else if (amount > 0 && cardDetails) {
-      if (!agreedToTerms) {
-        return res.status(400).json({ success: false, message: "You must agree to the terms and conditions." });
+
+      if (!cardDetails) {
+        paidWithWallet = true;
+      } else {
+        if (!agreedToTerms) {
+          return res.status(400).json({ success: false, message: "You must agree to the terms and conditions." });
+        }
+        // In a real scenario, we would call a payment gateway here
+        // For simulation, we'll just update the user's saved card if chosen
+        if (saveCard) {
+          user.savedCard = {
+            cardHolderName: cardDetails.cardHolderName,
+            cardNumber: encrypt(cardDetails.cardNumber),
+            expiryDate: cardDetails.expiryDate,
+            cvv: encrypt(cardDetails.cvv)
+          };
+        }
+        cardLast4 = cardDetails.cardNumber.slice(-4);
       }
-      // In a real scenario, we would call a payment gateway here
-      // For simulation, we'll just update the user's saved card if chosen
-      if (saveCard) {
-        user.savedCard = {
-          cardHolderName: cardDetails.cardHolderName,
-          cardNumber: encrypt(cardDetails.cardNumber),
-          expiryDate: cardDetails.expiryDate,
-          cvv: encrypt(cardDetails.cvv)
-        };
-      }
-      cardLast4 = cardDetails.cardNumber.slice(-4);
     }
 
     // Update subscription details
@@ -242,6 +245,113 @@ router.post("/subscribe", async (req, res) => {
           expiryDate: user.savedCard.expiryDate
         } : null
       }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Get all payments for a specific user
+router.get("/user/:userId", async (req, res) => {
+  try {
+    const payments = await Payment.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+    res.json(payments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Process individual listing promotion
+router.post("/promote-listing", async (req, res) => {
+  try {
+    const { userId, serviceId, planId, cardDetails, agreedToTerms, saveCard } = req.body;
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const service = await Service.findById(serviceId);
+    if (!service) {
+      return res.status(404).json({ success: false, message: "Service not found" });
+    }
+
+    if (service.providerId.toString() !== userId) {
+      return res.status(403).json({ success: false, message: "Unauthorized to promote this service" });
+    }
+
+    let amount = 0;
+    let durationDays = 0;
+
+    if (planId === "30days") {
+      amount = 20;
+      durationDays = 30;
+    } else if (planId === "90days") {
+      amount = 50;
+      durationDays = 90;
+    } else {
+      return res.status(400).json({ success: false, message: "Invalid promotion plan" });
+    }
+
+    let cardLast4 = null;
+    if (amount > 0) {
+      if (!cardDetails) {
+        // Paying with wallet
+        if (user.walletBalance < amount) {
+          return res.status(400).json({ success: false, message: "Insufficient balance" });
+        }
+        user.walletBalance -= amount;
+      } else {
+        // Paying with card
+        if (!agreedToTerms) {
+          return res.status(400).json({ success: false, message: "You must agree to the terms and conditions." });
+        }
+        if (saveCard) {
+          user.savedCard = {
+            cardHolderName: cardDetails.cardHolderName,
+            cardNumber: encrypt(cardDetails.cardNumber),
+            expiryDate: cardDetails.expiryDate,
+            cvv: encrypt(cardDetails.cvv)
+          };
+        }
+        cardLast4 = cardDetails.cardNumber.slice(-4);
+      }
+    }
+
+    // Update service featured status
+    service.isFeatured = true;
+    const now = new Date();
+    const expiry = service.featuredUntil && service.featuredUntil > now 
+      ? new Date(service.featuredUntil) 
+      : new Date();
+    
+    expiry.setDate(expiry.getDate() + durationDays);
+    service.featuredUntil = expiry;
+
+    await user.save();
+    await service.save();
+
+    // Create a payment record
+    const payment = new Payment({
+      userId: user._id,
+      amount,
+      cardHolderName: cardDetails?.cardHolderName || user.savedCard?.cardHolderName || "Wallet",
+      transactionId: `PROM-${Date.now()}`,
+      status: 'completed'
+    });
+    await payment.save();
+
+    // Send email notification (reusing subscription email for now or creating a new one)
+    // For now, let's just use the existing subscription balance email logic or similar
+    if (amount > 0) {
+       // Optional: Send specialized promotion email
+    }
+
+    res.status(200).json({ 
+      success: true, 
+      message: "Listing promoted successfully!",
+      service: service,
+      walletBalance: user.walletBalance
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { FaStar, FaMapMarkerAlt, FaCalendarAlt, FaCamera, FaTimes, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaStar, FaMapMarkerAlt, FaCalendarAlt, FaCamera, FaTimes, FaChevronLeft, FaChevronRight, FaCheckCircle } from "react-icons/fa";
 import axios from "axios";
 import "./ServiceDetails.css";
 import logo1 from '../../assets/logo1.png';
@@ -140,6 +140,9 @@ const ServiceDetails = () => {
                 `${providerName}:`
               )}
               {` ${serviceName}`}
+              {service.providerId?.subscriptionTier === 'Pro Plus' && (
+                <FaCheckCircle className="verified-badge-details" title={t('verifiedPro')} />
+              )}
             </h1>
             <div className="service-meta">
               <span><FaStar color="#ffc107" /> {averageRating} ({t("reviewsCount", { count: reviews.length })})</span>

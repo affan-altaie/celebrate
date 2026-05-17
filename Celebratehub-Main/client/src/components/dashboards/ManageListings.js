@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import axios from 'axios';
+import api from '../../api';
 import './Dashboard.css';
 
 const ManageListings = () => {
@@ -16,7 +16,7 @@ const ManageListings = () => {
       try {
         if (!user) return;
         const providerId = user.id || user._id;
-        const response = await axios.get(`/api/services/provider/${providerId}?all=true`);
+        const response = await api.get(`/services/provider/${providerId}?all=true`);
         setServices(response.data);
       } catch (error) {
         console.error('Failed to fetch services', error);
@@ -29,7 +29,7 @@ const ManageListings = () => {
   const handleStatusToggle = async (id, currentStatus) => {
     try {
       const newStatus = currentStatus === 'Active' ? 'Inactive' : 'Active';
-      await axios.put(`/api/services/${id}`, { status: newStatus });
+      await api.put(`/services/${id}`, { status: newStatus });
       setServices(services.map(service => 
         (service._id === id || service.id === id) ? { ...service, status: newStatus } : service
       ));
@@ -43,7 +43,7 @@ const ManageListings = () => {
   const handleDeleteService = async (id) => {
     if (window.confirm(t("confirmDeleteService", "Are you sure you want to delete this service?"))) {
       try {
-        await axios.delete(`/api/services/${id}`);
+        await api.delete(`/services/${id}`);
         setServices(services.filter(service => (service._id !== id && service.id !== id)));
         toast.success(t("serviceDeletedSuccess", "Service deleted successfully."));
       } catch (error) {
@@ -59,11 +59,25 @@ const ManageListings = () => {
     return parts.length > 1 ? parts.slice(1).join(': ') : fullName;
   };
 
+  const adLimits = { 'Standard': 1, 'Pro': 3, 'Pro Plus': Infinity };
+  const tier = user?.subscriptionTier || 'Standard';
+  const limit = adLimits[tier];
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1>{t("manageServicesTitle")}</h1>
-        <button onClick={() => navigate("/provider-dashboard")} className="action-btn">{t("backToDashboard")}</button>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div className="subscription-usage-pill">
+            <span className="usage-label">{t('subscriptionUsage')}:</span>
+            <span className="usage-count">
+              {limit === Infinity 
+                ? t('unlimited') 
+                : t('slotsUsed', { count: services.length, total: limit })}
+            </span>
+          </div>
+          <button onClick={() => navigate("/provider-dashboard")} className="action-btn">{t("backToDashboard")}</button>
+        </div>
       </header>
       <main className="dashboard-content">
         <div className="dashboard-card full-width">
@@ -76,7 +90,14 @@ const ManageListings = () => {
                 </span>
               )}
             </h3>
-            <button onClick={() => navigate("/add-service")} className="action-btn">{t("addNewServiceButton")}</button>
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+              {services.length >= limit && limit !== Infinity && (
+                <button onClick={() => navigate("/subscriptions")} className="action-btn upgrade-btn">
+                  {t("upgradePlan")}
+                </button>
+              )}
+              <button onClick={() => navigate("/add-service")} className="action-btn">{t("addNewServiceButton")}</button>
+            </div>
           </div>
           <table className="listing-table">
             <thead>

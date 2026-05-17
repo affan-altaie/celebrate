@@ -127,6 +127,36 @@
   background-color: #28a745;
 }
 
+.subscription-usage-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--secondary-color);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+}
+
+.subscription-usage-pill .usage-label {
+  opacity: 0.8;
+}
+
+.subscription-usage-pill .usage-count {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.upgrade-btn {
+  background-color: #fbbc05 !important;
+  color: #000 !important;
+}
+
+.upgrade-btn:hover {
+  background-color: #f9ab00 !important;
+}
+
 .dashboard-card h3 {
   margin-top: 0;
   color: var(--text-color);

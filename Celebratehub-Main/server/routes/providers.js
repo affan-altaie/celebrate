@@ -76,7 +76,7 @@ router.put("/:id/approve", async (req, res) => {
 // Reject provider
 router.put("/:id/reject", async (req, res) => {
   try {
-    const { reason } = req.body;
+    const { reason } = req.body || {};
     const user = await User.findByIdAndUpdate(
       req.params.id,
       { status: "rejected", rejectionReason: reason },

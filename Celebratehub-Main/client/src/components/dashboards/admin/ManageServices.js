@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../../api';
 import './Admin.css';
 
 const ManageServices = () => {
@@ -25,7 +25,7 @@ const ManageServices = () => {
 
   const fetchServices = async () => {
     try {
-      const response = await axios.get('/api/services/all');
+      const response = await api.get('/services/all');
       setServices(response.data);
     } catch (error) {
       console.error('Error fetching services:', error);
@@ -50,7 +50,7 @@ const ManageServices = () => {
         return;
     }
     try {
-      await axios.delete(`/api/services/${serviceToDelete}`, { data: { reason: finalReason } });
+      await api.delete(`/services/${serviceToDelete}`, { data: { reason: finalReason } });
       setServices(services.filter(service => service._id !== serviceToDelete));
       alert('Service deleted successfully');
       setShowDeleteModal(false);

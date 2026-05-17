@@ -215,7 +215,7 @@ router.put("/:id", async (req, res) => {
 // Suspend a user
 router.put("/:id/suspend", async (req, res) => {
   try {
-    const { reason } = req.body;
+    const { reason } = req.body || {};
     if (!reason) {
       return res.status(400).json({ message: "Suspension reason is required" });
     }

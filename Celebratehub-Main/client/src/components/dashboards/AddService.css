@@ -22,6 +22,24 @@
     flex-direction: column;
     gap: 1.5rem;
   }
+
+  .subscription-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    background-color: var(--secondary-color);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--primary-color);
+    color: var(--text-color);
+    font-size: 0.95rem;
+  }
+
+  .subscription-banner svg {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+  }
   
   .add-service-form .form-group {
     display: flex;
@@ -78,33 +96,201 @@
     align-items: center;
     margin-bottom: 1rem;
   }
+
+  .calendar-navigation button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .calendar-navigation button:hover {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+  }
+
+  .quick-select-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+  }
+
+  .quick-select-buttons button {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    border: 1px solid var(--primary-color);
+    background: transparent;
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+  }
+
+  .quick-select-buttons button:hover {
+    background: var(--primary-color);
+    color: white;
+  }
   
   .availability-calendar .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 0.5rem;
+    gap: 0.25rem;
+    background-color: var(--background-color);
+    padding: 0.5rem;
+    border-radius: 8px;
   }
   
   .calendar-day {
     text-align: center;
-    padding: 0.5rem;
-    border-radius: 50%;
+    padding: 0.6rem 0;
+    border-radius: 8px;
     cursor: pointer;
     color: var(--text-color);
+    transition: all 0.2s;
+    font-weight: 500;
   }
   
+  .calendar-day:hover:not(.empty):not(.disabled) {
+    background-color: var(--secondary-color);
+  }
+
   .calendar-day.empty {
     cursor: default;
   }
+
+  .calendar-day.disabled {
+    cursor: not-allowed;
+    opacity: 0.3;
+  }
   
   .calendar-day.available {
-    background-color: #d4edda;
-    color: #155724;
+    border: 2px solid #28a745;
   }
   
   .calendar-day.selected {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+
+  .selection-summary {
+    font-size: 0.9rem;
+    color: var(--text-color);
+    opacity: 0.8;
+    background: var(--secondary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    line-height: 1.4;
+    display: inline-block;
+  }
+
+  .selection-summary-container {
+    margin-bottom: 1rem;
+  }
+
+  .manager-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+  }
+
+  .clear-times-btn {
+    padding: 0.4rem 0.8rem;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .clear-times-btn:hover {
+    opacity: 0.8;
+  }
+
+  .time-slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    background-color: var(--background-color);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+  }
+
+  .time-grid-slot {
+    padding: 0.5rem 0.2rem;
+    font-size: 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .time-grid-slot.all {
     background-color: var(--primary-color);
-    color: var(--button-text-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+
+  .time-grid-slot.some {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    border-style: dashed;
+    border-width: 2px;
+  }
+
+  .time-grid-slot:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .custom-time-add {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--secondary-color);
+    border-radius: 8px;
+  }
+
+  .custom-time-add label {
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .current-slots-summary {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+  }
+
+  .current-slots-summary h5 {
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+    color: var(--text-color);
+  }
+
+  .no-slots-msg {
+    font-size: 0.85rem;
+    color: var(--text-color);
+    opacity: 0.6;
+    font-style: italic;
   }
   
   .time-slots-manager {
@@ -234,18 +420,30 @@
     overflow: hidden;
     background-color: var(--card-background);
     color: var(--text-color);
+    width: 100%;
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
   }
   
-  .service-main-image {
-    width: 900px;
-    height: 250px; 
-    object-fit: cover; /* This makes it fill the container beautifully without distorting */
-    display: flex;
+  .service-preview-card .service-image-container {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    background-color: var(--secondary-color);
+    flex-shrink: 0;
+  }
+  
+  .service-preview-card .service-image-container img,
+  .service-preview-card .service-main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   
   .image-placeholder {
     width: 100%;
-    height: 250px !important; /* Make sure this always matches the container height above */
+    height: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -341,11 +539,4 @@
   .toggle-btn.active {
     background-color: var(--primary-color);
     color: var(--button-text-color);
-  }
-  .service-image-container {
-    width: 900px;
-    height: 250px; /* Adjust this number up or down to make the image taller/shorter */
-    overflow: hidden;
-    display: block; /* Changed from flex to avoid shrinking behavior */
-    background-color: var(--secondary-color);
   }

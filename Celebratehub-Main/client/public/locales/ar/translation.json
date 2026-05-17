@@ -617,6 +617,19 @@
     "confirmWalletPayment": "هل أنت متأكد من رغبتك في استخدام رصيد محفظتك لدفع هذا الاشتراك؟",
     "latestServices": "أحدث الخدمات",
     "verifyYourEmail": "تحقق من بريدك الإلكتروني",
-    "otpVerificationSuccess": "تم التحقق من رمز OTP بنجاح"
-
+    "otpVerificationSuccess": "تم التحقق من رمز OTP بنجاح",
+    "subscriptionUsage": "استخدام الاشتراك",
+    "slotsUsed": "تم استخدام {{count}} من أصل {{total}} من المساحات",
+    "unlimited": "غير محدود",
+    "manageSubscription": "إدارة الاشتراك",
+    "weekdays": "أيام الأسبوع",
+    "weekends": "عطلات نهاية الأسبوع",
+    "clear": "مسح",
+    "addingTimesForDates": "إضافة أوقات لـ {{count}} تواريخ محددة",
+    "timeSlotAddedToSelected": "تمت إضافة الوقت إلى {{count}} تواريخ محددة",
+    "clearAllTimes": "مسح جميع الأوقات",
+    "addCustomTime": "إضافة وقت مخصص",
+    "currentSlots": "الأوقات الحالية",
+    "noSlotsSet": "لا توجد أوقات محددة لهذا اليوم",
+    "timesClearedForSelected": "تم مسح جميع الأوقات لـ {{count}} تواريخ"
 }

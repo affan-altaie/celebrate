@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaCalendarAlt, FaStar, FaUserFriends, FaCheckCircle, FaClock, FaCreditCard } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaCalendarAlt, FaStar, FaUserFriends, FaCheckCircle, FaClock, FaCreditCard, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import './BookingPage.css';
 
 const BookingPage = () => {
@@ -304,9 +304,13 @@ const BookingPage = () => {
     return (
       <div>
         <div className="calendar-navigation">
-          <button type="button" onClick={handlePrevMonth}></button>
+          <button type="button" onClick={handlePrevMonth} aria-label="Previous Month">
+            <FaChevronLeft />
+          </button>
           <h3>{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</h3>
-          <button type="button" onClick={handleNextMonth}></button>
+          <button type="button" onClick={handleNextMonth} aria-label="Next Month">
+            <FaChevronRight />
+          </button>
         </div>
         <div className="calendar-grid">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => <div key={day} className="calendar-header">{t(day.toLowerCase())}</div>)}{dates}</div>
       </div>

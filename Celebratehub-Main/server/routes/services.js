@@ -7,6 +7,7 @@ const Booking = require("../modals/Booking");
 const supabase = require("../supabase");
 const User = require("../modals/User");
 const { sendDeletionEmail } = require("../email");
+const { isAuthenticated } = require("../middleware/auth");
 
 const AD_LIMITS = {
   'Standard': 1,
@@ -211,8 +212,8 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", upload.array("images", 8), async (req, res) => {
   try {
     // Handle status-only update
-    if (req.body.status && Object.keys(req.body).length === 1) {
-      const { status } = req.body;
+    if (req.body && req.body.status && Object.keys(req.body).length === 1) {
+      const { status } = req.body || {};
       const updatedService = await Service.findByIdAndUpdate(
         req.params.id,
         { status },
@@ -312,7 +313,7 @@ router.put("/:id", upload.array("images", 8), async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", isAuthenticated, async (req, res) => {
   try {
     const service = await Service.findById(req.params.id).populate("providerId");
     if (!service) {
@@ -335,14 +336,21 @@ router.delete("/:id", async (req, res) => {
       }
     }
     
-    const { reason } = req.body;
-    console.log(`Deleting service: ${service.name}, Reason: ${reason}`);
+    const { reason } = req.body || {};
+    console.log(`Deleting service: ${service.name}, Reason: ${reason}, DeletedBy: ${req.user.id}`);
 
-    if (service.providerId && service.providerId.email) {
-      console.log(`Sending deletion email to: ${service.providerId.email}`);
-      sendDeletionEmail(service.providerId.email, reason || "No reason provided", service.name);
+    // Only send email if the service is deleted by someone other than the owner (e.g., Admin)
+    const isOwner = service.providerId && service.providerId._id.toString() === req.user.id;
+
+    if (!isOwner) {
+      if (service.providerId && service.providerId.email) {
+        console.log(`Sending deletion email to: ${service.providerId.email}`);
+        sendDeletionEmail(service.providerId.email, reason || "No reason provided", service.name);
+      } else {
+        console.warn(`Could not send deletion email for service ${service.name}: Provider email not found.`);
+      }
     } else {
-      console.warn(`Could not send deletion email for service ${service.name}: Provider email not found.`);
+      console.log(`Self-deletion by provider ${req.user.id}, suppressing email.`);
     }
 
     await Service.findByIdAndDelete(req.params.id);

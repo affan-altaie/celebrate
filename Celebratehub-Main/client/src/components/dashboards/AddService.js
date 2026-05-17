@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
-import { FaCamera, FaRegStar, FaStar, FaMapMarkerAlt } from 'react-icons/fa';
+import api from '../../api';
+import { FaCamera, FaRegStar, FaStar, FaMapMarkerAlt, FaChevronLeft, FaChevronRight, FaInfoCircle } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './Dashboard.css';
@@ -17,7 +17,7 @@ const ImagePreviewer = ({ file, alt, className }) => {
             setImageUrl(url);
 
             return () => {
-                URL(url);
+                URL.revokeObjectURL(url);
             };
         }
     }, [file]);
@@ -122,13 +122,14 @@ const AddService = () => {
   const [mainImageIndex, setMainImageIndex] = useState(0);
   const [imageError, setImageError] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedAvailabilityDate, setSelectedAvailabilityDate] = useState(null);
+  const [selectedAvailabilityDates, setSelectedAvailabilityDates] = useState([]);
   const [timeInput, setTimeInput] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [providerName, setProviderName] = useState('');
   const [serviceName, setServiceName] = useState('');
   const [limitReached, setLimitReached] = useState(false);
   const [currentPlan, setCurrentPlan] = useState('');
+  const [serviceCount, setServiceCount] = useState(0);
 
   const locations = [
     "Adam",
@@ -204,8 +205,9 @@ const AddService = () => {
           setCurrentPlan(user.subscriptionTier || 'Standard');
           
           try {
-            const response = await axios.get(`/api/services/provider/${user.id || user._id}?all=true`);
+            const response = await api.get(`/services/provider/${user.id || user._id}?all=true`);
             const count = response.data.length;
+            setServiceCount(count);
             const tier = user.subscriptionTier || 'Standard';
             const limits = { 'Standard': 1, 'Pro': 3, 'Pro Plus': Infinity };
             
@@ -311,24 +313,128 @@ const AddService = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (date >= today) {
-      setSelectedAvailabilityDate(date);
+      const dateStr = date.toDateString();
+      setSelectedAvailabilityDates(prev => {
+        const exists = prev.find(d => d.toDateString() === dateStr);
+        if (exists) {
+          return prev.filter(d => d.toDateString() !== dateStr);
+        } else {
+          return [...prev, date];
+        }
+      });
       setTimeInput('');
     }
   };
 
-  const addTimeSlot = () => {
-    if (selectedAvailabilityDate && timeInput) {
-      const dateStr = selectedAvailabilityDate.toISOString().split('T')[0];
-      const newAvailability = { ...formData.availability };
+  const selectWeekdays = () => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const weekdays = [];
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const dayOfWeek = date.getDay();
+      // Sunday (0) to Thursday (4)
+      if (date >= today && dayOfWeek >= 0 && dayOfWeek <= 4) {
+        weekdays.push(date);
+      }
+    }
+    setSelectedAvailabilityDates(weekdays);
+  };
+
+  const selectWeekends = () => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const weekends = [];
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const dayOfWeek = date.getDay();
+      // Thursday (4) to Saturday (6)
+      if (date >= today && dayOfWeek >= 4 && dayOfWeek <= 6) {
+        weekends.push(date);
+      }
+    }
+    setSelectedAvailabilityDates(weekends);
+  };
+
+  const clearSelection = () => {
+    setSelectedAvailabilityDates([]);
+  };
+
+  const standardTimeSlots = [
+    '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', 
+    '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'
+  ];
+
+  const toggleTimeSlot = (time) => {
+    if (selectedAvailabilityDates.length === 0) return;
+
+    const newAvailability = { ...formData.availability };
+    
+    // Check if all selected dates already have this time
+    const allHaveIt = selectedAvailabilityDates.every(date => {
+      const dateStr = date.toISOString().split('T')[0];
+      return newAvailability[dateStr]?.includes(time);
+    });
+
+    selectedAvailabilityDates.forEach(date => {
+      const dateStr = date.toISOString().split('T')[0];
       if (!newAvailability[dateStr]) {
         newAvailability[dateStr] = [];
       }
-      if (!newAvailability[dateStr].includes(timeInput)) {
-        newAvailability[dateStr].push(timeInput);
-        newAvailability[dateStr].sort();
-        setFormData(prev => ({ ...prev, availability: newAvailability }));
+
+      if (allHaveIt) {
+        // Remove it from all if all had it
+        newAvailability[dateStr] = newAvailability[dateStr].filter(t => t !== time);
+        if (newAvailability[dateStr].length === 0) delete newAvailability[dateStr];
+      } else {
+        // Add it to all if at least one was missing it
+        if (!newAvailability[dateStr].includes(time)) {
+          newAvailability[dateStr].push(time);
+          newAvailability[dateStr].sort();
+        }
       }
+    });
+
+    setFormData(prev => ({ ...prev, availability: newAvailability }));
+  };
+
+  const clearAllTimesForSelected = () => {
+    if (selectedAvailabilityDates.length === 0) return;
+    const newAvailability = { ...formData.availability };
+    selectedAvailabilityDates.forEach(date => {
+      const dateStr = date.toISOString().split('T')[0];
+      delete newAvailability[dateStr];
+    });
+    setFormData(prev => ({ ...prev, availability: newAvailability }));
+    toast.info(t('timesClearedForSelected', { count: selectedAvailabilityDates.length }));
+  };
+
+  const addTimeSlot = () => {
+    if (selectedAvailabilityDates.length > 0 && timeInput) {
+      const newAvailability = { ...formData.availability };
+      
+      selectedAvailabilityDates.forEach(date => {
+        const dateStr = date.toISOString().split('T')[0];
+        if (!newAvailability[dateStr]) {
+          newAvailability[dateStr] = [];
+        }
+        if (!newAvailability[dateStr].includes(timeInput)) {
+          newAvailability[dateStr].push(timeInput);
+          newAvailability[dateStr].sort();
+        }
+      });
+      
+      setFormData(prev => ({ ...prev, availability: newAvailability }));
       setTimeInput('');
+      toast.success(t('timeSlotAddedToSelected', { count: selectedAvailabilityDates.length }));
     }
   };
 
@@ -389,7 +495,7 @@ const AddService = () => {
       for (let pair of data.entries()) {
         console.log(pair[0]+ ', ' + pair[1]); 
       }
-      const response = await axios.post('/api/services', data, {
+      const response = await api.post('/services', data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -426,7 +532,7 @@ const AddService = () => {
     for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day);
         const dateStr = date.toISOString().split('T')[0];
-        const isSelected = selectedAvailabilityDate && selectedAvailabilityDate.toDateString() === date.toDateString();
+        const isSelected = selectedAvailabilityDates.some(d => d.toDateString() === date.toDateString());
         const hasAvailability = formData.availability[dateStr] && formData.availability[dateStr].length > 0;
         const isPast = date < today;
 
@@ -444,9 +550,18 @@ const AddService = () => {
     return (
         <div className="availability-calendar">
             <div className="calendar-navigation">
-                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}></button>
+                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))} aria-label="Previous Month">
+                    <FaChevronLeft />
+                </button>
                 <h3>{currentMonth.toLocaleString(t('locale'), { month: 'long', year: 'numeric' })}</h3>
-                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}></button>
+                <button type="button" onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))} aria-label="Next Month">
+                    <FaChevronRight />
+                </button>
+            </div>
+            <div className="quick-select-buttons">
+                <button type="button" onClick={selectWeekdays}>{t('weekdays')}</button>
+                <button type="button" onClick={selectWeekends}>{t('weekends')}</button>
+                <button type="button" onClick={clearSelection}>{t('clear')}</button>
             </div>
             <div className="calendar-grid">
                 <div className="calendar-header">{t('sun')}</div>
@@ -463,29 +578,88 @@ const AddService = () => {
   };
   
   const renderAvailabilityManager = () => {
-    const selectedDateStr = selectedAvailabilityDate ? selectedAvailabilityDate.toISOString().split('T')[0] : null;
+    const isSingleSelection = selectedAvailabilityDates.length === 1;
+    const selectedDateStr = isSingleSelection ? selectedAvailabilityDates[0].toISOString().split('T')[0] : null;
+    
+    const getSlotStatus = (time) => {
+      const presentIn = selectedAvailabilityDates.filter(date => {
+        const dateStr = date.toISOString().split('T')[0];
+        return formData.availability[dateStr]?.includes(time);
+      });
+      if (presentIn.length === 0) return 'none';
+      if (presentIn.length === selectedAvailabilityDates.length) return 'all';
+      return 'some';
+    };
+
     return (
         <div className="availability-manager">
             {renderAvailabilityCalendar()}
-            {selectedAvailabilityDate && (
+            {selectedAvailabilityDates.length > 0 && (
                 <div className="time-slots-manager">
-                    <h4>{t('availableTimesFor', { date: selectedDateStr })}</h4>
-                    <div className="time-slots-list">
-                        {formData.availability[selectedDateStr] && formData.availability[selectedDateStr].map(time => (
-                            <div key={time} className="time-slot-chip">
-                                {time}
-                                <button type="button" onClick={() => removeTimeSlot(selectedDateStr, time)}>&times;</button>
+                    <div className="manager-header">
+                        <h4>
+                            {isSingleSelection 
+                                ? t('availableTimesFor', { date: selectedDateStr }) 
+                                : t('addingTimesForDates', { count: selectedAvailabilityDates.length })}
+                        </h4>
+                        {!isSingleSelection && (
+                            <button type="button" className="clear-times-btn" onClick={clearAllTimesForSelected}>
+                                {t('clearAllTimes')}
+                            </button>
+                        )}
+                    </div>
+                    
+                    <div className="selection-summary-container">
+                        <p className="selection-summary">
+                            {selectedAvailabilityDates.map(d => d.getDate()).sort((a,b) => a-b).join(', ')} {currentMonth.toLocaleString('default', { month: 'short' })}
+                        </p>
+                    </div>
+
+                    <div className="time-slots-grid">
+                        {standardTimeSlots.map(time => {
+                            const status = getSlotStatus(time);
+                            return (
+                                <button 
+                                    key={time} 
+                                    type="button" 
+                                    className={`time-grid-slot ${status}`}
+                                    onClick={() => toggleTimeSlot(time)}
+                                >
+                                    {time}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    <div className="custom-time-add">
+                        <label>{t('addCustomTime')}:</label>
+                        <div className="add-time-slot">
+                            <input
+                                type="time"
+                                value={timeInput}
+                                onChange={(e) => setTimeInput(e.target.value)}
+                            />
+                            <button type="button" onClick={addTimeSlot}>{t('addTime')}</button>
+                        </div>
+                    </div>
+
+                    {isSingleSelection && (
+                        <div className="current-slots-summary">
+                            <h5>{t('currentSlots')}:</h5>
+                            <div className="time-slots-list">
+                                {formData.availability[selectedDateStr] && formData.availability[selectedDateStr].length > 0 ? (
+                                    formData.availability[selectedDateStr].map(time => (
+                                        <div key={time} className="time-slot-chip">
+                                            {time}
+                                            <button type="button" onClick={() => removeTimeSlot(selectedDateStr, time)}>&times;</button>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <span className="no-slots-msg">{t('noSlotsSet')}</span>
+                                )}
                             </div>
-                        ))}
-                    </div>
-                    <div className="add-time-slot">
-                        <input
-                            type="time"
-                            value={timeInput}
-                            onChange={(e) => setTimeInput(e.target.value)}
-                        />
-                        <button type="button" onClick={addTimeSlot}>{t('addTime')}</button>
-                    </div>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
@@ -510,6 +684,9 @@ const AddService = () => {
     );
   }
 
+  const adLimits = { 'Standard': 1, 'Pro': 3, 'Pro Plus': Infinity };
+  const limit = adLimits[currentPlan] || 1;
+
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
@@ -521,6 +698,14 @@ const AddService = () => {
             <ServicePreview service={formData} mainImageIndex={mainImageIndex} />
         </div>
         <div className="add-service-form-column">
+            <div className="subscription-banner">
+                <FaInfoCircle />
+                <span>
+                    {currentPlan} {t('plan')}: {limit === Infinity 
+                        ? t('unlimitedAds') 
+                        : t('slotsUsed', { count: serviceCount, total: limit })}
+                </span>
+            </div>
             <form onSubmit={handleSubmit} className="add-service-form">
 <div className="form-group">
     <label htmlFor="name">{t('serviceNameLabel')}</label>

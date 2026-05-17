@@ -383,8 +383,19 @@
 .calendar-navigation button {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   cursor: pointer;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.calendar-navigation button:hover {
+  background-color: var(--secondary-color);
   color: var(--primary-color);
 }
 

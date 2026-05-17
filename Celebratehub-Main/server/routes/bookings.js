@@ -274,7 +274,7 @@ router.get("/provider/:providerId", async (req, res) => {
 // UPDATE BOOKING STATUS
 router.patch("/:id/status", async (req, res) => {
   try {
-    const { status, reason } = req.body;
+    const { status, reason } = req.body || {};
     const booking = await Booking.findById(req.params.id);
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });

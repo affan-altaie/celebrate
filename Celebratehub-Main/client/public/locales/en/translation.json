@@ -628,5 +628,19 @@
     "confirmWalletPayment": "Are you sure you want to use your wallet credits to pay for this subscription?",
     "latestServices": "latest services",
     "verifyYourEmail": "verify Your Email",
-    "otpVerificationSuccess": "otp Verification Success"
+    "otpVerificationSuccess": "otp Verification Success",
+    "subscriptionUsage": "Subscription Usage",
+    "slotsUsed": "{{count}} of {{total}} slots used",
+    "unlimited": "Unlimited",
+    "manageSubscription": "Manage Subscription",
+    "weekdays": "Weekdays",
+    "weekends": "Weekends",
+    "clear": "Clear",
+    "addingTimesForDates": "Adding times for {{count}} selected dates",
+    "timeSlotAddedToSelected": "Time slot added to {{count}} selected dates",
+    "clearAllTimes": "Clear All Times",
+    "addCustomTime": "Add Custom Time",
+    "currentSlots": "Current Slots",
+    "noSlotsSet": "No slots set for this day",
+    "timesClearedForSelected": "Cleared all times for {{count}} dates"
 }

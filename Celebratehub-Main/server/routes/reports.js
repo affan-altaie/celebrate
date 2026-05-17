@@ -76,7 +76,7 @@ router.patch("/:id/status", isAuthenticated, async (req, res) => {
       return res.status(403).json({ message: "Access denied. Admins only." });
     }
 
-    const { status } = req.body;
+    const { status } = req.body || {};
     if (!['pending', 'reviewed', 'resolved'].includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }

@@ -9,7 +9,12 @@ const ReportSchema = new mongoose.Schema({
   service: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Service',
-    required: true,
+    required: false,
+  },
+  type: {
+    type: String,
+    enum: ['report', 'support'],
+    default: 'report',
   },
   reason: {
     type: String,

@@ -9,17 +9,18 @@ const sendEmail = require("../utils/email");
 // @access  Private (Customer)
 router.post("/", isAuthenticated, async (req, res) => {
   try {
-    const { serviceId, reason, description } = req.body;
+    const { serviceId, reason, description, type = 'report' } = req.body;
     const userId = req.user.id;
     const userEmail = req.user.email;
 
-    if (!serviceId || !reason || !description) {
+    if ((type === 'report' && !serviceId) || !reason || !description) {
       return res.status(400).json({ message: "Please provide all required fields" });
     }
 
     const newReport = new Report({
       user: userId,
-      service: serviceId,
+      service: serviceId || null,
+      type,
       reason,
       description,
     });
@@ -56,7 +57,7 @@ router.get("/", isAuthenticated, async (req, res) => {
     }
 
     const reports = await Report.find()
-      .populate("user", "username email")
+      .populate("user", "username email subscriptionTier")
       .populate("service", "name")
       .sort({ createdAt: -1 });
       

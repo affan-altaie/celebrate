@@ -459,6 +459,41 @@
     line-height: 1.6;
     word-break: break-word;
   }
+
+  /* Tier Mini Badges */
+  .tier-badge-mini {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    margin-left: 8px;
+    text-transform: uppercase;
+  }
+
+  .tier-pro {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .tier-pro-plus {
+    background-color: #28a745;
+    color: white;
+  }
+
+  .support-type-tag {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid #ced4da;
+  }
+
+  .support-row {
+    background-color: rgba(0, 123, 255, 0.03);
+  }
   
 [data-theme='dark'] .user-section-card {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
@@ -482,4 +517,14 @@
 
 [data-theme='dark'] .btn-submit {
     color: var(--button-text-color);
+}
+
+[data-theme='dark'] .support-row {
+  background-color: rgba(0, 123, 255, 0.07);
+}
+
+[data-theme='dark'] .support-type-tag {
+  background-color: #343a40;
+  color: #e9ecef;
+  border-color: #495057;
 }

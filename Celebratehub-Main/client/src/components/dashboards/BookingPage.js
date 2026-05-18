@@ -182,8 +182,28 @@ const BookingPage = () => {
     e.preventDefault();
     setFormSubmitted(true);
     
-    if (!formData.location || !formData.phone || !formData.email) {
-      toast.error(t("fillAllFields"));
+    if (!formData.location) {
+      toast.error(t("bookingLocationRequired"));
+      return;
+    }
+
+    if (!formData.phone) {
+      toast.error(t("phoneRequired"));
+      return;
+    }
+
+    if (!formData.email) {
+      toast.error(t("emailRequired"));
+      return;
+    }
+
+    if (service.pricePerHour && (!hours || hours < 1)) {
+      toast.error(t("hoursRequired"));
+      return;
+    }
+
+    if (service.pricePerPerson && (!numberOfPersons || numberOfPersons < 1)) {
+      toast.error(t("personsRequired"));
       return;
     }
 
@@ -209,12 +229,24 @@ const BookingPage = () => {
 
     if (useSavedCard) {
         if (!formData.cvc) {
-            toast.error(t("fillAllFields"));
+            toast.error(t("cvvRequired"));
             return;
         }
     } else {
-        if (!formData.cardHolderName || !formData.cardNumber || !formData.expiryDate || !formData.cvc) {
-            toast.error(t("fillAllFields"));
+        if (!formData.cardHolderName) {
+            toast.error(t("cardHolderNameRequired"));
+            return;
+        }
+        if (!formData.cardNumber) {
+            toast.error(t("cardNumberRequired"));
+            return;
+        }
+        if (!formData.expiryDate) {
+            toast.error(t("expiryDateRequired"));
+            return;
+        }
+        if (!formData.cvc) {
+            toast.error(t("cvvRequired"));
             return;
         }
         // Run validation only if using a new card

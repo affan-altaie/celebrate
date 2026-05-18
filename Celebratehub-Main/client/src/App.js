@@ -35,6 +35,7 @@ import Subscriptions from './components/dashboards/Subscriptions';
 import AddService from './components/dashboards/AddService';
 import LeaveReview from './components/dashboards/LeaveReview';
 import ReportService from './components/dashboards/ReportService';
+import ContactSupport from './components/dashboards/ContactSupport';
 import BookingPage from './components/dashboards/BookingPage';
 import BookingManagement from './components/dashboards/BookingManagement';
 import BookingConfirmation from './components/dashboards/BookingConfirmation';
@@ -101,6 +102,7 @@ const AppContent = () => {
         <Route path="/booking-history" element={<ProtectedRoute allowedRoles={['customer']}><BookingHistory /></ProtectedRoute>} />
         <Route path="/leave-review/:bookingId" element={<ProtectedRoute allowedRoles={['customer']}><LeaveReview /></ProtectedRoute>} />
         <Route path="/report-service/:serviceId" element={<ProtectedRoute allowedRoles={['customer']}><ReportService /></ProtectedRoute>} />
+        <Route path="/contact-support" element={<ProtectedRoute allowedRoles={['customer', 'provider']}><ContactSupport /></ProtectedRoute>} />
         <Route path="/new-booking" element={<ProtectedRoute allowedRoles={['customer']}><NewBooking /></ProtectedRoute>} />
         <Route path="/services" element={<ProtectedRoute allowedRoles={['customer', 'provider', 'admin']}><ServicesList /></ProtectedRoute>} />
         <Route path="/services/provider/:providerId" element={<ProtectedRoute allowedRoles={['customer', 'provider', 'admin']}><ServicesList /></ProtectedRoute>} />

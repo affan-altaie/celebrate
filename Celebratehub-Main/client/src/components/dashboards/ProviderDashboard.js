@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { FaCheck, FaCrown, FaStar, FaRocket, FaChartLine } from 'react-icons/fa';
+import { FaCheck, FaCrown, FaStar, FaRocket, FaChartLine, FaHeadset } from 'react-icons/fa';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 import './Dashboard.css';
@@ -141,6 +141,20 @@ const ProviderDashboard = () => {
           )}
           <button onClick={handleSubscriptionAction} className="action-btn">
             {user?.subscriptionTier === 'Pro Plus' ? t('viewPerks') : t('upgrade')}
+          </button>
+        </div>
+        <div className="dashboard-card support-card">
+          <h3>{t('support', 'Support')}</h3>
+          <p>
+            {user?.subscriptionTier === 'Pro Plus' ? t('premiumSupportDesc', 'Get help anytime with 24/7 premium support.') : 
+             user?.subscriptionTier === 'Pro' ? t('prioritySupportDesc', 'Your inquiries will be handled with high priority.') : 
+             t('basicSupportDesc', 'Contact our support team for any assistance.')}
+          </p>
+          <button onClick={() => navigate('/contact-support')} className="action-btn secondary-btn" style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+            <FaHeadset />
+            {user?.subscriptionTier === 'Pro Plus' ? t('premiumSupport', 'Premium Support') : 
+             user?.subscriptionTier === 'Pro' ? t('prioritySupport', 'Priority Support') : 
+             t('contactSupport', 'Contact Support')}
           </button>
         </div>
 

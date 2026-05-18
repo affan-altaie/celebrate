@@ -4,6 +4,12 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import './Admin.css';
 
+// Helper to convert hyphen-case reasons to camelCase translation keys
+const getTranslationKey = (reason) => {
+  if (!reason) return '';
+  return reason.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+};
+
 const ReportsAndFeedback = () => {
   const { t } = useTranslation();
   const [reports, setReports] = useState([]);
@@ -14,7 +20,7 @@ const ReportsAndFeedback = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [reasonFilter, setReasonFilter] = useState('all');
-  const [sortOrder, setSortOrder] = useState('newest');
+  const [sortOrder, setSortOrder] = useState('priority');
   const [selectedReport, setSelectedReport] = useState(null);
 
   const fetchReports = useCallback(async () => {
@@ -45,10 +51,14 @@ const ReportsAndFeedback = () => {
 
   const filteredReports = useMemo(() => {
     let result = reports.filter(report => {
+      const serviceName = report.type === 'support' ? t('generalSupport', 'General Support') : (report.service?.name || '');
+      
       const matchesSearch = 
         (report.user?.username || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (report.service?.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (report.description || '').toLowerCase().includes(searchTerm.toLowerCase());
+        serviceName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (report.description || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (report.type || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        t(getTranslationKey(report.reason), report.reason).toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === 'all' || report.status === statusFilter;
       const matchesReason = reasonFilter === 'all' || report.reason === reasonFilter;
@@ -56,14 +66,23 @@ const ReportsAndFeedback = () => {
       return matchesSearch && matchesStatus && matchesReason;
     });
 
+    const tierRank = { 'Pro Plus': 2, 'Pro': 1, 'Standard': 0 };
+
     result.sort((a, b) => {
+      if (sortOrder === 'priority') {
+        const rankA = tierRank[a.user?.subscriptionTier] || 0;
+        const rankB = tierRank[b.user?.subscriptionTier] || 0;
+        if (rankA !== rankB) return rankB - rankA;
+        // If same rank, sort by newest
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      }
       const dateA = new Date(a.createdAt);
       const dateB = new Date(b.createdAt);
       return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
     });
 
     return result;
-  }, [reports, searchTerm, statusFilter, reasonFilter, sortOrder]);
+  }, [reports, searchTerm, statusFilter, reasonFilter, sortOrder, t]);
 
   const truncateText = (text, maxLength = 80) => {
     if (!text || text.length <= maxLength) return text;
@@ -129,7 +148,7 @@ const ReportsAndFeedback = () => {
           >
             <option value="all">{t('allReasons')}</option>
             {uniqueReasons.map(reason => (
-              <option key={reason} value={reason}>{t(reason)}</option>
+              <option key={reason} value={reason}>{t(getTranslationKey(reason), reason)}</option>
             ))}
           </select>
         </div>
@@ -141,6 +160,7 @@ const ReportsAndFeedback = () => {
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
           >
+            <option value="priority">{t('priority', 'Priority')}</option>
             <option value="newest">{t('newest')}</option>
             <option value="oldest">{t('oldest')}</option>
           </select>
@@ -164,10 +184,24 @@ const ReportsAndFeedback = () => {
             <tbody>
               {filteredReports.length > 0 ? (
                 filteredReports.map((report) => (
-                  <tr key={report._id}>
-                    <td>{report.user?.username || t('N/A')}<br/><small>({report.user?.email})</small></td>
-                    <td>{report.service?.name || t('N/A')}</td>
-                    <td>{t(report.reason)}</td>
+                  <tr key={report._id} className={report.type === 'support' ? 'support-row' : ''}>
+                    <td>
+                      {report.user?.username || t('N/A')}
+                      {report.user?.subscriptionTier && report.user.subscriptionTier !== 'Standard' && (
+                        <span className={`tier-badge-mini tier-${report.user.subscriptionTier.toLowerCase().replace(/\s+/g, '-')}`}>
+                          {report.user.subscriptionTier}
+                        </span>
+                      )}
+                      <br/><small>({report.user?.email})</small>
+                    </td>
+                    <td>
+                      {report.type === 'support' ? (
+                        t('generalSupport', 'General Support')
+                      ) : (
+                        report.service?.name || t('N/A')
+                      )}
+                    </td>
+                    <td>{t(getTranslationKey(report.reason), report.reason)}</td>
                     <td>
                       {truncateText(report.description)}
                       {report.description.length > 80 && (
@@ -251,12 +285,14 @@ const ReportsAndFeedback = () => {
 
             <div className="detail-row">
               <span className="detail-label">{t('serviceName')}</span>
-              <div className="detail-value">{selectedReport.service?.name}</div>
+              <div className="detail-value">
+                {selectedReport.type === 'support' ? t('generalSupport', 'General Support') : (selectedReport.service?.name || t('N/A'))}
+              </div>
             </div>
 
             <div className="detail-row">
               <span className="detail-label">{t('reasonForReport')}</span>
-              <div className="detail-value">{t(selectedReport.reason)}</div>
+              <div className="detail-value">{t(getTranslationKey(selectedReport.reason), selectedReport.reason)}</div>
             </div>
 
             <div className="detail-row">

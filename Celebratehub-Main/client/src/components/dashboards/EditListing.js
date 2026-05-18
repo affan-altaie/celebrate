@@ -662,11 +662,11 @@ const EditListing = () => {
               </div>
                 <div className="form-group">
                     <label htmlFor="pricePerHour">{t('pricePerHour')}</label>
-                    <input id="pricePerHour" type="text" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} placeholder="OMR 20 / hour" />
+                    <input id="pricePerHour" type="number" name="pricePerHour" value={formData.pricePerHour} onChange={handleChange} min="0" step="0.01" placeholder="20" />
                 </div>
                 <div className="form-group">
                     <label htmlFor="pricePerPerson">{t('pricePerPerson')}</label>
-                    <input id="pricePerPerson" type="text" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} placeholder="OMR 2 / person" />
+                    <input id="pricePerPerson" type="number" name="pricePerPerson" value={formData.pricePerPerson} onChange={handleChange} min="0" step="0.01" placeholder="2" />
                 </div>
               <div className="form-group">
                   <label htmlFor="description">{t('descriptionLabel')}</label>

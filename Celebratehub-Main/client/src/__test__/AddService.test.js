@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../i18n'; // Import your i18n instance
 import AddService from '../components/dashboards/AddService';
-import axios from 'axios';
+import api from '../api';
 
 // Mock react-router-dom
 const mockedNavigate = jest.fn();
@@ -11,26 +11,10 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockedNavigate,
 }));
 
-// Mock axios
-jest.mock('axios', () => ({
-  create: jest.fn(() => ({
-    get: jest.fn(),
-    post: jest.fn(),
-    put: jest.fn(),
-    delete: jest.fn(),
-    interceptors: {
-      request: {
-        use: jest.fn(),
-      },
-      response: {
-        use: jest.fn(),
-      },
-    },
-  })),
-  get: jest.fn(),
+// Mock api
+jest.mock('../api', () => ({
   post: jest.fn(),
-  put: jest.fn(),
-  delete: jest.fn(),
+  get: jest.fn(),
 }));
 
 // Mock react-toastify
@@ -56,8 +40,8 @@ describe('AddService Component', () => {
     // Mock localStorage
     const user = { email: 'test@example.com' };
     localStorage.setItem('user', JSON.stringify(user));
-    // Mock axios post for all tests in this suite
-    axios.post.mockResolvedValue({ data: {} });
+    // Mock api post for all tests in this suite
+    api.post.mockResolvedValue({ data: {} });
   });
 
   afterEach(() => {
@@ -71,23 +55,23 @@ describe('AddService Component', () => {
     expect(screen.getByLabelText(/categoryLabel/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/locationLabel/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/pricePerHour/i)).toBeInTheDocument();
-    // pricePerPerson is conditionally rendered, so we only expect pricePerHour initially
-    expect(screen.queryByLabelText(/pricePerPerson/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/pricePerPerson/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/descriptionLabel/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/featuresLabel/i)).toBeInTheDocument();
     expect(screen.getByText(/addServiceBtn/i)).toBeInTheDocument();
   });
 
   test('submits form successfully', async () => {
-    axios.post.mockResolvedValue({ data: {} });
+    api.post.mockResolvedValue({ data: {} });
 
     renderComponent();
 
     fireEvent.change(screen.getByLabelText(/serviceNameLabel/i), { target: { value: 'Test Service' } });
     fireEvent.change(screen.getByLabelText(/categoryLabel/i), { target: { value: 'catering' } });
-    fireEvent.change(screen.getByLabelText(/locationLabel/i), { target: { value: 'Test Location' } });
+    // Location is a select, but we use fireEvent.change
+    fireEvent.change(screen.getByLabelText(/locationLabel/i), { target: { value: 'Barka' } });
     fireEvent.change(screen.getByLabelText(/pricePerHour/i), { target: { value: '10' } });
-    // pricePerPerson is not visible by default, so we don't interact with it here
+    fireEvent.change(screen.getByLabelText(/pricePerPerson/i), { target: { value: '5' } });
     fireEvent.change(screen.getByLabelText(/descriptionLabel/i), { target: { value: 'Test Description' } });
     fireEvent.change(screen.getByLabelText(/featuresLabel/i), { target: { value: 'Feature 1, Feature 2' } });
 
@@ -104,7 +88,7 @@ describe('AddService Component', () => {
     fireEvent.click(screen.getByText(/addServiceBtn/i));
 
     await waitFor(() => {
-      expect(axios.post).toHaveBeenCalledTimes(1);
+      expect(api.post).toHaveBeenCalledTimes(1);
       expect(mockedNavigate).toHaveBeenCalledWith('/manage-listings');
     });
   });

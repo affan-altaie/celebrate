@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaCalendarAlt, FaStar, FaUserFriends, FaCheckCircle, FaClock, FaCreditCard, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaCalendarAlt, FaStar, FaUserFriends, FaCheckCircle, FaClock, FaCreditCard, FaChevronLeft, FaChevronRight, FaTag } from 'react-icons/fa';
 import './BookingPage.css';
 
 const BookingPage = () => {
@@ -343,14 +343,42 @@ const BookingPage = () => {
       <button onClick={() => navigate(-1)} className="back-button">{t('backToServiceDetails')}</button>
       <div className="booking-page-container">
         <div className="booking-details-column">
-            <img src={service.images[service.mainImageIndex]} alt={service.name} className="service-image" />
-            <h2>{service.name}</h2>
-            <div className="service-meta"><span><FaStar /> {averageRating}</span> <span><FaUserFriends /> {t('reviewsCount', { count: service.reviews ? service.reviews.length : 0 })}</span></div>
-            <p className="service-info"><FaMapMarkerAlt /> {service.location}</p>
-            {service.pricePerHour && <p className="service-info">OMR {service.pricePerHour} / hour</p>}
-            {service.pricePerPerson && <p className="service-info">OMR {service.pricePerPerson} / {t('personLabel')}</p>}
-            <p className="service-description">{service.description}</p>
-            <div className="service-features"><h3>{t('features')}</h3><ul>{service.features.map((feature, index) => <li key={index}><FaCheckCircle /> {feature}</li>)}</ul></div>
+          <img src={service.images[service.mainImageIndex]} alt={service.name} className="service-image" />
+          <h2>{service.name}</h2>
+          <div className="service-meta">
+            <span><FaStar style={{ color: '#ffc107' }} /> {averageRating}</span>
+            <span><FaUserFriends /> {t('reviewsCount', { count: service.reviews ? service.reviews.length : 0 })}</span>
+          </div>
+
+          <div className="service-info-container">
+            <div className="service-info">
+              <FaMapMarkerAlt />
+              <span>{service.location}</span>
+            </div>
+            {service.pricePerHour && (
+              <div className="service-info">
+                <FaClock />
+                <span>OMR {service.pricePerHour} / {t('hour')}</span>
+              </div>
+            )}
+            {service.pricePerPerson && (
+              <div className="service-info">
+                <FaTag />
+                <span>OMR {service.pricePerPerson} / {t('personLabel')}</span>
+              </div>
+            )}
+          </div>
+
+          <p className="service-description">{service.description}</p>
+
+          <div className="service-features">
+            <h3>{t('features')}</h3>
+            <ul>
+              {service.features.map((feature, index) => (
+                <li key={index}><FaCheckCircle style={{ color: 'var(--primary-color)' }} /> {feature}</li>
+              ))}
+            </ul>
+          </div>
         </div>
         <div className="booking-form-column">
           <h2>{t('bookThisService')}</h2>
@@ -360,7 +388,7 @@ const BookingPage = () => {
             <div className="form-group"><label><FaEnvelope /> {t('emailAddress')}</label><input type="email" name="email" value={formData.email} onChange={handleChange} placeholder={t('emailAddressPlaceholder')} required /></div>
             {service.pricePerHour && <div className="form-group"><label><FaClock /> {t('numberOfHours')}</label><input type="number" name="hours" value={hours} onChange={(e) => setHours(e.target.value)} min="1" required /></div>}
             {service.pricePerPerson && <div className="form-group"><label><FaUserFriends /> {t('numberOfPersons')}</label><input type="number" name="persons" value={numberOfPersons} onChange={(e) => setNumberOfPersons(e.target.value)} min="1" required /></div>}
-            {totalPrice > 0 && <div className="form-group"><label>{t('totalPrice')}</label><p className="total-price">OMR {totalPrice.toFixed(2)}</p></div>}
+            {totalPrice > 0 && <div className="form-group"><label><FaTag /> {t('totalPrice')}</label><p className="total-price">OMR {totalPrice.toFixed(2)}</p></div>}
             <div className={`form-group ${formSubmitted && !selectedDate ? 'validation-error' : ''}`}>
               <label><FaCalendarAlt /> {t('selectAvailableDate')}</label>
               {renderCalendar()}
@@ -368,7 +396,7 @@ const BookingPage = () => {
             </div>
             {selectedDate && (
               <div className={`form-group ${formSubmitted && !selectedTime ? 'validation-error' : ''}`}>
-                <label>{t('selectAvailableTime', { date: selectedDate })}</label>
+                <label><FaClock /> {t('selectAvailableTime', { date: selectedDate })}</label>
                 <div className="time-slots-container">
                   {service.availability[selectedDate]?.map((time, index) => (
                     <button 

@@ -46,6 +46,7 @@ describe('Register Component', () => {
     fireEvent.change(screen.getByLabelText(/phoneNumber/i), { target: { value: '91234567' } });
     fireEvent.change(screen.getByLabelText(/^password/i), { target: { value: 'Abcdef1!' } });
     fireEvent.change(screen.getByLabelText(/confirmPassword/i), { target: { value: 'Abcdef1!' } });
+    fireEvent.click(screen.getByLabelText(/iAgreeToThe/i));
 
     fireEvent.click(screen.getByRole('button', { name: /createAccount/i }));
 
@@ -74,6 +75,7 @@ describe('Register Component', () => {
     fireEvent.change(screen.getByLabelText(/phoneNumber/i), { target: { value: '91234567' } });
     fireEvent.change(screen.getByLabelText(/^password/i), { target: { value: 'Abcdef1!' } });
     fireEvent.change(screen.getByLabelText(/confirmPassword/i), { target: { value: 'Abcdef1!' } });
+    fireEvent.click(screen.getByLabelText(/iAgreeToThe/i));
     fireEvent.click(screen.getByRole('button', { name: /createAccount/i }));
 
     await waitFor(() => {

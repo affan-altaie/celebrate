@@ -33,42 +33,72 @@
 
 .booking-details-column, .booking-form-column {
   background-color: var(--card-background);
-  padding: 2rem;
+  padding: 2.5rem;
   border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   width: 50%;
   color: var(--text-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.booking-details-column:hover, .booking-form-column:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
 }
 
 .service-image {
   width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin-bottom: 1rem;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .booking-details-column h2 {
   font-size: 1.8rem;
   margin-bottom: 1rem;
   color: var(--text-color);
+  text-align: left;
+}
+
+.service-info-container {
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
 }
 
 .service-info {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: flex-start;
+  gap: 0.75rem;
   font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   color: var(--text-color);
-  opacity: 0.8;
+  opacity: 0.9;
+  text-align: left;
+  width: 100%;
+}
+
+.service-info svg {
+  color: var(--primary-color);
+  width: 18px;
+  min-width: 18px;
+  text-align: center;
 }
 
 .service-meta {
   display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
   color: var(--text-color);
-  opacity: 0.7;
+  opacity: 0.8;
+  width: 100%;
 }
 
 .service-meta span {
@@ -82,12 +112,14 @@
   line-height: 1.6;
   color: var(--text-color);
   opacity: 0.8;
+  text-align: left;
 }
 
 .service-features h3 {
   font-size: 1.2rem;
   margin-bottom: 1rem;
   color: var(--text-color);
+  text-align: left;
 }
 
 .service-features ul {
@@ -99,9 +131,11 @@
 .service-features li {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
   color: var(--text-color);
+  text-align: left;
 }
 
 .booking-form-column h2 {
@@ -150,6 +184,14 @@
   background-color: #5847d3;
 }
 
+.total-price {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  padding: 0.5rem 0;
+}
+
 .loading {
   text-align: center;
   padding: 2rem;
@@ -161,7 +203,6 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 0.5rem;
-  margin-top: 1rem;
 }
 
 .calendar-header {
@@ -250,7 +291,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-top: 1rem;
 }
 
 .time-slot-button {
@@ -409,7 +449,12 @@
 
 [data-theme='dark'] .booking-details-column,
 [data-theme='dark'] .booking-form-column {
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] .booking-details-column:hover,
+[data-theme='dark'] .booking-form-column:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
 }
 
 [data-theme='dark'] .calendar-day.available {

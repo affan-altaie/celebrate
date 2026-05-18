@@ -90,11 +90,11 @@ const EditService = () => {
         </div>
         <div className="form-group">
           <label>{t('pricePerHour')}</label>
-          <input type="text" value={pricePerHour} onChange={(e) => setPricePerHour(e.target.value)} />
+          <input type="number" value={pricePerHour} onChange={(e) => setPricePerHour(e.target.value)} min="0" step="0.01" />
         </div>
         <div className="form-group">
           <label>{t('pricePerPerson')}</label>
-          <input type="text" value={pricePerPerson} onChange={(e) => setPricePerPerson(e.target.value)} />
+          <input type="number" value={pricePerPerson} onChange={(e) => setPricePerPerson(e.target.value)} min="0" step="0.01" />
         </div>
         <div className="form-group">
           <label>{t('cancellationPolicy')}</label>

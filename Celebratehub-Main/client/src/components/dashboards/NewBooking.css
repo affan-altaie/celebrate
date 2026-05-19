@@ -608,6 +608,11 @@
   opacity: 0.8;
   line-height: 1.6;
   margin-bottom: 1.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .features-list {

@@ -692,5 +692,10 @@
     "promotionPausedSuccess": "Promotion paused successfully",
     "promotionResumedSuccess": "Promotion resumed successfully",
     "failedToPausePromotion": "Failed to pause promotion",
-    "failedToResumePromotion": "Failed to resume promotion"
+    "failedToResumePromotion": "Failed to resume promotion",
+    "editUsername": "Edit Username",
+    "newUsernameLabel": "New Username",
+    "updateUsername": "Update Username",
+    "usernameUpdated": "Username updated successfully",
+    "usernameUpdateFailed": "Failed to update username"
 }

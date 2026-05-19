@@ -681,5 +681,10 @@
     "promotionPausedSuccess": "تم إيقاف الترقية مؤقتًا بنجاح",
     "promotionResumedSuccess": "تم استئناف الترقية بنجاح",
     "failedToPausePromotion": "فشل إيقاف الترقية مؤقتًا",
-    "failedToResumePromotion": "فشل استئناف الترقية"
+    "failedToResumePromotion": "فشل استئناف الترقية",
+    "editUsername": "تعديل اسم المستخدم",
+    "newUsernameLabel": "اسم المستخدم الجديد",
+    "updateUsername": "تحديث اسم المستخدم",
+    "usernameUpdated": "تم تحديث اسم المستخدم بنجاح",
+    "usernameUpdateFailed": "فشل تحديث اسم المستخدم"
 }

@@ -14,6 +14,8 @@ const CustomerProfile = () => {
   const [user, setUser] = useState(location.state?.user || null);
   const [newPhoneNumber, setNewPhoneNumber] = useState('');
   const [phoneNumberError, setPhoneNumberError] = useState('');
+  const [newUsername, setNewUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
   const [isEditingCard, setIsEditingCard] = useState(false);
   const [originalCardData, setOriginalCardData] = useState(null);
   const [cardData, setCardData] = useState({
@@ -148,6 +150,42 @@ const CustomerProfile = () => {
         toast.success(t('profilePictureUpdated'));
       } else {
         toast.error(data.message || t('imageUploadFailed'));
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(t('genericError'));
+    }
+  };
+
+  const handleUsernameUpdate = async (e) => {
+    e.preventDefault();
+    setUsernameError('');
+
+    if (!newUsername) {
+      setUsernameError("Username is required.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/users/${user.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username: newUsername })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        const updatedUser = { ...user, username: newUsername };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        setUser(updatedUser);
+        toast.success('Username updated successfully');
+        setNewUsername('');
+        setUsernameError('');
+      } else {
+        toast.error(data.message || 'Failed to update username');
       }
     } catch (err) {
       console.error(err);
@@ -373,6 +411,24 @@ const CustomerProfile = () => {
             <p><strong>{t('emailLabel')}:</strong> {user.email}</p>
             <p><strong>{t('phoneLabel')}:</strong> {user.phoneNumber}</p>
           </div>
+
+          <hr />
+
+          <h3 style={{ textAlign: 'center' }}>Edit Username</h3>
+          <form onSubmit={handleUsernameUpdate} style={{ textAlign: 'left', marginBottom: '2rem' }}>
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
+              <label>New Username</label>
+              <input
+                type="text"
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+                required
+                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+              />
+              {usernameError && <div className="error-message">{usernameError}</div>}
+            </div>
+            <button type="submit" className="action-btn">Update Username</button>
+          </form>
 
           <hr />
 

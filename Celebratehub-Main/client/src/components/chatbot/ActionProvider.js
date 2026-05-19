@@ -90,9 +90,8 @@ class ActionProvider {
     this.updateChatbotState(message);
   }
 
-  handleBirthdayPackages() {
-    const message = this.createChatBotMessage(i18n.t('chatbotBirthdayPackages'));
-    this.updateChatbotState(message);
+  handleBirthdayPackages(recommendations = []) {
+    this.handleServiceQuery("birthday", recommendations);
   }
 
   handleFilterLocation() {

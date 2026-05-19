@@ -109,7 +109,7 @@ class MessageParser {
         this.actionProvider.handleLoginIssues();
         break;
       case 'birthday':
-        this.actionProvider.handleBirthdayPackages();
+        this.actionProvider.handleBirthdayPackages(recommendations);
         break;
       case 'approvals':
         this.actionProvider.handlePendingApproval();

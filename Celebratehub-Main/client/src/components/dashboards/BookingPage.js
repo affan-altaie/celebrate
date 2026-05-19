@@ -351,6 +351,9 @@ const BookingPage = () => {
 
   if (!service) return <div className="loading">{t('loading')}</div>;
 
+  const serviceNameOnly = service.name.includes(':') ? service.name.split(': ').slice(1).join(': ') : service.name;
+  const providerName = service.providerId ? service.providerId.username : (service.name.includes(':') ? service.name.split(': ')[0] : '');
+
   const available = isServiceAvailable(service.availability);
 
   const averageRating = service.reviews && service.reviews.length > 0
@@ -376,7 +379,7 @@ const BookingPage = () => {
       <div className="booking-page-container">
         <div className="booking-details-column">
           <img src={service.images[service.mainImageIndex]} alt={service.name} className="service-image" />
-          <h2>{service.name}</h2>
+          <h2>{providerName ? `${providerName}: ${serviceNameOnly}` : serviceNameOnly}</h2>
           <div className="service-meta">
             <span><FaStar style={{ color: '#ffc107' }} /> {averageRating}</span>
             <span><FaUserFriends /> {t('reviewsCount', { count: service.reviews ? service.reviews.length : 0 })}</span>

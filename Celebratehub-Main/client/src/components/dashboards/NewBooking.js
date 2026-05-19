@@ -420,6 +420,8 @@ const handleRemoveFromHistory = (itemToRemove) => {
         <div className="results-grid">
           {topProviders.map((provider, index) => {
             const available = isServiceAvailable(provider.availability);
+            const serviceNameOnly = provider.name.includes(':') ? provider.name.split(': ').slice(1).join(': ') : provider.name;
+            const providerName = provider.providerId ? provider.providerId.username : (provider.name.includes(':') ? provider.name.split(': ')[0] : '');
             return (
               <div key={index} className={`result-card ${!available ? 'unavailable' : ''} ${provider.isFeatured ? 'featured-card' : ''}`} onClick={() => navigate(`/service/${provider._id}`)}>
                 <div className="card-image-container">
@@ -443,7 +445,7 @@ const handleRemoveFromHistory = (itemToRemove) => {
                   }}
                 />
                   <div className="service-tag">{t(provider.category === 'wedding-halls' ? 'weddingHalls' : provider.category)}</div>
-                  <h3>{provider.name}</h3>
+                  <h3>{providerName ? `${providerName}: ${serviceNameOnly}` : serviceNameOnly}</h3>
                   <p className="reviews">{t('reviewsCount', { count: provider.reviewsCount || 0 })}</p>
                 </div>
               </div>
@@ -471,6 +473,8 @@ const handleRemoveFromHistory = (itemToRemove) => {
           <div className="results-grid">
           {searchResults.map((result, index) => {
             const available = isServiceAvailable(result.availability);
+            const serviceNameOnly = result.name.includes(':') ? result.name.split(': ').slice(1).join(': ') : result.name;
+            const providerName = result.providerId ? result.providerId.username : (result.name.includes(':') ? result.name.split(': ')[0] : '');
             return (
               <div key={index} className={`result-card ${!available ? 'unavailable' : ''} ${result.isFeatured ? 'featured-card' : ''}`}>
                 <div className="card-image-container" onClick={() => navigate(`/service/${result._id}`)} style={{ cursor: 'pointer' }}>
@@ -494,7 +498,7 @@ const handleRemoveFromHistory = (itemToRemove) => {
                     }}
                   />
                     <div className="service-tag">{t(result.category === 'wedding-halls' ? 'weddingHalls' : result.category)}</div>
-                    <h3>{result.name}</h3>
+                    <h3>{providerName ? `${providerName}: ${serviceNameOnly}` : serviceNameOnly}</h3>
                     {result.location && <p className="location"><FaMapMarkerAlt className="icon" /> {result.location}</p>}
                     <p className="reviews">{t('reviewsCount', { count: result.reviewsCount || 0 })}</p>
                     <p className="description">{result.description}</p>

@@ -28,7 +28,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="footer-bottom">
-        <p>&copy; 2025 CelebrateHub. {t('allRightsReserved')}</p>
+        <p>&copy; 2026 CelebrateHub. {t('allRightsReserved')}</p>
         <div className="footer-legal">
           <Link to="/about">{t('aboutUs')}</Link>
           <Link to="/terms">{t('termsOfService')}</Link>

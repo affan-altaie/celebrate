@@ -1,3 +1,4 @@
+
 .service-recommendations-container {
   display: flex;
   flex-direction: column;
@@ -67,5 +68,14 @@
 
 .dark .service-recommendation-item:hover {
   background-color: #bb86fc;
+}
+
+.dark .service-name,
+.dark .service-category {
+  color: #121212;
+}
+
+.dark .service-recommendation-item:hover .service-name,
+.dark .service-recommendation-item:hover .service-category {
   color: #121212;
 }
